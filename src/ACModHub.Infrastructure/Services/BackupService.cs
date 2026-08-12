@@ -60,7 +60,8 @@ public sealed class BackupService : IBackupService
     {
         var backups = new List<BackupDescriptor>();
         if (!Directory.Exists(_paths.BackupsDirectory)) return backups;
-        foreach (var file in Directory.EnumerateFiles(_paths.BackupsDirectory, "backup.json", SearchOption.AllDirectories))
+        var descriptorFiles = await Task.Run(() => Directory.EnumerateFiles(_paths.BackupsDirectory, "backup.json", SearchOption.AllDirectories).ToArray(), cancellationToken).ConfigureAwait(false);
+        foreach (var file in descriptorFiles)
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
@@ -73,13 +74,12 @@ public sealed class BackupService : IBackupService
         return backups.OrderByDescending(x => x.CreatedAt).ToArray();
     }
 
-    public Task DeleteAsync(Guid backupId, CancellationToken cancellationToken = default)
+    public Task DeleteAsync(Guid backupId, CancellationToken cancellationToken = default) => Task.Run(() =>
     {
         cancellationToken.ThrowIfCancellationRequested();
         var directory = Path.Combine(_paths.BackupsDirectory, backupId.ToString("N"));
         if (Directory.Exists(directory)) Directory.Delete(directory, true);
-        return Task.CompletedTask;
-    }
+    }, cancellationToken);
 
     private static async Task CopyAsync(string source, string destination, bool overwrite, CancellationToken cancellationToken)
     {

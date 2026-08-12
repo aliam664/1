@@ -49,6 +49,8 @@ public sealed class InstallationJournal
     public Guid ModId { get; init; }
     public required string GamePath { get; init; }
     public required string ArchivePath { get; init; }
+    public TransactionKind Kind { get; init; } = TransactionKind.Install;
+    public ModManifest? PreviousManifest { get; init; }
     public JournalState State { get; set; } = JournalState.InProgress;
     public InstallStage Stage { get; set; } = InstallStage.Analyze;
     public DateTimeOffset StartedAt { get; init; } = DateTimeOffset.UtcNow;

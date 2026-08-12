@@ -133,7 +133,7 @@ The installer follows this pipeline:
 Analyze → Preview → Conflict Check → Backup → Install → Verify → Done
 ```
 
-For each target, it writes a recovery operation to an atomic JSON journal **before** changing the file. Existing files are copied to a backup tree. New content is copied to a temporary sibling and atomically moved into place. Any extraction, I/O, cancellation or hash-verification failure reverses the journal. Incomplete journals are recovered at the next startup.
+For each target, it durably appends a recovery operation to a write-through JSONL journal **before** changing the file; transaction metadata and the previous manifest are stored atomically in JSON. Existing files are copied to a backup tree. New content is copied to a temporary sibling and atomically moved into place. Any extraction, I/O, cancellation or hash-verification failure reverses the journal. Incomplete journals are recovered at the next startup.
 
 Ownership is keyed by normalized game-relative path. Uninstall removes a physical file only after the selected mod is removed from its owner set and no owners remain. Shared files are retained. Disabling a solely owned file moves it into `%AppData%\ACModHub\disabled`; a shared file is not removed from the game.
 

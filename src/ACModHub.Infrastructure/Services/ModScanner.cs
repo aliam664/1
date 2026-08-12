@@ -19,7 +19,7 @@ public sealed class ModScanner : IModScanner
     public async Task<IReadOnlyList<ModManifest>> ScanAsync(string gamePath, bool calculateHashes, IProgress<double>? progress = null, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(gamePath);
-        var candidates = BuildCandidates(gamePath).ToArray();
+        var candidates = await Task.Run(() => BuildCandidates(gamePath).ToArray(), cancellationToken).ConfigureAwait(false);
         var manifests = new List<ModManifest>(candidates.Length);
         for (var index = 0; index < candidates.Length; index++)
         {

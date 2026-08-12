@@ -22,4 +22,26 @@ public sealed class CrashRecoveryTests
         Assert.Equal(1, count);
         Assert.False(File.Exists(target));
     }
+
+    [Fact]
+    public async Task Recovery_RestoresManifestAndOwnershipForInterruptedUninstall()
+    {
+        using var environment = new TestEnvironment();
+        var id = Guid.NewGuid();
+        const string relative = "content/cars/recovery/data.acd";
+        var manifest = new ModManifest { Id = id, Name = "Recovery", Files = [new ModFileRecord { RelativePath = relative, Size = 1, Sha256 = string.Empty }] };
+        manifest.Metadata["gamePath"] = environment.GamePath;
+        var repository = environment.Get<IModRepository>();
+        await repository.SaveAsync(manifest);
+        await repository.SaveOwnershipAsync(new FileOwnershipRecord { RelativePath = relative, ModIds = [id] });
+        var journal = new InstallationJournal { ModId = id, GamePath = environment.GamePath, ArchivePath = "uninstall", Kind = TransactionKind.Uninstall, PreviousManifest = manifest };
+        await environment.Get<IJournalStore>().SaveAsync(journal);
+        await repository.DeleteOwnershipAsync(relative);
+        await repository.DeleteAsync(id);
+
+        await environment.Get<ICrashRecoveryService>().RecoverAsync();
+
+        Assert.NotNull(await repository.GetAsync(id));
+        Assert.Contains(id, (await repository.GetOwnershipAsync(relative))!.ModIds);
+    }
 }

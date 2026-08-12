@@ -96,6 +96,8 @@ public sealed class JsonJournalStore : IJournalStore
         ModId = source.ModId,
         GamePath = source.GamePath,
         ArchivePath = source.ArchivePath,
+        Kind = source.Kind,
+        PreviousManifest = source.PreviousManifest,
         State = source.State,
         Stage = source.Stage,
         StartedAt = source.StartedAt,

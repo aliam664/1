@@ -176,7 +176,7 @@ public sealed class TransactionalModInstaller : IModInstaller
                 .Select(file => file.RelativePath)
                 .ToArray();
             var backup = await _backups.CreateAsync(modId, gamePath, soleOwned, cancellationToken).ConfigureAwait(false);
-            var journal = new InstallationJournal { ModId = modId, GamePath = gamePath, ArchivePath = manifest.SourceArchivePath ?? "uninstall", Stage = InstallStage.Install };
+            var journal = new InstallationJournal { ModId = modId, GamePath = gamePath, ArchivePath = manifest.SourceArchivePath ?? "uninstall", Kind = TransactionKind.Uninstall, PreviousManifest = manifest, Stage = InstallStage.Install };
             await _journals.SaveAsync(journal, cancellationToken).ConfigureAwait(false);
             foreach (var relative in backup.RelativeFiles)
                 await _journals.AppendOperationAsync(journal, new JournalOperation { Kind = FileOperationKind.Deleted, TargetRelativePath = relative, BackupPath = SafePath.CombineUnderRoot(backup.RootPath, relative) }, cancellationToken).ConfigureAwait(false);
@@ -209,6 +209,7 @@ public sealed class TransactionalModInstaller : IModInstaller
                 var disabledRoot = Path.Combine(_paths.DisabledModsDirectory, modId.ToString("N"));
                 try { if (Directory.Exists(disabledRoot)) Directory.Delete(disabledRoot, true); }
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { _logger.LogWarning(ex, "Could not remove disabled-file cache for mod {ModId}", modId); }
+                if (!string.IsNullOrWhiteSpace(manifest.SourceArchivePath)) TryDeleteCachedPackage(manifest.SourceArchivePath);
             }
             catch
             {
@@ -256,7 +257,7 @@ public sealed class TransactionalModInstaller : IModInstaller
         await _installationGate.WaitAsync(cancellationToken).ConfigureAwait(false);
         var staging = Path.Combine(_paths.CacheDirectory, "staging", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(staging);
-        var journal = new InstallationJournal { ModId = modId, GamePath = gamePath, ArchivePath = analysis.ArchivePath };
+        var journal = new InstallationJournal { ModId = modId, GamePath = gamePath, ArchivePath = analysis.ArchivePath, Kind = previous is null ? TransactionKind.Install : TransactionKind.Update, PreviousManifest = previous };
         BackupDescriptor? backup = null;
         try
         {
@@ -295,7 +296,7 @@ public sealed class TransactionalModInstaller : IModInstaller
             }
 
             await RemoveObsoleteFilesAsync(previous, records, gamePath, journal, backup, cancellationToken).ConfigureAwait(false);
-            var package = await CachePackageAsync(analysis.ArchivePath, modId, cancellationToken).ConfigureAwait(false);
+            var package = await CachePackageAsync(analysis.ArchivePath, modId, journal.Id, cancellationToken).ConfigureAwait(false);
             var manifest = new ModManifest
             {
                 Id = modId,
@@ -326,6 +327,7 @@ public sealed class TransactionalModInstaller : IModInstaller
             journal.State = JournalState.Completed;
             journal.Stage = InstallStage.Done;
             await _journals.SaveAsync(journal, cancellationToken).ConfigureAwait(false);
+            if (previous?.SourceArchivePath is { } oldPackage && !oldPackage.Equals(package, StringComparison.OrdinalIgnoreCase)) TryDeleteCachedPackage(oldPackage);
             Report(progress, InstallStage.Done, 1, "Installation completed");
             return new InstallResult { Success = true, ModId = modId };
         }
@@ -376,11 +378,11 @@ public sealed class TransactionalModInstaller : IModInstaller
         finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }
 
-    private async Task<string> CachePackageAsync(string archivePath, Guid modId, CancellationToken cancellationToken)
+    private async Task<string> CachePackageAsync(string archivePath, Guid modId, Guid transactionId, CancellationToken cancellationToken)
     {
         var packages = Path.Combine(_paths.CacheDirectory, "packages");
         Directory.CreateDirectory(packages);
-        var destination = Path.Combine(packages, modId.ToString("N") + Path.GetExtension(archivePath).ToLowerInvariant());
+        var destination = Path.Combine(packages, $"{modId:N}-{transactionId:N}{Path.GetExtension(archivePath).ToLowerInvariant()}");
         await AtomicCopyAsync(archivePath, destination, cancellationToken).ConfigureAwait(false);
         return destination;
     }
@@ -480,6 +482,20 @@ public sealed class TransactionalModInstaller : IModInstaller
             owner.ModIds.Add(manifest.Id);
         }
         await _repository.ApplyOwnershipChangesAsync(ownership.Values, [], cancellationToken).ConfigureAwait(false);
+    }
+
+    private void TryDeleteCachedPackage(string path)
+    {
+        try
+        {
+            var packageRoot = Path.GetFullPath(Path.Combine(_paths.CacheDirectory, "packages")).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            var fullPath = Path.GetFullPath(path);
+            if (fullPath.StartsWith(packageRoot, StringComparison.OrdinalIgnoreCase) && File.Exists(fullPath)) File.Delete(fullPath);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _logger.LogWarning(ex, "Could not remove cached package {PackagePath}", path);
+        }
     }
 
     private static string OwnershipKey(string path) => path.Replace('\\', '/').Trim('/');
