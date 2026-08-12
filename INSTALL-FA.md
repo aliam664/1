@@ -21,7 +21,19 @@
 
 ## ۲. نصب با فایل Setup
 
-پس از ساخته‌شدن Release یا GitHub Actions artifact، فایل زیر را دریافت کنید:
+فایل Preview آماده از مسیر زیر قابل دریافت است:
+
+```text
+releases/v1.0.0-preview.1/AC-Mod-Hub-Setup.exe
+```
+
+یا Release صفحهٔ GitHub را باز کنید:
+
+```text
+https://github.com/aliam664/1/releases/tag/v1.0.0-preview.1
+```
+
+نام فایل:
 
 ```text
 AC-Mod-Hub-Setup.exe

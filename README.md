@@ -6,6 +6,8 @@ A Windows launcher, mod manager, secure mod installer, backup manager and downlo
 
 **راهنمای کامل فارسی نصب و راه‌اندازی:** [INSTALL-FA.md](INSTALL-FA.md)
 
+**Windows Preview installer:** [Download AC-Mod-Hub-Setup.exe](releases/v1.0.0-preview.1/AC-Mod-Hub-Setup.exe) · [SHA-256](releases/v1.0.0-preview.1/SHA256SUMS.txt)
+
 ## Highlights
 
 - Steam discovery through registry locations, `libraryfolders.vdf` and App ID `244210`, including multiple selectable installations
