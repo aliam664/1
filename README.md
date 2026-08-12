@@ -36,9 +36,9 @@ ACModHub/
 ├── tests/
 │   └── ACModHub.Tests
 ├── installer/
-│   └── ACModHub.iss
+│   ├── ACModHub.iss
+│   └── windows-release.yml.template
 ├── assets/
-├── .github/workflows/windows-release.yml
 └── README.md
 ```
 
@@ -99,7 +99,7 @@ To invoke Inno Setup manually:
   ".\installer\ACModHub.iss"
 ```
 
-The GitHub Actions workflow performs the same build on `windows-latest` and uploads both files as the `AC-Mod-Hub-1.0.0-win-x64` artifact.
+The Windows release workflow is preserved as `installer/windows-release.yml.template`. To activate GitHub Actions, copy it to `.github/workflows/windows-release.yml` using a GitHub connection/token with Workflows permission; it then uploads both files as the `AC-Mod-Hub-1.0.0-win-x64` artifact.
 
 ## First run
 

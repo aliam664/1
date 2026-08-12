@@ -278,13 +278,15 @@ artifacts\installer\AC-Mod-Hub-Setup.exe
 
 ## ۱۳. ساخت خودکار با GitHub Actions
 
-Workflow زیر روی Windows اجرا می‌شود:
+تعریف Workflow ویندوز در قالب زیر حفظ شده است:
 
 ```text
-.github/workflows/windows-release.yml
+installer/windows-release.yml.template
 ```
 
-در GitHub:
+برای فعال‌کردن GitHub Actions، این فایل را با یک Token/اتصال دارای مجوز Workflows به مسیر `.github/workflows/windows-release.yml` کپی و commit کنید.
+
+پس از فعال‌کردن و Push کردن Workflow، در GitHub:
 
 1. وارد تب **Actions** شوید.
 2. Workflow با نام **Windows Build, Test and Installer** را انتخاب کنید.
