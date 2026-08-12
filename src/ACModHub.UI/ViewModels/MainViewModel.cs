@@ -1,4 +1,5 @@
 using System.Windows;
+using ACModHub.Core.Interfaces;
 using ACModHub.Core.Models;
 using ACModHub.UI.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,17 +11,18 @@ public sealed class MainViewModel : ObservableObject
     private readonly IServiceProvider _services;
     private readonly IFilePickerService _picker;
     private readonly ILocalizationService _localization;
+    private readonly ISettingsService _settings;
     private object? _currentPage;
     private string _selectedPage = "Dashboard";
     private string? _notification;
     private FlowDirection _flowDirection;
 
-    public MainViewModel(IServiceProvider services, IFilePickerService picker, ILocalizationService localization)
+    public MainViewModel(IServiceProvider services, IFilePickerService picker, ILocalizationService localization, ISettingsService settings)
     {
-        _services = services; _picker = picker; _localization = localization; _flowDirection = localization.FlowDirection;
+        _services = services; _picker = picker; _localization = localization; _settings = settings; _flowDirection = localization.FlowDirection;
         NavigateCommand = new AsyncRelayCommand(NavigateAsync, onError: SetError);
         ImportCommand = new AsyncRelayCommand(ImportAsync, onError: SetError);
-        ToggleLanguageCommand = new RelayCommand(_ => localization.SetLanguage(localization.Language.StartsWith("fa", StringComparison.OrdinalIgnoreCase) ? "en-US" : "fa-IR"));
+        ToggleLanguageCommand = new AsyncRelayCommand(ToggleLanguageAsync, onError: SetError);
         _localization.LanguageChanged += (_, _) => FlowDirection = _localization.FlowDirection;
     }
 
@@ -30,7 +32,7 @@ public sealed class MainViewModel : ObservableObject
     public FlowDirection FlowDirection { get => _flowDirection; private set => SetProperty(ref _flowDirection, value); }
     public AsyncRelayCommand NavigateCommand { get; }
     public AsyncRelayCommand ImportCommand { get; }
-    public RelayCommand ToggleLanguageCommand { get; }
+    public AsyncRelayCommand ToggleLanguageCommand { get; }
 
     public Task InitializeAsync(CancellationToken cancellationToken = default) => ShowDashboardAsync(cancellationToken);
 
@@ -62,6 +64,15 @@ public sealed class MainViewModel : ObservableObject
     {
         var library = _services.GetRequiredService<LibraryViewModel>(); library.Configure(category); CurrentPage = library; await library.LoadAsync(token);
     }
+    private async Task ToggleLanguageAsync(object? _, CancellationToken token)
+    {
+        var language = _localization.Language.StartsWith("fa", StringComparison.OrdinalIgnoreCase) ? "en-US" : "fa-IR";
+        _localization.SetLanguage(language);
+        var settings = await _settings.LoadAsync(token);
+        settings.Language = language;
+        await _settings.SaveAsync(settings, token);
+    }
+
     private async Task ImportAsync(object? parameter, CancellationToken token)
     {
         var archive = parameter is string[] files && files.Length > 0 ? files[0] : _picker.PickArchive();

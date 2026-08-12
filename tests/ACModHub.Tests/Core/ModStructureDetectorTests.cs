@@ -30,6 +30,15 @@ public sealed class ModStructureDetectorTests
     }
 
     [Fact]
+    public void Detect_InfersCarForStructuredSkin()
+    {
+        ArchiveEntryDescriptor[] entries = [new("wrapper/ks_car/skins/red/ui_skin.json", 10, 10, false), new("wrapper/ks_car/skins/red/livery.png", 5, 5, false)];
+        var plan = _detector.Detect("skin.zip", entries);
+        Assert.Equal(ModCategory.Skin, plan.Category);
+        Assert.Contains(plan.Files, x => x.DestinationPath == "content/cars/ks_car/skins/red/livery.png");
+    }
+
+    [Fact]
     public void Detect_RecognizesPythonApp()
     {
         ArchiveEntryDescriptor[] entries = [new("telemetry/app.py", 10, 10, false), new("telemetry/icon.png", 5, 5, false)];

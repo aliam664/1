@@ -8,6 +8,6 @@
     <ProjectReference Include="..\ACModHub.Core\ACModHub.Core.csproj" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
-    <PackageReference Include="SharpCompress" Version="0.38.0" />
+    <PackageReference Include="SharpCompress" Version="0.50.3" />
   </ItemGroup>
 </Project>

@@ -29,6 +29,7 @@ public interface IModRepository
     Task<IReadOnlyList<FileOwnershipRecord>> GetAllOwnershipAsync(CancellationToken cancellationToken = default);
     Task SaveOwnershipAsync(FileOwnershipRecord ownership, CancellationToken cancellationToken = default);
     Task DeleteOwnershipAsync(string relativePath, CancellationToken cancellationToken = default);
+    Task ApplyOwnershipChangesAsync(IEnumerable<FileOwnershipRecord> upserts, IEnumerable<string> deletions, CancellationToken cancellationToken = default);
 }
 
 public interface IManifestService

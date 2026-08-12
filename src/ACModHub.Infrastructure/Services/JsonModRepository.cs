@@ -118,6 +118,22 @@ public sealed class JsonModRepository : IModRepository
         finally { _gate.Release(); }
     }
 
+    public async Task ApplyOwnershipChangesAsync(IEnumerable<FileOwnershipRecord> upserts, IEnumerable<string> deletions, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(upserts);
+        ArgumentNullException.ThrowIfNull(deletions);
+        await _gate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            var items = await ReadOwnership(cancellationToken).ConfigureAwait(false);
+            var byPath = items.ToDictionary(x => NormalizeKey(x.RelativePath), StringComparer.OrdinalIgnoreCase);
+            foreach (var path in deletions) byPath.Remove(NormalizeKey(path));
+            foreach (var ownership in upserts) byPath[NormalizeKey(ownership.RelativePath)] = ownership;
+            await _store.WriteAsync(_ownershipPath, byPath.Values.OrderBy(x => x.RelativePath, StringComparer.OrdinalIgnoreCase).ToList(), cancellationToken).ConfigureAwait(false);
+        }
+        finally { _gate.Release(); }
+    }
+
     private Task<List<ModManifest>> ReadManifests(CancellationToken token) => _store.ReadAsync(_libraryPath, new List<ModManifest>(), token);
     private Task<List<FileOwnershipRecord>> ReadOwnership(CancellationToken token) => _store.ReadAsync(_ownershipPath, new List<FileOwnershipRecord>(), token);
     private static string NormalizeKey(string path) => path.Replace('\\', '/').Trim('/').ToUpperInvariant();

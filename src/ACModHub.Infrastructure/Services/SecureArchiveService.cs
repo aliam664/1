@@ -35,7 +35,7 @@ public sealed class SecureArchiveService : IArchiveService
 
         // Inspect first and then validate every entry again while extracting. This also rejects duplicate paths.
         await InspectAsync(archivePath, cancellationToken).ConfigureAwait(false);
-        using var archive = ArchiveFactory.Open(archivePath, new ReaderOptions { LeaveStreamOpen = false });
+        using var archive = ArchiveFactory.OpenArchive(archivePath, new ReaderOptions { LeaveStreamOpen = false });
         var extracted = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var entry in archive.Entries)
         {
@@ -48,7 +48,7 @@ public sealed class SecureArchiveService : IArchiveService
 
             var destination = SafePath.CombineUnderRoot(destinationDirectory, relative);
             Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
-            await using var source = entry.OpenEntryStream();
+            await using var source = await entry.OpenEntryStreamAsync(cancellationToken).ConfigureAwait(false);
             await using var target = new FileStream(destination, FileMode.CreateNew, FileAccess.Write, FileShare.None, 128 * 1024, FileOptions.Asynchronous | FileOptions.SequentialScan);
             await source.CopyToAsync(target, 128 * 1024, cancellationToken).ConfigureAwait(false);
             await target.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -57,7 +57,7 @@ public sealed class SecureArchiveService : IArchiveService
 
     private static ArchiveInspection InspectCore(string archivePath, CancellationToken cancellationToken)
     {
-        using var archive = ArchiveFactory.Open(archivePath, new ReaderOptions { LeaveStreamOpen = false });
+        using var archive = ArchiveFactory.OpenArchive(archivePath, new ReaderOptions { LeaveStreamOpen = false });
         var entries = new List<ArchiveEntryDescriptor>();
         var unique = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         long total = 0;

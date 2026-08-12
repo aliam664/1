@@ -38,7 +38,8 @@ public static class ServiceCollectionExtensions
             provider.GetRequiredService<IHttpClientFactory>().CreateClient("downloads"),
             provider.GetRequiredService<IFileHashService>(),
             provider.GetRequiredService<IAppPaths>(),
-            provider.GetRequiredService<Microsoft.Extensions.Logging.ILogger<HttpDownloadManager>>()));
+            provider.GetRequiredService<Microsoft.Extensions.Logging.ILogger<HttpDownloadManager>>(),
+            provider.GetRequiredService<ISettingsService>().LoadAsync().GetAwaiter().GetResult().ConcurrentDownloads));
         return services;
     }
 }

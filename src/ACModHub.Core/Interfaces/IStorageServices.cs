@@ -25,6 +25,7 @@ public interface ISettingsService
 public interface IJournalStore
 {
     Task SaveAsync(InstallationJournal journal, CancellationToken cancellationToken = default);
+    Task AppendOperationAsync(InstallationJournal journal, JournalOperation operation, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<InstallationJournal>> GetIncompleteAsync(CancellationToken cancellationToken = default);
     Task DeleteAsync(Guid journalId, CancellationToken cancellationToken = default);
 }

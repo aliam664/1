@@ -15,8 +15,9 @@ public sealed class CrashRecoveryTests
         Directory.CreateDirectory(Path.GetDirectoryName(target)!);
         await File.WriteAllTextAsync(target, "partial");
         var journal = new InstallationJournal { ModId = Guid.NewGuid(), GamePath = environment.GamePath, ArchivePath = "test.zip", Stage = InstallStage.Install };
-        journal.Operations.Add(new JournalOperation { Kind = FileOperationKind.Created, TargetRelativePath = relative });
-        await environment.Get<IJournalStore>().SaveAsync(journal);
+        var journals = environment.Get<IJournalStore>();
+        await journals.SaveAsync(journal);
+        await journals.AppendOperationAsync(journal, new JournalOperation { Kind = FileOperationKind.Created, TargetRelativePath = relative });
         var count = await environment.Get<ICrashRecoveryService>().RecoverAsync();
         Assert.Equal(1, count);
         Assert.False(File.Exists(target));

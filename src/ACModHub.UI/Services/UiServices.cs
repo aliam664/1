@@ -46,7 +46,7 @@ public sealed class LocalizationService : ILocalizationService
         {
             var old = application.Resources.MergedDictionaries.FirstOrDefault(x => x.Source?.OriginalString.Contains("Strings.", StringComparison.OrdinalIgnoreCase) == true);
             if (old is not null) application.Resources.MergedDictionaries.Remove(old);
-            application.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri($"/ACModHub.UI;component/Resources/Strings.{normalized}.xaml", UriKind.RelativeOrAbsolute) });
+            application.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri($"/ACModHub.UI;component/Resources/Strings.{normalized}.xaml", UriKind.Relative) });
         }
         Language = normalized;
         LanguageChanged?.Invoke(this, EventArgs.Empty);

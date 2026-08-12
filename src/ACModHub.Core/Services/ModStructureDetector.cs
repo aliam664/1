@@ -41,7 +41,11 @@ public sealed class ModStructureDetector : IModStructureDetector
         var skinRoot = FindMetadataRoot(paths, "ui_skin.json");
         if (skinRoot is not null)
         {
-            warnings.Add("A standalone skin was found. Verify the destination car in Preview before installing.");
+            var rootParts = Split(skinRoot);
+            var skinsIndex = Array.FindIndex(rootParts, x => x.Equals("skins", StringComparison.OrdinalIgnoreCase));
+            if (skinsIndex >= 1 && skinsIndex + 1 < rootParts.Length)
+                return CreateExactPlan(archiveName, files, paths, skinRoot, $"content/cars/{rootParts[skinsIndex - 1]}/skins/{rootParts[skinsIndex + 1]}", ModCategory.Skin, warnings);
+            warnings.Add("A standalone skin was found. Select its destination car in Preview before installing.");
             return CreateContentPlan(archiveName, files, paths, skinRoot, "content/cars/_select_car_/skins", ModCategory.Skin, warnings);
         }
 
@@ -110,6 +114,29 @@ public sealed class ModStructureDetector : IModStructureDetector
             Category = category,
             RootPrefixRemoved = string.Join('/', Split(paths[0]).Take(prefixLength)),
             Files = mappings,
+            Warnings = warnings
+        };
+    }
+
+    private static ModInstallPlan CreateExactPlan(
+        string archiveName,
+        IReadOnlyList<ArchiveEntryDescriptor> files,
+        IReadOnlyList<string> paths,
+        string sourceRoot,
+        string destinationRoot,
+        ModCategory category,
+        List<string> warnings)
+    {
+        var rootParts = Split(sourceRoot);
+        if (paths.Any(path => !StartsWithSegments(Split(path), rootParts)))
+            throw new ModHubException("The archive mixes unrelated files with a detected skin root.");
+        warnings.Add("A missing Assetto Corsa content root was reconstructed automatically.");
+        return new ModInstallPlan
+        {
+            SuggestedName = FriendlyName(rootParts.LastOrDefault() ?? Path.GetFileNameWithoutExtension(archiveName)),
+            Category = category,
+            RootPrefixRemoved = sourceRoot,
+            Files = BuildMappings(files, paths, rootParts.Length, destinationRoot, includeRootName: false),
             Warnings = warnings
         };
     }

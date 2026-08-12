@@ -18,6 +18,8 @@ public sealed class ConflictDetector : IConflictDetector
     public async Task<IReadOnlyList<ModConflict>> DetectAsync(string gamePath, IReadOnlyList<PlannedFile> files, Guid? currentModId = null, CancellationToken cancellationToken = default)
     {
         var result = new List<ModConflict>();
+        var ownershipByPath = (await _repository.GetAllOwnershipAsync(cancellationToken).ConfigureAwait(false))
+            .ToDictionary(x => Normalize(x.RelativePath), StringComparer.OrdinalIgnoreCase);
         foreach (var file in files)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -35,7 +37,7 @@ public sealed class ConflictDetector : IConflictDetector
                 continue;
             }
 
-            var ownership = await _repository.GetOwnershipAsync(file.DestinationPath, cancellationToken).ConfigureAwait(false);
+            ownershipByPath.TryGetValue(Normalize(file.DestinationPath), out var ownership);
             if (ownership is null || ownership.ModIds.Count == 0)
                 result.Add(new(file.DestinationPath, ConflictKind.UntrackedFile, "An untracked game file already exists."));
             else
@@ -47,4 +49,6 @@ public sealed class ConflictDetector : IConflictDetector
         }
         return result;
     }
+
+    private static string Normalize(string path) => path.Replace('\\', '/').Trim('/');
 }

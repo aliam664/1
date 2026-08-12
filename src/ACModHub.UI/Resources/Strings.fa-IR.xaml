@@ -14,4 +14,38 @@
   <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Conflicts">تداخل فایل‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Files">فایل‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AllowOverwrite">با پشتیبان‌گیری، تداخل‌های قابل‌حل بازنویسی شوند</sys:String>
   <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DownloadsTitle">مدیریت دانلود</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="BackupsTitle">مدیریت پشتیبان‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SettingsTitle">تنظیمات و عیب‌یابی</sys:String>
   <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Save">ذخیره</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Detect">تشخیص خودکار</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Diagnostics">اجرای عیب‌یابی</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ScanExisting">اسکن و واردکردن محتوای فعلی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NameLabel">نام</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AuthorLabel">سازنده</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="VersionLabel">نسخه</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="CategoryLabel">دسته‌بندی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SizeLabel">حجم</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="StatusLabel">وضعیت</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="EnableAction">فعال‌سازی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DisableAction">غیرفعال‌سازی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UpdateAction">به‌روزرسانی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RepairAction">تعمیر</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReinstallAction">نصب مجدد</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UninstallAction">حذف مود</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="VerifyAction">بررسی سلامت</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="PauseAction">مکث</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ResumeAction">ادامه</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RetryAction">تلاش مجدد</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DeleteAction">حذف</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RestoreAction">بازیابی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AddAction">افزودن</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UrlLabel">نشانی HTTP / HTTPS</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="FileNameLabel">نام فایل</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ShaLabel">SHA-256 (اختیاری)</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="StateLabel">وضعیت</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReceivedLabel">دریافت‌شده</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="TotalLabel">کل</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RetriesLabel">تلاش‌ها</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ErrorLabel">خطا</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="CheckProviders">بررسی منابع</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ApplicationLabel">برنامه</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="LanguageLabel">زبان / Language</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ConcurrentDownloadsLabel">دانلودهای هم‌زمان (۱ تا ۸)</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ExistingInstallation">نصب فعلی بازی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ProviderArchitecture">معماری مستقل از ارائه‌دهنده برای به‌روزرسانی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SkinCarTarget">پوشهٔ ماشین مقصد (مثال: ks_ferrari_458)</sys:String>
 </ResourceDictionary>

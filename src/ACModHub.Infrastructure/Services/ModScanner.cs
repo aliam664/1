@@ -57,6 +57,8 @@ public sealed class ModScanner : IModScanner
 
     public async Task ImportAsync(IEnumerable<ModManifest> manifests, CancellationToken cancellationToken = default)
     {
+        var ownership = (await _repository.GetAllOwnershipAsync(cancellationToken).ConfigureAwait(false))
+            .ToDictionary(x => Normalize(x.RelativePath), StringComparer.OrdinalIgnoreCase);
         foreach (var manifest in manifests)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -64,13 +66,17 @@ public sealed class ModScanner : IModScanner
             await _repository.SaveAsync(manifest, cancellationToken).ConfigureAwait(false);
             foreach (var file in manifest.Files)
             {
-                var ownership = await _repository.GetOwnershipAsync(file.RelativePath, cancellationToken).ConfigureAwait(false)
-                    ?? new FileOwnershipRecord { RelativePath = file.RelativePath };
-                ownership.ModIds.Add(manifest.Id);
-                ownership.UpdatedAt = DateTimeOffset.UtcNow;
-                await _repository.SaveOwnershipAsync(ownership, cancellationToken).ConfigureAwait(false);
+                var key = Normalize(file.RelativePath);
+                if (!ownership.TryGetValue(key, out var owner))
+                {
+                    owner = new FileOwnershipRecord { RelativePath = file.RelativePath };
+                    ownership.Add(key, owner);
+                }
+                owner.ModIds.Add(manifest.Id);
+                owner.UpdatedAt = DateTimeOffset.UtcNow;
             }
         }
+        await _repository.ApplyOwnershipChangesAsync(ownership.Values, [], cancellationToken).ConfigureAwait(false);
     }
 
     private static IEnumerable<ScanCandidate> BuildCandidates(string gamePath)
@@ -95,6 +101,8 @@ public sealed class ModScanner : IModScanner
         var path = parts.Aggregate(root, Path.Combine);
         return Directory.Exists(path) ? Directory.EnumerateDirectories(path) : Enumerable.Empty<string>();
     }
+
+    private static string Normalize(string path) => path.Replace('\\', '/').Trim('/');
 
     private static Guid StableId(string input)
     {

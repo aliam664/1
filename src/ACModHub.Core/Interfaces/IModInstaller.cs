@@ -5,6 +5,7 @@ namespace ACModHub.Core.Interfaces;
 public interface IModInstaller
 {
     Task<ModAnalysis> AnalyzeAsync(string archivePath, string gamePath, CancellationToken cancellationToken = default);
+    Task<ModAnalysis> ApplySkinTargetAsync(ModAnalysis analysis, string carFolderName, CancellationToken cancellationToken = default);
     Task<InstallResult> InstallAsync(ModAnalysis analysis, InstallOptions options, IProgress<InstallProgress>? progress = null, CancellationToken cancellationToken = default);
     Task<InstallResult> UpdateAsync(Guid modId, string archivePath, InstallOptions options, IProgress<InstallProgress>? progress = null, CancellationToken cancellationToken = default);
     Task<InstallResult> ReinstallAsync(Guid modId, IProgress<InstallProgress>? progress = null, CancellationToken cancellationToken = default);

@@ -14,4 +14,38 @@
   <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Conflicts">File conflicts</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Files">Files</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AllowOverwrite">Overwrite resolvable conflicts after backup</sys:String>
   <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DownloadsTitle">Download manager</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="BackupsTitle">Backup manager</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SettingsTitle">Settings &amp; diagnostics</sys:String>
   <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Save">Save</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Detect">Auto-detect</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Diagnostics">Run diagnostics</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ScanExisting">Scan &amp; import existing content</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NameLabel">Name</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AuthorLabel">Author</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="VersionLabel">Version</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="CategoryLabel">Category</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SizeLabel">Size</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="StatusLabel">Status</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="EnableAction">Enable</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DisableAction">Disable</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UpdateAction">Update</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RepairAction">Repair</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReinstallAction">Reinstall</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UninstallAction">Uninstall</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="VerifyAction">Verify</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="PauseAction">Pause</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ResumeAction">Resume</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RetryAction">Retry</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DeleteAction">Delete</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RestoreAction">Restore</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AddAction">Add</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UrlLabel">HTTP / HTTPS URL</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="FileNameLabel">File name</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ShaLabel">SHA-256 (optional)</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="StateLabel">State</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReceivedLabel">Received</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="TotalLabel">Total</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RetriesLabel">Retries</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ErrorLabel">Error</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="CheckProviders">Check providers</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ApplicationLabel">Application</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="LanguageLabel">Language / زبان</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ConcurrentDownloadsLabel">Concurrent downloads (1–8)</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ExistingInstallation">Existing installation</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ProviderArchitecture">Provider-independent update architecture</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SkinCarTarget">Destination car folder (example: ks_ferrari_458)</sys:String>
 </ResourceDictionary>
