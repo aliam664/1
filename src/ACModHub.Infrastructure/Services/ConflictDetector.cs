@@ -1,3 +1,4 @@
+using ACModHub.Core;
 using ACModHub.Core.Interfaces;
 using ACModHub.Core.Models;
 using ACModHub.Core.Services;

@@ -29,12 +29,14 @@ public sealed partial class RegistrySteamLocationProvider : ISteamLocationProvid
         }
     }
 
+#pragma warning disable CA1416 // Registry hives/views are only enumerated after the OperatingSystem.IsWindows guard.
     private static IEnumerable<(RegistryHive Hive, RegistryView View, string Path, string Name)> Locations()
     {
         yield return (RegistryHive.CurrentUser, RegistryView.Default, @"Software\Valve\Steam", "SteamPath");
         yield return (RegistryHive.LocalMachine, RegistryView.Registry64, @"SOFTWARE\WOW6432Node\Valve\Steam", "InstallPath");
         yield return (RegistryHive.LocalMachine, RegistryView.Registry32, @"SOFTWARE\Valve\Steam", "InstallPath");
     }
+#pragma warning restore CA1416
 }
 
 public sealed partial class SteamGameDetector : IGameDetector

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows;
 using ACModHub.Core.Interfaces;
 using ACModHub.Core.Models;
@@ -20,7 +21,7 @@ public sealed class DownloadsViewModel : ObservableObject
     {
         _downloads = downloads; _errors = errors;
         _downloads.ProgressChanged += OnProgress;
-        AddCommand = new AsyncRelayCommand(AddAsync, _ => Uri.TryCreate(Url, UriKind.Absolute, out _) && !string.IsNullOrWhiteSpace(FileName), SetError);
+        AddCommand = new AsyncRelayCommand(AddAsync, parameter => Uri.TryCreate(Url, UriKind.Absolute, out _) && !string.IsNullOrWhiteSpace(FileName), SetError);
         PauseCommand = new AsyncRelayCommand((_, token) => _downloads.PauseAsync(Selected!.Request.Id, token), _ => Selected is not null, SetError);
         ResumeCommand = new AsyncRelayCommand((_, token) => _downloads.ResumeAsync(Selected!.Request.Id, token), _ => Selected is not null, SetError);
         CancelCommand = new AsyncRelayCommand((_, token) => _downloads.CancelAsync(Selected!.Request.Id, token), _ => Selected is not null, SetError);

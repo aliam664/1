@@ -226,7 +226,7 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
 
     private void Raise(DownloadJob job)
     {
-        var percentage = job.TotalBytes is > 0 ? job.BytesReceived * 100d / job.TotalBytes.Value : null;
+        double? percentage = job.TotalBytes is > 0 ? job.BytesReceived * 100d / job.TotalBytes.Value : null;
         ProgressChanged?.Invoke(this, new DownloadProgress(job.Request.Id, job.State, job.BytesReceived, job.TotalBytes, percentage, job.SpeedBytesPerSecond, job.EstimatedTimeRemaining));
     }
 
