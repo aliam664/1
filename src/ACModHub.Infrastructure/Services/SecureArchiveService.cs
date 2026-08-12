@@ -4,6 +4,7 @@ using ACModHub.Core.Models;
 using ACModHub.Core.Services;
 using SharpCompress.Archives;
 using SharpCompress.Common;
+using SharpCompress.Readers;
 
 namespace ACModHub.Infrastructure.Services;
 
@@ -41,7 +42,7 @@ public sealed class SecureArchiveService : IArchiveService
             cancellationToken.ThrowIfCancellationRequested();
             if (entry.IsDirectory) continue;
             ValidateEntry(entry.Key, entry.Size, entry.CompressedSize, entry.IsEncrypted, entry.LinkTarget);
-            var relative = SafePath.NormalizeRelative(entry.Key);
+            var relative = SafePath.NormalizeRelative(entry.Key!);
             if (!extracted.Add(relative))
                 throw new UnsafeArchiveException($"The archive contains a duplicate destination path: {entry.Key}");
 
@@ -68,7 +69,7 @@ public sealed class SecureArchiveService : IArchiveService
                 throw new UnsafeArchiveException($"The archive exceeds the {MaximumEntryCount:N0} entry safety limit.");
 
             ValidateEntry(entry.Key, entry.Size, entry.CompressedSize, entry.IsEncrypted, entry.LinkTarget);
-            var normalized = SafePath.NormalizeRelative(entry.Key).Replace('\\', '/');
+            var normalized = SafePath.NormalizeRelative(entry.Key!).Replace('\\', '/');
             if (!entry.IsDirectory && !unique.Add(normalized))
                 throw new UnsafeArchiveException($"The archive contains duplicate paths: {entry.Key}");
 

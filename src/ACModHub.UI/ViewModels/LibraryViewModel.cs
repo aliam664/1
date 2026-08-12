@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using ACModHub.Core.Interfaces;
 using ACModHub.Core.Models;
+using ACModHub.UI.Services;
 
 namespace ACModHub.UI.ViewModels;
 
@@ -10,6 +11,7 @@ public sealed class LibraryViewModel : ObservableObject
     private readonly IModInstaller _installer;
     private readonly IManifestService _manifests;
     private readonly ISettingsService _settings;
+    private readonly IFilePickerService _picker;
     private IReadOnlyList<ModManifest> _all = [];
     private string _search = string.Empty;
     private ModCategory? _category;
@@ -19,14 +21,15 @@ public sealed class LibraryViewModel : ObservableObject
     private string? _message;
     private bool _isBusy;
 
-    public LibraryViewModel(IModRepository repository, IModInstaller installer, IManifestService manifests, ISettingsService settings)
+    public LibraryViewModel(IModRepository repository, IModInstaller installer, IManifestService manifests, ISettingsService settings, IFilePickerService picker)
     {
-        _repository = repository; _installer = installer; _manifests = manifests; _settings = settings;
+        _repository = repository; _installer = installer; _manifests = manifests; _settings = settings; _picker = picker;
         RefreshCommand = new AsyncRelayCommand((_, token) => LoadAsync(token), onError: SetError);
         EnableCommand = new AsyncRelayCommand(EnableAsync, _ => SelectedMod is not null, SetError);
         DisableCommand = new AsyncRelayCommand(DisableAsync, _ => SelectedMod is not null, SetError);
         RepairCommand = new AsyncRelayCommand(RepairAsync, _ => SelectedMod is not null, SetError);
         ReinstallCommand = new AsyncRelayCommand(ReinstallAsync, _ => SelectedMod is not null, SetError);
+        UpdateCommand = new AsyncRelayCommand(UpdateAsync, _ => SelectedMod is not null, SetError);
         UninstallCommand = new AsyncRelayCommand(UninstallAsync, _ => SelectedMod is not null, SetError);
         VerifyCommand = new AsyncRelayCommand(VerifyAsync, _ => SelectedMod is not null, SetError);
     }
@@ -47,6 +50,7 @@ public sealed class LibraryViewModel : ObservableObject
     public AsyncRelayCommand DisableCommand { get; }
     public AsyncRelayCommand RepairCommand { get; }
     public AsyncRelayCommand ReinstallCommand { get; }
+    public AsyncRelayCommand UpdateCommand { get; }
     public AsyncRelayCommand UninstallCommand { get; }
     public AsyncRelayCommand VerifyCommand { get; }
 
@@ -78,6 +82,7 @@ public sealed class LibraryViewModel : ObservableObject
     private async Task DisableAsync(object? _, CancellationToken token) { await _installer.DisableAsync(SelectedMod!.Id, token); await LoadAsync(token); }
     private async Task RepairAsync(object? _, CancellationToken token) { var result = await _installer.RepairAsync(SelectedMod!.Id, cancellationToken: token); Message = result.IsHealthy ? "Mod repaired and verified." : $"{result.Issues.Count} issue(s) remain."; await LoadAsync(token); }
     private async Task ReinstallAsync(object? _, CancellationToken token) { var result = await _installer.ReinstallAsync(SelectedMod!.Id, cancellationToken: token); Message = result.Success ? "Mod reinstalled." : result.Error; await LoadAsync(token); }
+    private async Task UpdateAsync(object? _, CancellationToken token) { var archive = _picker.PickArchive(); if (archive is null) return; var result = await _installer.UpdateAsync(SelectedMod!.Id, archive, new InstallOptions { AllowOverwriteConflicts = true }, cancellationToken: token); Message = result.Success ? "Mod updated and verified." : result.Error; await LoadAsync(token); }
     private async Task UninstallAsync(object? _, CancellationToken token) { await _installer.UninstallAsync(SelectedMod!.Id, token); SelectedMod = null; Message = "Mod uninstalled safely."; await LoadAsync(token); }
     private async Task VerifyAsync(object? _, CancellationToken token)
     {
@@ -86,6 +91,6 @@ public sealed class LibraryViewModel : ObservableObject
         var result = await _manifests.VerifyAsync(SelectedMod!, settings.GamePath, token);
         Message = result.IsHealthy ? "SHA-256 verification passed." : $"Verification found {result.Issues.Count} issue(s).";
     }
-    private void RaiseActions() { EnableCommand.RaiseCanExecuteChanged(); DisableCommand.RaiseCanExecuteChanged(); RepairCommand.RaiseCanExecuteChanged(); ReinstallCommand.RaiseCanExecuteChanged(); UninstallCommand.RaiseCanExecuteChanged(); VerifyCommand.RaiseCanExecuteChanged(); }
+    private void RaiseActions() { EnableCommand.RaiseCanExecuteChanged(); DisableCommand.RaiseCanExecuteChanged(); RepairCommand.RaiseCanExecuteChanged(); ReinstallCommand.RaiseCanExecuteChanged(); UpdateCommand.RaiseCanExecuteChanged(); UninstallCommand.RaiseCanExecuteChanged(); VerifyCommand.RaiseCanExecuteChanged(); }
     private void SetError(Exception ex) => Message = ex.Message;
 }

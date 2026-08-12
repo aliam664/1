@@ -14,7 +14,7 @@ public sealed class InstallationTests
         var installer = environment.Get<IModInstaller>();
         var analysis = await installer.AnalyzeAsync(archive, environment.GamePath);
         var result = await installer.InstallAsync(analysis, new InstallOptions());
-        Assert.True(result.Success, result.Error);
+        Assert.True(result.Success, result.Error ?? "Installation failed.");
         var manifest = await environment.Get<IModRepository>().GetAsync(result.ModId!.Value);
         Assert.NotNull(manifest);
         Assert.Equal(ModCategory.Car, manifest.Category);
@@ -39,6 +39,20 @@ public sealed class InstallationTests
         Assert.Contains(first.ModId!.Value, (await environment.Get<IModRepository>().GetOwnershipAsync("content/cars/shared/data.acd"))!.ModIds);
         await installer.UninstallAsync(first.ModId.Value);
         Assert.False(File.Exists(target));
+    }
+
+    [Fact]
+    public async Task Repair_RestoresDamagedFileFromCachedPackage()
+    {
+        using var environment = new TestEnvironment();
+        var archive = environment.CreateZip("repair.zip", ("content/cars/repair/data.acd", "healthy"));
+        var installer = environment.Get<IModInstaller>();
+        var installed = await installer.InstallAsync(await installer.AnalyzeAsync(archive, environment.GamePath), new InstallOptions());
+        var target = Path.Combine(environment.GamePath, "content", "cars", "repair", "data.acd");
+        await File.WriteAllTextAsync(target, "damaged");
+        var repaired = await installer.RepairAsync(installed.ModId!.Value);
+        Assert.True(repaired.IsHealthy);
+        Assert.Equal("healthy", await File.ReadAllTextAsync(target));
     }
 
     [Fact]

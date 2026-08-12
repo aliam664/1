@@ -31,7 +31,7 @@ public sealed class GameDetectionTests
         File.Delete(Path.Combine(environment.GamePath, "acs.exe"));
         var result = await new SteamGameDetector(new FakeSteamLocation()).ValidateManualPathAsync(environment.GamePath);
         Assert.False(result.IsValid);
-        Assert.Contains("acs.exe", result.ValidationMessage);
+        Assert.Contains("acs.exe", result.ValidationMessage!);
     }
 
     private sealed class FakeSteamLocation(params string[] roots) : ISteamLocationProvider
