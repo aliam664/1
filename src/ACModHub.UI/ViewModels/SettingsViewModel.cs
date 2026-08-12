@@ -19,6 +19,7 @@ public sealed class SettingsViewModel : ObservableObject
     private AppSettings _model = new();
     private string _gamePath = string.Empty;
     private string _language = "fa-IR";
+    private string _catalogUrl = string.Empty;
     private bool _launchThroughSteam = true;
     private int _concurrentDownloads = 3;
     private GameInstallation? _selectedInstallation;
@@ -40,6 +41,7 @@ public sealed class SettingsViewModel : ObservableObject
     public IReadOnlyList<string> Languages { get; } = ["fa-IR", "en-US"];
     public string GamePath { get => _gamePath; set => SetProperty(ref _gamePath, value); }
     public string Language { get => _language; set => SetProperty(ref _language, value); }
+    public string CatalogUrl { get => _catalogUrl; set => SetProperty(ref _catalogUrl, value); }
     public bool LaunchThroughSteam { get => _launchThroughSteam; set => SetProperty(ref _launchThroughSteam, value); }
     public int ConcurrentDownloads { get => _concurrentDownloads; set => SetProperty(ref _concurrentDownloads, Math.Clamp(value, 1, 8)); }
     public GameInstallation? SelectedInstallation
@@ -64,7 +66,7 @@ public sealed class SettingsViewModel : ObservableObject
             var known = await _detector.ValidateManualPathAsync(knownPath, cancellationToken);
             if (known.IsValid) DetectedInstallations.Add(known);
         }
-        GamePath = _model.GamePath ?? string.Empty; Language = _model.Language; LaunchThroughSteam = _model.LaunchThroughSteam; ConcurrentDownloads = _model.ConcurrentDownloads;
+        GamePath = _model.GamePath ?? string.Empty; Language = _model.Language; CatalogUrl = _model.CatalogUrl ?? string.Empty; LaunchThroughSteam = _model.LaunchThroughSteam; ConcurrentDownloads = _model.ConcurrentDownloads;
         SelectedInstallation = DetectedInstallations.FirstOrDefault(x => x.RootPath.Equals(GamePath, StringComparison.OrdinalIgnoreCase));
     }
 
@@ -72,7 +74,7 @@ public sealed class SettingsViewModel : ObservableObject
     {
         _model.GamePath = string.IsNullOrWhiteSpace(GamePath) ? null : Path.GetFullPath(GamePath);
         _model.KnownGamePaths = DetectedInstallations.Where(x => x.IsValid).Select(x => x.RootPath).Append(_model.GamePath ?? string.Empty).Where(x => !string.IsNullOrWhiteSpace(x)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-        _model.Language = Language; _model.LaunchThroughSteam = LaunchThroughSteam; _model.ConcurrentDownloads = ConcurrentDownloads;
+        _model.Language = Language; _model.CatalogUrl = string.IsNullOrWhiteSpace(CatalogUrl) ? null : CatalogUrl.Trim(); _model.LaunchThroughSteam = LaunchThroughSteam; _model.ConcurrentDownloads = ConcurrentDownloads;
         await _settings.SaveAsync(_model, token);
         _localization.SetLanguage(Language);
         Message = "Settings saved.";

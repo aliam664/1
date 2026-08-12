@@ -307,7 +307,7 @@ installer/windows-release.yml.template
 5. بعد از موفقیت Job، Artifact با نام زیر را دانلود کنید:
 
 ```text
-AC-Mod-Hub-1.0.0-win-x64
+AC-Mod-Hub-1.0.1-win-x64
 ```
 
 Artifact شامل Setup و Portable ZIP است.

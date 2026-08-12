@@ -32,10 +32,16 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ILaunchService, LaunchService>();
         services.AddSingleton<IDiagnosticsService, DiagnosticsService>();
         services.AddSingleton<IContentProvider, DirectUrlContentProvider>();
+        services.AddSingleton<IModCatalogService, JsonModCatalogService>();
+        services.AddHttpClient("catalog", client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(20);
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("ACModHub/1.0.1");
+        });
         services.AddHttpClient("downloads", client =>
         {
             client.Timeout = Timeout.InfiniteTimeSpan;
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("ACModHub/1.0");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("ACModHub/1.0.1");
         });
         services.AddSingleton<IDownloadManager>(provider => new HttpDownloadManager(
             provider.GetRequiredService<IHttpClientFactory>().CreateClient("downloads"),

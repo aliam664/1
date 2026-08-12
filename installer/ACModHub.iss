@@ -1,5 +1,5 @@
 #define MyAppName "AC Mod Hub"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1"
 #define MyAppPublisher "AC Mod Hub"
 #define MyAppExeName "ACModHub.exe"
 #ifndef PublishDir

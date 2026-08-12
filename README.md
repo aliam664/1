@@ -4,7 +4,7 @@ A Windows launcher, mod manager, secure mod installer, backup manager and downlo
 
 > AC Mod Hub is an independent community project. Assetto Corsa and Steam are trademarks of their respective owners.
 
-**راهنمای کامل فارسی نصب و راه‌اندازی:** [INSTALL-FA.md](INSTALL-FA.md)
+**راهنمای کامل فارسی نصب و راه‌اندازی:** [INSTALL-FA.md](INSTALL-FA.md) · **راهنمای افزودن لینک مود:** [CATALOG-FA.md](CATALOG-FA.md)
 
 **Windows Preview installer:** [Download AC-Mod-Hub-Setup.exe](releases/v1.0.0-preview.1/AC-Mod-Hub-Setup.exe) · [SHA-256](releases/v1.0.0-preview.1/SHA256SUMS.txt)
 
@@ -23,6 +23,8 @@ A Windows launcher, mod manager, secure mod installer, backup manager and downlo
 - Resumable HTTP download queue with Range support, real speed/ETA/progress, expected-size/SHA-256 validation, pause, resume, cancellation, retry and concurrency
 - Provider-independent `IContentProvider` update architecture (no third-party catalog dependency in v1)
 - Persian/English UI (Persian/RTL by default), dark gaming-oriented shell and drag-and-drop import
+- Embedded animated HTML/CSS/JavaScript Mod Store with search, categories, featured cards, one-click secure download and installer handoff
+- Hybrid embedded/remote JSON catalog with HTTPS validation, cache fallback and no executable scripting privileges
 - Per-user Inno Setup installer and portable self-contained `win-x64` package
 - Rotating application logs and startup recovery for interrupted installation journals
 
@@ -101,7 +103,7 @@ To invoke Inno Setup manually:
   ".\installer\ACModHub.iss"
 ```
 
-The Windows release workflow is preserved as `installer/windows-release.yml.template`. To activate GitHub Actions, copy it to `.github/workflows/windows-release.yml` using a GitHub connection/token with Workflows permission; it then uploads both files as the `AC-Mod-Hub-1.0.0-win-x64` artifact.
+The Windows release workflow is preserved as `installer/windows-release.yml.template`. To activate GitHub Actions, copy it to `.github/workflows/windows-release.yml` using a GitHub connection/token with Workflows permission; it then uploads both files as the `AC-Mod-Hub-1.0.1-win-x64` artifact.
 
 ## First run
 

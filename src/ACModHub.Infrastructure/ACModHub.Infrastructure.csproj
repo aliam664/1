@@ -5,6 +5,9 @@
     <RootNamespace>ACModHub.Infrastructure</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\..\assets\catalog.v1.json" LogicalName="ACModHub.Catalog.catalog.v1.json" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ACModHub.Core\ACModHub.Core.csproj" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />

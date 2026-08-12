@@ -13,6 +13,7 @@ public sealed class AppSettings
     public List<string> KnownGamePaths { get; set; } = [];
     public string Language { get; set; } = "fa-IR";
     public string? DownloadDirectory { get; set; }
+    public string? CatalogUrl { get; set; }
     public int ConcurrentDownloads { get; set; } = 3;
     public bool LaunchThroughSteam { get; set; } = true;
     public bool VerifyAfterInstall { get; set; } = true;

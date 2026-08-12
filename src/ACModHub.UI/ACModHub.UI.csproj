@@ -6,6 +6,11 @@
     <RootNamespace>ACModHub.UI</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\Catalog\index.html" />
+    <EmbeddedResource Include="Resources\Catalog\catalog.css" />
+    <EmbeddedResource Include="Resources\Catalog\catalog.js" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ACModHub.Core\ACModHub.Core.csproj" />
     <ProjectReference Include="..\ACModHub.Infrastructure\ACModHub.Infrastructure.csproj" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />

@@ -14,7 +14,7 @@ public sealed class MainViewModel : ObservableObject
     private readonly ISettingsService _settings;
     private readonly IUiErrorHandler _errors;
     private object? _currentPage;
-    private string _selectedPage = "Dashboard";
+    private string _selectedPage = "Catalog";
     private string? _notification;
     private FlowDirection _flowDirection;
     private bool _downloadsHooked;
@@ -36,7 +36,7 @@ public sealed class MainViewModel : ObservableObject
     public AsyncRelayCommand ImportCommand { get; }
     public AsyncRelayCommand ToggleLanguageCommand { get; }
 
-    public Task InitializeAsync(CancellationToken cancellationToken = default) => ShowDashboardAsync(cancellationToken);
+    public Task InitializeAsync(CancellationToken cancellationToken = default) => ShowCatalogAsync(cancellationToken);
 
     private async Task NavigateAsync(object? parameter, CancellationToken token)
     {
@@ -45,6 +45,7 @@ public sealed class MainViewModel : ObservableObject
         switch (key)
         {
             case "Dashboard": await ShowDashboardAsync(token); break;
+            case "Catalog": await ShowCatalogAsync(token); break;
             case "Mods": await ShowLibraryAsync(null, token); break;
             case "Cars": await ShowLibraryAsync(ModCategory.Car, token); break;
             case "Tracks": await ShowLibraryAsync(ModCategory.Track, token); break;
@@ -60,6 +61,14 @@ public sealed class MainViewModel : ObservableObject
             case "Settings": var settings = _services.GetRequiredService<SettingsViewModel>(); CurrentPage = settings; await settings.LoadAsync(token); break;
             default: await ShowDashboardAsync(token); break;
         }
+    }
+
+    private async Task ShowCatalogAsync(CancellationToken token)
+    {
+        var catalog = _services.GetRequiredService<CatalogViewModel>();
+        catalog.PackageReady += path => ImportCommand.Execute(path);
+        CurrentPage = catalog;
+        await catalog.LoadAsync(token);
     }
 
     private async Task ShowDashboardAsync(CancellationToken token)

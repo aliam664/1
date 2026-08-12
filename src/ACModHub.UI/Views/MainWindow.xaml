@@ -4,7 +4,7 @@
  Title="AC Mod Hub" Width="1440" Height="900" MinWidth="1100" MinHeight="700" WindowStyle="None" ResizeMode="CanResize" FlowDirection="{Binding FlowDirection}" b:FileDropBehavior.Command="{Binding ImportCommand}">
  <shell:WindowChrome.WindowChrome><shell:WindowChrome CaptionHeight="48" ResizeBorderThickness="6" CornerRadius="0" GlassFrameThickness="0"/></shell:WindowChrome.WindowChrome>
  <Window.Resources>
-  <DataTemplate DataType="{x:Type vm:DashboardViewModel}"><views:DashboardView/></DataTemplate><DataTemplate DataType="{x:Type vm:LibraryViewModel}"><views:LibraryView/></DataTemplate>
+  <DataTemplate DataType="{x:Type vm:DashboardViewModel}"><views:DashboardView/></DataTemplate><DataTemplate DataType="{x:Type vm:CatalogViewModel}"><views:CatalogView/></DataTemplate><DataTemplate DataType="{x:Type vm:LibraryViewModel}"><views:LibraryView/></DataTemplate>
   <DataTemplate DataType="{x:Type vm:InstallerViewModel}"><views:InstallerView/></DataTemplate><DataTemplate DataType="{x:Type vm:DownloadsViewModel}"><views:DownloadsView/></DataTemplate>
   <DataTemplate DataType="{x:Type vm:BackupsViewModel}"><views:BackupsView/></DataTemplate><DataTemplate DataType="{x:Type vm:UpdatesViewModel}"><views:UpdatesView/></DataTemplate>
   <DataTemplate DataType="{x:Type vm:SettingsViewModel}"><views:SettingsView/></DataTemplate>
@@ -29,6 +29,7 @@
    <Border Grid.Column="0" Background="#0D121B" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
     <Grid><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
      <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="8,18">
+      <Button Style="{StaticResource NavButton}" Command="{Binding NavigateCommand}" CommandParameter="Catalog"><TextBlock><Run Text="✦  "/><Run Text="{DynamicResource NavCatalog}"/></TextBlock></Button>
       <Button Style="{StaticResource NavButton}" Command="{Binding NavigateCommand}" CommandParameter="Dashboard"><TextBlock><Run Text="◈  "/><Run Text="{DynamicResource NavDashboard}"/></TextBlock></Button>
       <Button Style="{StaticResource NavButton}" Command="{Binding NavigateCommand}" CommandParameter="Mods"><TextBlock><Run Text="▦  "/><Run Text="{DynamicResource NavMods}"/></TextBlock></Button>
       <Button Style="{StaticResource NavButton}" Command="{Binding NavigateCommand}" CommandParameter="Cars"><TextBlock><Run Text="◆  "/><Run Text="{DynamicResource NavCars}"/></TextBlock></Button>
