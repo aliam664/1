@@ -1,3 +1,4 @@
+using System.Text.Json;
 using ACModHub.Core;
 using ACModHub.Core.Interfaces;
 using ACModHub.Core.Models;
@@ -18,8 +19,10 @@ public sealed class TransactionalModInstaller : IModInstaller
     private readonly IDiskSpaceService _diskSpace;
     private readonly IJournalStore _journals;
     private readonly IAppPaths _paths;
+    private readonly IInstallationLockService _installationLocks;
+    private readonly IUserErrorMessageService _userErrors;
+    private readonly IModUninstaller _uninstaller;
     private readonly ILogger<TransactionalModInstaller> _logger;
-    private readonly SemaphoreSlim _installationGate = new(1, 1);
 
     public TransactionalModInstaller(
         IArchiveService archives,
@@ -32,6 +35,9 @@ public sealed class TransactionalModInstaller : IModInstaller
         IDiskSpaceService diskSpace,
         IJournalStore journals,
         IAppPaths paths,
+        IInstallationLockService installationLocks,
+        IUserErrorMessageService userErrors,
+        IModUninstaller uninstaller,
         ILogger<TransactionalModInstaller> logger)
     {
         _archives = archives;
@@ -44,6 +50,9 @@ public sealed class TransactionalModInstaller : IModInstaller
         _diskSpace = diskSpace;
         _journals = journals;
         _paths = paths;
+        _installationLocks = installationLocks;
+        _userErrors = userErrors;
+        _uninstaller = uninstaller;
         _logger = logger;
     }
 
@@ -61,8 +70,11 @@ public sealed class TransactionalModInstaller : IModInstaller
         var plan = new ModInstallPlan
         {
             SuggestedName = analysis.Plan.SuggestedName,
+            PackageId = analysis.Plan.PackageId,
             Author = analysis.Plan.Author,
             Version = analysis.Plan.Version,
+            Description = analysis.Plan.Description,
+            Metadata = new Dictionary<string, string>(analysis.Plan.Metadata, StringComparer.OrdinalIgnoreCase),
             Category = analysis.Plan.Category,
             RootPrefixRemoved = analysis.Plan.RootPrefixRemoved,
             Files = files,
@@ -106,19 +118,24 @@ public sealed class TransactionalModInstaller : IModInstaller
 
     public async Task DisableAsync(Guid modId, CancellationToken cancellationToken = default)
     {
-        await _installationGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        var manifest = await RequiredManifestAsync(modId, cancellationToken).ConfigureAwait(false);
+        if (manifest.Status == ModStatus.Disabled) return;
+        var gamePath = RequiredGamePath(manifest);
+        await using var installationLock = await _installationLocks.AcquireAsync(gamePath, cancellationToken).ConfigureAwait(false);
+        var ownershipByPath = (await _repository.GetAllOwnershipAsync(cancellationToken).ConfigureAwait(false))
+            .ToDictionary(x => OwnershipKey(x.RelativePath), StringComparer.OrdinalIgnoreCase);
+        if (manifest.Files.Any(file => ownershipByPath.TryGetValue(OwnershipKey(file.RelativePath), out var owner) && owner.ModIds.Contains(modId) && !IsTopOwner(owner, modId)))
+            throw new ModHubException("This mod cannot be disabled while a newer mod overrides the same files. Disable or uninstall the newer mod first.");
+        var moved = new List<(ModFileRecord File, string GameFile, string DisabledFile)>();
         try
         {
-            var manifest = await RequiredManifestAsync(modId, cancellationToken).ConfigureAwait(false);
-            if (manifest.Status == ModStatus.Disabled) return;
-            var gamePath = RequiredGamePath(manifest);
-            var ownershipByPath = (await _repository.GetAllOwnershipAsync(cancellationToken).ConfigureAwait(false))
-                .ToDictionary(x => OwnershipKey(x.RelativePath), StringComparer.OrdinalIgnoreCase);
             foreach (var file in manifest.Files)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 ownershipByPath.TryGetValue(OwnershipKey(file.RelativePath), out var ownership);
-                if (ownership is null || ownership.ModIds.Count != 1 || !ownership.ModIds.Contains(modId)) continue;
+                if (!IsTopOwner(ownership, modId)) continue;
+                if (file.WasExisting && (string.IsNullOrWhiteSpace(file.BackupPath) || !File.Exists(file.BackupPath)))
+                    throw new ModHubException($"Mod cannot be disabled safely because the pre-install backup is missing: {file.RelativePath}");
                 var source = SafePath.CombineUnderRoot(gamePath, file.RelativePath);
                 if (!File.Exists(source)) continue;
                 var disabledRoot = Path.Combine(_paths.DisabledModsDirectory, modId.ToString("N"));
@@ -126,111 +143,89 @@ public sealed class TransactionalModInstaller : IModInstaller
                 Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
                 File.Move(source, destination, true);
                 file.DisabledStorePath = destination;
+                moved.Add((file, source, destination));
+                var originalBackup = file.BackupPath;
+                if (file.WasExisting && !string.IsNullOrWhiteSpace(originalBackup) && File.Exists(originalBackup))
+                    await AtomicCopyAsync(originalBackup, source, cancellationToken).ConfigureAwait(false);
             }
             manifest.Status = ModStatus.Disabled;
             manifest.UpdatedAt = DateTimeOffset.UtcNow;
             await _repository.SaveAsync(manifest, cancellationToken).ConfigureAwait(false);
         }
-        finally { _installationGate.Release(); }
+        catch
+        {
+            foreach (var item in moved.AsEnumerable().Reverse())
+            {
+                if (File.Exists(item.GameFile)) File.Delete(item.GameFile);
+                if (File.Exists(item.DisabledFile)) { Directory.CreateDirectory(Path.GetDirectoryName(item.GameFile)!); File.Move(item.DisabledFile, item.GameFile, true); }
+                item.File.DisabledStorePath = null;
+            }
+            throw;
+        }
     }
 
     public async Task EnableAsync(Guid modId, CancellationToken cancellationToken = default)
     {
-        await _installationGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        var manifest = await RequiredManifestAsync(modId, cancellationToken).ConfigureAwait(false);
+        if (manifest.Status == ModStatus.Enabled) return;
+        var gamePath = RequiredGamePath(manifest);
+        await using var installationLock = await _installationLocks.AcquireAsync(gamePath, cancellationToken).ConfigureAwait(false);
+        var ownershipByPath = (await _repository.GetAllOwnershipAsync(cancellationToken).ConfigureAwait(false))
+            .ToDictionary(x => OwnershipKey(x.RelativePath), StringComparer.OrdinalIgnoreCase);
+        var enabled = new List<(ModFileRecord File, string GameFile, string DisabledFile)>();
         try
         {
-            var manifest = await RequiredManifestAsync(modId, cancellationToken).ConfigureAwait(false);
-            if (manifest.Status == ModStatus.Enabled) return;
-            var gamePath = RequiredGamePath(manifest);
-            var ownershipByPath = (await _repository.GetAllOwnershipAsync(cancellationToken).ConfigureAwait(false))
-                .ToDictionary(x => OwnershipKey(x.RelativePath), StringComparer.OrdinalIgnoreCase);
             foreach (var file in manifest.Files)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (string.IsNullOrWhiteSpace(file.DisabledStorePath) || !File.Exists(file.DisabledStorePath)) continue;
+                var disabledSource = file.DisabledStorePath;
+                if (string.IsNullOrWhiteSpace(disabledSource) || !File.Exists(disabledSource)) continue;
                 ownershipByPath.TryGetValue(OwnershipKey(file.RelativePath), out var ownership);
                 var target = SafePath.CombineUnderRoot(gamePath, file.RelativePath);
-                if (ownership is not null && ownership.ModIds.Count > 1 && File.Exists(target)) continue;
+                if (!IsTopOwner(ownership, modId) && File.Exists(target)) continue;
                 Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-                File.Move(file.DisabledStorePath, target, true);
+                File.Move(disabledSource, target, true);
+                enabled.Add((file, target, disabledSource));
                 file.DisabledStorePath = null;
             }
-            manifest.Status = ModStatus.Enabled;
+            manifest.Status = manifest.Files.Any(x => !string.IsNullOrWhiteSpace(x.DisabledStorePath) && File.Exists(x.DisabledStorePath)) ? ModStatus.Disabled : ModStatus.Enabled;
             manifest.UpdatedAt = DateTimeOffset.UtcNow;
             await _repository.SaveAsync(manifest, cancellationToken).ConfigureAwait(false);
         }
-        finally { _installationGate.Release(); }
-    }
-
-    public async Task UninstallAsync(Guid modId, CancellationToken cancellationToken = default)
-    {
-        await _installationGate.WaitAsync(cancellationToken).ConfigureAwait(false);
-        try
+        catch
         {
-            var manifest = await RequiredManifestAsync(modId, cancellationToken).ConfigureAwait(false);
-            var gamePath = RequiredGamePath(manifest);
-            var ownershipByPath = (await _repository.GetAllOwnershipAsync(cancellationToken).ConfigureAwait(false))
-                .ToDictionary(x => OwnershipKey(x.RelativePath), StringComparer.OrdinalIgnoreCase);
-            var soleOwned = manifest.Files
-                .Where(file => ownershipByPath.TryGetValue(OwnershipKey(file.RelativePath), out var owner) && owner.ModIds.SetEquals([modId]))
-                .Select(file => file.RelativePath)
-                .ToArray();
-            var backup = await _backups.CreateAsync(modId, gamePath, soleOwned, cancellationToken).ConfigureAwait(false);
-            var journal = new InstallationJournal { ModId = modId, GamePath = gamePath, ArchivePath = manifest.SourceArchivePath ?? "uninstall", Kind = TransactionKind.Uninstall, PreviousManifest = manifest, Stage = InstallStage.Install };
-            await _journals.SaveAsync(journal, cancellationToken).ConfigureAwait(false);
-            foreach (var relative in backup.RelativeFiles)
-                await _journals.AppendOperationAsync(journal, new JournalOperation { Kind = FileOperationKind.Deleted, TargetRelativePath = relative, BackupPath = SafePath.CombineUnderRoot(backup.RootPath, relative) }, cancellationToken).ConfigureAwait(false);
-
-            try
+            foreach (var item in enabled.AsEnumerable().Reverse())
             {
-                var upserts = new List<FileOwnershipRecord>();
-                var deletions = new List<string>();
-                foreach (var file in manifest.Files)
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    if (ownershipByPath.TryGetValue(OwnershipKey(file.RelativePath), out var ownership))
-                    {
-                        ownership.ModIds.Remove(modId);
-                        if (ownership.ModIds.Count == 0)
-                        {
-                            var target = SafePath.CombineUnderRoot(gamePath, file.RelativePath);
-                            if (File.Exists(target)) File.Delete(target);
-                            deletions.Add(file.RelativePath);
-                            DeleteEmptyParents(Path.GetDirectoryName(target), gamePath);
-                        }
-                        else upserts.Add(ownership);
-                    }
-                }
-                await _repository.ApplyOwnershipChangesAsync(upserts, deletions, cancellationToken).ConfigureAwait(false);
-                await _repository.DeleteAsync(modId, cancellationToken).ConfigureAwait(false);
-                journal.State = JournalState.Completed;
-                journal.Stage = InstallStage.Done;
-                await _journals.SaveAsync(journal, cancellationToken).ConfigureAwait(false);
-                var disabledRoot = Path.Combine(_paths.DisabledModsDirectory, modId.ToString("N"));
-                try { if (Directory.Exists(disabledRoot)) Directory.Delete(disabledRoot, true); }
-                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { _logger.LogWarning(ex, "Could not remove disabled-file cache for mod {ModId}", modId); }
-                if (!string.IsNullOrWhiteSpace(manifest.SourceArchivePath)) TryDeleteCachedPackage(manifest.SourceArchivePath);
+                Directory.CreateDirectory(Path.GetDirectoryName(item.DisabledFile)!);
+                if (File.Exists(item.GameFile)) File.Move(item.GameFile, item.DisabledFile, true);
+                var originalBackup = item.File.BackupPath;
+                if (item.File.WasExisting && !string.IsNullOrWhiteSpace(originalBackup) && File.Exists(originalBackup))
+                    await AtomicCopyAsync(originalBackup, item.GameFile, CancellationToken.None).ConfigureAwait(false);
+                item.File.DisabledStorePath = item.DisabledFile;
             }
-            catch
-            {
-                await _backups.RestoreAsync(backup, gamePath, CancellationToken.None).ConfigureAwait(false);
-                await RestoreOwnerReferencesAsync(manifest, CancellationToken.None).ConfigureAwait(false);
-                await _repository.SaveAsync(manifest, CancellationToken.None).ConfigureAwait(false);
-                journal.State = JournalState.RolledBack;
-                await _journals.SaveAsync(journal, CancellationToken.None).ConfigureAwait(false);
-                throw;
-            }
+            throw;
         }
-        finally { _installationGate.Release(); }
     }
+
+    public Task<UninstallAnalysis> AnalyzeUninstallAsync(Guid modId, CancellationToken cancellationToken = default) =>
+        _uninstaller.AnalyzeAsync(modId, cancellationToken);
+
+    public Task UninstallAsync(Guid modId, CancellationToken cancellationToken = default) =>
+        _uninstaller.UninstallAsync(modId, new UninstallOptions(), cancellationToken);
+
+    public Task UninstallAsync(Guid modId, UninstallOptions options, CancellationToken cancellationToken = default) =>
+        _uninstaller.UninstallAsync(modId, options, cancellationToken);
 
     private async Task<ModAnalysis> AnalyzeCoreAsync(string archivePath, string gamePath, Guid? currentModId, CancellationToken cancellationToken)
     {
         var fullGamePath = Path.GetFullPath(gamePath);
         if (!Directory.Exists(fullGamePath)) throw new DirectoryNotFoundException("The selected game directory does not exist.");
         var inspection = await _archives.InspectAsync(archivePath, cancellationToken).ConfigureAwait(false);
-        var plan = _structures.Detect(Path.GetFileName(archivePath), inspection.Entries);
+        var detectedPlan = _structures.Detect(Path.GetFileName(archivePath), inspection.Entries);
+        var plan = await ApplyPackageMetadataAsync(detectedPlan, inspection, cancellationToken).ConfigureAwait(false);
         var conflicts = (await _conflicts.DetectAsync(fullGamePath, plan.Files, currentModId, cancellationToken).ConfigureAwait(false)).ToList();
+        if (plan.Category == ModCategory.Miscellaneous)
+            conflicts.Add(new(".", ConflictKind.UnknownStructure, "No canonical Assetto Corsa root was detected. Review every destination and explicitly confirm this package before installation."));
         var existingBytes = plan.Files.Select(x => SafePath.CombineUnderRoot(fullGamePath, x.DestinationPath)).Where(File.Exists).Sum(x => new FileInfo(x).Length);
         var required = checked(inspection.TotalUncompressedSize + existingBytes + 64L * 1024 * 1024);
         try
@@ -245,6 +240,52 @@ public sealed class TransactionalModInstaller : IModInstaller
         return new ModAnalysis { ArchivePath = inspection.ArchivePath, GamePath = fullGamePath, Plan = plan, Conflicts = conflicts, RequiredDiskBytes = required };
     }
 
+    private async Task<ModInstallPlan> ApplyPackageMetadataAsync(ModInstallPlan plan, ArchiveInspection inspection, CancellationToken cancellationToken)
+    {
+        var metadataEntry = inspection.Entries.FirstOrDefault(x => !x.IsDirectory && !x.ArchivePath.Contains('/')
+            && (x.ArchivePath.Equals("manifest.json", StringComparison.OrdinalIgnoreCase) || x.ArchivePath.Equals("acmodhub.manifest.json", StringComparison.OrdinalIgnoreCase)));
+        if (metadataEntry is null) return plan;
+        var json = await _archives.ReadTextEntryAsync(inspection.ArchivePath, metadataEntry.ArchivePath, cancellationToken: cancellationToken).ConfigureAwait(false);
+        if (string.IsNullOrWhiteSpace(json)) return plan;
+        try
+        {
+            using var document = JsonDocument.Parse(json, new JsonDocumentOptions { AllowTrailingCommas = true, CommentHandling = JsonCommentHandling.Skip, MaxDepth = 16 });
+            var root = document.RootElement;
+            var game = ReadString(root, "game");
+            if (!string.IsNullOrWhiteSpace(game) && !game.Equals("assetto-corsa", StringComparison.OrdinalIgnoreCase))
+                throw new ModHubException($"This package targets '{game}', not Assetto Corsa.");
+            var metadata = new Dictionary<string, string>(plan.Metadata, StringComparer.OrdinalIgnoreCase);
+            foreach (var property in root.EnumerateObject())
+                if (property.Value.ValueKind is JsonValueKind.String or JsonValueKind.Number or JsonValueKind.True or JsonValueKind.False)
+                    metadata[property.Name] = property.Value.ToString();
+            return new ModInstallPlan
+            {
+                SuggestedName = ReadString(root, "name") ?? plan.SuggestedName,
+                PackageId = ReadString(root, "id"),
+                Author = ReadString(root, "author") ?? plan.Author,
+                Version = ReadString(root, "version") ?? plan.Version,
+                Description = ReadString(root, "description"),
+                Metadata = metadata,
+                Category = plan.Category,
+                RootPrefixRemoved = plan.RootPrefixRemoved,
+                Files = plan.Files,
+                Warnings = plan.Warnings
+            };
+        }
+        catch (JsonException ex)
+        {
+            throw new ModHubException("The package manifest.json is not valid JSON.", ex);
+        }
+    }
+
+    private static string? ReadString(JsonElement root, string propertyName)
+    {
+        foreach (var property in root.EnumerateObject())
+            if (property.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase) && property.Value.ValueKind == JsonValueKind.String)
+                return property.Value.GetString();
+        return null;
+    }
+
     private async Task<InstallResult> InstallCoreAsync(ModAnalysis analysis, InstallOptions options, Guid modId, ModManifest? previous, IProgress<InstallProgress>? progress, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(analysis);
@@ -254,10 +295,14 @@ public sealed class TransactionalModInstaller : IModInstaller
         if (blocking.Length > 0)
             return new InstallResult { Success = false, ModId = modId, Error = string.Join(Environment.NewLine, blocking.Take(5).Select(x => x.Message)) };
 
-        await _installationGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        await using var installationLock = await _installationLocks.AcquireAsync(gamePath, cancellationToken).ConfigureAwait(false);
         var staging = Path.Combine(_paths.CacheDirectory, "staging", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(staging);
-        var journal = new InstallationJournal { ModId = modId, GamePath = gamePath, ArchivePath = analysis.ArchivePath, Kind = previous is null ? TransactionKind.Install : TransactionKind.Update, PreviousManifest = previous };
+        var previousOwnership = previous is null
+            ? new List<FileOwnershipRecord>()
+            : (await _repository.GetAllOwnershipAsync(cancellationToken).ConfigureAwait(false)).Where(x => x.ModIds.Contains(modId)).Select(CloneOwnership).ToList();
+        var journal = new InstallationJournal { ModId = modId, GamePath = gamePath, ArchivePath = analysis.ArchivePath, Kind = previous is null ? TransactionKind.Install : TransactionKind.Update, PreviousManifest = previous, PreviousOwnership = previousOwnership };
+        _logger.LogInformation("{TransactionKind} transaction {TransactionId} started for mod {ModId}, game root {GameRoot}, archive {ArchivePath}, files {FileCount}", journal.Kind, journal.Id, modId, gamePath, analysis.ArchivePath, analysis.Plan.Files.Count);
         BackupDescriptor? backup = null;
         try
         {
@@ -291,8 +336,16 @@ public sealed class TransactionalModInstaller : IModInstaller
                 Directory.CreateDirectory(Path.GetDirectoryName(target)!);
                 await AtomicCopyAsync(source, target, cancellationToken).ConfigureAwait(false);
                 var hash = await _hashes.ComputeSha256Async(target, cancellationToken).ConfigureAwait(false);
-                records.Add(new ModFileRecord { RelativePath = planned.DestinationPath.Replace('\\', '/'), Size = new FileInfo(target).Length, Sha256 = hash });
-                Report(progress, InstallStage.Install, 0.15 + 0.65 * (i + 1d) / analysis.Plan.Files.Count, "Installing files", planned.DestinationPath);
+                var previousFile = previous?.Files.FirstOrDefault(x => OwnershipKey(x.RelativePath).Equals(OwnershipKey(planned.DestinationPath), StringComparison.OrdinalIgnoreCase));
+                records.Add(new ModFileRecord
+                {
+                    RelativePath = planned.DestinationPath.Replace('\\', '/'),
+                    Size = new FileInfo(target).Length,
+                    Sha256 = hash,
+                    WasExisting = previousFile?.WasExisting ?? existed,
+                    BackupPath = previousFile?.BackupPath ?? backupPath
+                });
+                Report(progress, InstallStage.Install, 0.15 + 0.65 * (i + 1d) / analysis.Plan.Files.Count, "Installing files", planned.DestinationPath, i + 1, analysis.Plan.Files.Count);
             }
 
             await RemoveObsoleteFilesAsync(previous, records, gamePath, journal, backup, cancellationToken).ConfigureAwait(false);
@@ -311,6 +364,9 @@ public sealed class TransactionalModInstaller : IModInstaller
                 UpdatedAt = DateTimeOffset.UtcNow,
                 Files = records
             };
+            foreach (var item in analysis.Plan.Metadata) manifest.Metadata[item.Key] = item.Value;
+            if (!string.IsNullOrWhiteSpace(analysis.Plan.PackageId)) manifest.Metadata["packageId"] = analysis.Plan.PackageId;
+            if (!string.IsNullOrWhiteSpace(analysis.Plan.Description)) manifest.Metadata["description"] = analysis.Plan.Description;
             manifest.Metadata["gamePath"] = gamePath;
             manifest.Metadata["originalArchive"] = analysis.ArchivePath;
 
@@ -328,6 +384,7 @@ public sealed class TransactionalModInstaller : IModInstaller
             journal.Stage = InstallStage.Done;
             await _journals.SaveAsync(journal, cancellationToken).ConfigureAwait(false);
             if (previous?.SourceArchivePath is { } oldPackage && !oldPackage.Equals(package, StringComparison.OrdinalIgnoreCase)) TryDeleteCachedPackage(oldPackage);
+            _logger.LogInformation("Transaction {TransactionId} committed successfully for mod {ModId}", journal.Id, modId);
             Report(progress, InstallStage.Done, 1, "Installation completed");
             return new InstallResult { Success = true, ModId = modId };
         }
@@ -339,7 +396,7 @@ public sealed class TransactionalModInstaller : IModInstaller
             await RemoveOwnerReferencesAsync(modId, CancellationToken.None).ConfigureAwait(false);
             if (previous is not null)
             {
-                await RestoreOwnerReferencesAsync(previous, CancellationToken.None).ConfigureAwait(false);
+                await RestoreOwnershipSnapshotAsync(journal.PreviousOwnership, CancellationToken.None).ConfigureAwait(false);
                 await _repository.SaveAsync(previous, CancellationToken.None).ConfigureAwait(false);
             }
             else await _repository.DeleteAsync(modId, CancellationToken.None).ConfigureAwait(false);
@@ -347,12 +404,11 @@ public sealed class TransactionalModInstaller : IModInstaller
             journal.Stage = InstallStage.Failed;
             journal.Error = ex.Message;
             await _journals.SaveAsync(journal, CancellationToken.None).ConfigureAwait(false);
-            return new InstallResult { Success = false, ModId = modId, Error = ex.Message, WasRolledBack = rolledBack };
+            return new InstallResult { Success = false, ModId = modId, Error = _userErrors.ToUserMessage(ex, "Installation"), WasRolledBack = rolledBack };
         }
         finally
         {
             try { if (Directory.Exists(staging)) Directory.Delete(staging, true); } catch (IOException) { }
-            _installationGate.Release();
         }
     }
 
@@ -362,8 +418,8 @@ public sealed class TransactionalModInstaller : IModInstaller
     private static string RequiredGamePath(ModManifest manifest) =>
         manifest.Metadata.TryGetValue("gamePath", out var path) && !string.IsNullOrWhiteSpace(path) ? path : throw new ModHubException("The mod manifest does not contain its game path.");
 
-    private static void Report(IProgress<InstallProgress>? progress, InstallStage stage, double percentage, string message, string? file = null) =>
-        progress?.Report(new(stage, percentage, message, file));
+    private static void Report(IProgress<InstallProgress>? progress, InstallStage stage, double percentage, string message, string? file = null, int current = 0, int total = 0) =>
+        progress?.Report(new(stage, percentage, message, file, current, total));
 
     private static async Task AtomicCopyAsync(string source, string target, CancellationToken cancellationToken)
     {
@@ -399,6 +455,7 @@ public sealed class TransactionalModInstaller : IModInstaller
             {
                 if (!ownership.TryGetValue(OwnershipKey(old.RelativePath), out var owner)) continue;
                 owner.ModIds.Remove(manifest.Id);
+                owner.OwnerStack.RemoveAll(x => x == manifest.Id);
                 if (owner.ModIds.Count == 0) { ownership.Remove(OwnershipKey(old.RelativePath)); deletions.Add(old.RelativePath); }
             }
         }
@@ -406,7 +463,10 @@ public sealed class TransactionalModInstaller : IModInstaller
         {
             var key = OwnershipKey(file.RelativePath);
             if (!ownership.TryGetValue(key, out var owner)) { owner = new FileOwnershipRecord { RelativePath = file.RelativePath }; ownership.Add(key, owner); }
+            NormalizeOwnerStack(owner);
             owner.ModIds.Add(manifest.Id);
+            owner.OwnerStack.RemoveAll(x => x == manifest.Id);
+            owner.OwnerStack.Add(manifest.Id);
             owner.UpdatedAt = DateTimeOffset.UtcNow;
             deletions.Remove(file.RelativePath);
         }
@@ -422,13 +482,19 @@ public sealed class TransactionalModInstaller : IModInstaller
         foreach (var obsolete in previous.Files.Where(x => !currentPaths.Contains(x.RelativePath)))
         {
             ownershipByPath.TryGetValue(OwnershipKey(obsolete.RelativePath), out var ownership);
-            if (ownership is null || ownership.ModIds.Count != 1 || !ownership.ModIds.Contains(previous.Id)) continue;
+            if (!IsTopOwner(ownership, previous.Id)) continue;
             var target = SafePath.CombineUnderRoot(gamePath, obsolete.RelativePath);
             if (!File.Exists(target)) continue;
-            var backupPath = backup is not null && backup.RelativeFiles.Contains(obsolete.RelativePath, StringComparer.OrdinalIgnoreCase)
+            var originalBackup = obsolete.BackupPath;
+            if (obsolete.WasExisting && (string.IsNullOrWhiteSpace(originalBackup) || !File.Exists(originalBackup)))
+                throw new InstallationException($"Update cannot remove '{obsolete.RelativePath}' because its original backup is missing.");
+            var rollbackPath = backup is not null && backup.RelativeFiles.Contains(obsolete.RelativePath, StringComparer.OrdinalIgnoreCase)
                 ? SafePath.CombineUnderRoot(backup.RootPath, obsolete.RelativePath) : null;
-            await _journals.AppendOperationAsync(journal, new JournalOperation { Kind = FileOperationKind.Deleted, TargetRelativePath = obsolete.RelativePath, BackupPath = backupPath }, cancellationToken).ConfigureAwait(false);
-            File.Delete(target);
+            await _journals.AppendOperationAsync(journal, new JournalOperation { Kind = obsolete.WasExisting ? FileOperationKind.Replaced : FileOperationKind.Deleted, TargetRelativePath = obsolete.RelativePath, BackupPath = rollbackPath }, cancellationToken).ConfigureAwait(false);
+            if (obsolete.WasExisting && !string.IsNullOrWhiteSpace(originalBackup) && File.Exists(originalBackup))
+                await AtomicCopyAsync(originalBackup, target, cancellationToken).ConfigureAwait(false);
+            else
+                File.Delete(target);
         }
     }
 
@@ -466,23 +532,22 @@ public sealed class TransactionalModInstaller : IModInstaller
         foreach (var owner in await _repository.GetAllOwnershipAsync(cancellationToken).ConfigureAwait(false))
         {
             if (!owner.ModIds.Remove(modId)) continue;
+            owner.OwnerStack.RemoveAll(x => x == modId);
             if (owner.ModIds.Count == 0) deletions.Add(owner.RelativePath); else upserts.Add(owner);
         }
         await _repository.ApplyOwnershipChangesAsync(upserts, deletions, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task RestoreOwnerReferencesAsync(ModManifest manifest, CancellationToken cancellationToken)
+    private Task RestoreOwnershipSnapshotAsync(IEnumerable<FileOwnershipRecord> snapshot, CancellationToken cancellationToken) =>
+        _repository.ApplyOwnershipChangesAsync(snapshot.Select(CloneOwnership), [], cancellationToken);
+
+    private static FileOwnershipRecord CloneOwnership(FileOwnershipRecord source) => new()
     {
-        var ownership = (await _repository.GetAllOwnershipAsync(cancellationToken).ConfigureAwait(false))
-            .ToDictionary(x => OwnershipKey(x.RelativePath), StringComparer.OrdinalIgnoreCase);
-        foreach (var file in manifest.Files)
-        {
-            var key = OwnershipKey(file.RelativePath);
-            if (!ownership.TryGetValue(key, out var owner)) { owner = new FileOwnershipRecord { RelativePath = file.RelativePath }; ownership.Add(key, owner); }
-            owner.ModIds.Add(manifest.Id);
-        }
-        await _repository.ApplyOwnershipChangesAsync(ownership.Values, [], cancellationToken).ConfigureAwait(false);
-    }
+        RelativePath = source.RelativePath,
+        ModIds = new HashSet<Guid>(source.ModIds),
+        OwnerStack = new List<Guid>(source.OwnerStack),
+        UpdatedAt = source.UpdatedAt
+    };
 
     private void TryDeleteCachedPackage(string path)
     {
@@ -498,16 +563,20 @@ public sealed class TransactionalModInstaller : IModInstaller
         }
     }
 
+    private static bool IsTopOwner(FileOwnershipRecord? ownership, Guid modId)
+    {
+        if (ownership is null || !ownership.ModIds.Contains(modId)) return false;
+        NormalizeOwnerStack(ownership);
+        return ownership.OwnerStack.Count == 0 || ownership.OwnerStack[^1] == modId;
+    }
+
+    private static void NormalizeOwnerStack(FileOwnershipRecord ownership)
+    {
+        ownership.OwnerStack.RemoveAll(x => !ownership.ModIds.Contains(x));
+        foreach (var owner in ownership.ModIds)
+            if (!ownership.OwnerStack.Contains(owner)) ownership.OwnerStack.Add(owner);
+    }
+
     private static string OwnershipKey(string path) => path.Replace('\\', '/').Trim('/');
 
-    private static void DeleteEmptyParents(string? directory, string root)
-    {
-        var fullRoot = Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar);
-        while (!string.IsNullOrWhiteSpace(directory) && Directory.Exists(directory) && !Path.GetFullPath(directory).TrimEnd(Path.DirectorySeparatorChar).Equals(fullRoot, StringComparison.OrdinalIgnoreCase))
-        {
-            if (Directory.EnumerateFileSystemEntries(directory).Any()) break;
-            Directory.Delete(directory);
-            directory = Path.GetDirectoryName(directory);
-        }
-    }
 }

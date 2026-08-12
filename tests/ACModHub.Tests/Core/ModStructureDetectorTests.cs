@@ -30,6 +30,17 @@ public sealed class ModStructureDetectorTests
     }
 
     [Fact]
+    public void Detect_ReportsMixedPackageWithoutDiscardingAnyFiles()
+    {
+        ArchiveEntryDescriptor[] entries = [
+            new("content/cars/mixed/data.acd", 10, 10, false),
+            new("extension/config/cars/mixed.ini", 5, 5, false)];
+        var plan = _detector.Detect("mixed.zip", entries);
+        Assert.Equal(ModCategory.Mixed, plan.Category);
+        Assert.Equal(2, plan.Files.Count);
+    }
+
+    [Fact]
     public void Detect_InfersCarForStructuredSkin()
     {
         ArchiveEntryDescriptor[] entries = [new("wrapper/ks_car/skins/red/ui_skin.json", 10, 10, false), new("wrapper/ks_car/skins/red/livery.png", 5, 5, false)];

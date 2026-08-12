@@ -17,8 +17,11 @@ public sealed record PlannedFile(
 public sealed class ModInstallPlan
 {
     public required string SuggestedName { get; init; }
+    public string? PackageId { get; init; }
     public string Author { get; init; } = "Unknown";
     public string Version { get; init; } = "1.0";
+    public string? Description { get; init; }
+    public Dictionary<string, string> Metadata { get; init; } = new(StringComparer.OrdinalIgnoreCase);
     public required ModCategory Category { get; init; }
     public required string RootPrefixRemoved { get; init; }
     public required IReadOnlyList<PlannedFile> Files { get; init; }

@@ -13,6 +13,7 @@ public sealed class SafePathTests
     [InlineData("folder/file.txt:stream")]
     [InlineData("CON/file.txt")]
     [InlineData("folder./file.txt")]
+    [InlineData("folder/file.txt ")]
     public void NormalizeRelative_RejectsUnsafeWindowsPaths(string path) => Assert.Throws<UnsafeArchiveException>(() => SafePath.NormalizeRelative(path));
 
     [Fact]

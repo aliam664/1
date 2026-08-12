@@ -26,6 +26,16 @@ public sealed class ArchiveValidationTests
     }
 
     [Fact]
+    public async Task Inspect_RejectsCorruptArchiveWithUnderstandableDomainError()
+    {
+        using var environment = new TestEnvironment();
+        var archive = Path.Combine(environment.Root, "corrupt.zip");
+        await File.WriteAllBytesAsync(archive, [0x50, 0x4B, 0x03, 0x04, 0x00]);
+        var error = await Assert.ThrowsAsync<UnsafeArchiveException>(() => environment.Get<IArchiveService>().InspectAsync(archive));
+        Assert.Contains("corrupt", error.Message, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public async Task Extract_WritesOnlyInsideValidatedDestination()
     {
         using var environment = new TestEnvironment();

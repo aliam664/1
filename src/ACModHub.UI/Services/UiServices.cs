@@ -1,7 +1,32 @@
 using System.Windows;
+using ACModHub.Core.Interfaces;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 
 namespace ACModHub.UI.Services;
+
+public interface IUiErrorHandler
+{
+    string Handle(Exception exception, string operation);
+}
+
+public sealed class UiErrorHandler : IUiErrorHandler
+{
+    private readonly IUserErrorMessageService _messages;
+    private readonly ILogger<UiErrorHandler> _logger;
+
+    public UiErrorHandler(IUserErrorMessageService messages, ILogger<UiErrorHandler> logger)
+    {
+        _messages = messages;
+        _logger = logger;
+    }
+
+    public string Handle(Exception exception, string operation)
+    {
+        _logger.LogError(exception, "UI operation {Operation} failed", operation);
+        return _messages.ToUserMessage(exception, operation);
+    }
+}
 
 public interface IFilePickerService
 {

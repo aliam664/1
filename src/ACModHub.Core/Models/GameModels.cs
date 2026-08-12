@@ -10,6 +10,7 @@ public sealed record GameInstallation(
 public sealed class AppSettings
 {
     public string? GamePath { get; set; }
+    public List<string> KnownGamePaths { get; set; } = [];
     public string Language { get; set; } = "fa-IR";
     public string? DownloadDirectory { get; set; }
     public int ConcurrentDownloads { get; set; } = 3;

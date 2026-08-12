@@ -1,5 +1,6 @@
 using ACModHub.Core.Interfaces;
 using ACModHub.Core.Models;
+using ACModHub.UI.Services;
 
 namespace ACModHub.UI.ViewModels;
 
@@ -7,6 +8,7 @@ public sealed class InstallerViewModel : ObservableObject
 {
     private readonly IModInstaller _installer;
     private readonly ISettingsService _settings;
+    private readonly IUiErrorHandler _errors;
     private ModAnalysis? _analysis;
     private InstallStage _stage = InstallStage.Analyze;
     private double _progress;
@@ -16,9 +18,9 @@ public sealed class InstallerViewModel : ObservableObject
     private bool _isBusy;
     private string? _error;
 
-    public InstallerViewModel(IModInstaller installer, ISettingsService settings)
+    public InstallerViewModel(IModInstaller installer, ISettingsService settings, IUiErrorHandler errors)
     {
-        _installer = installer; _settings = settings;
+        _installer = installer; _settings = settings; _errors = errors;
         InstallCommand = new AsyncRelayCommand(InstallAsync, _ => Analysis is not null && !IsBusy, SetError);
         CancelCommand = new RelayCommand(_ => CancelRequested?.Invoke());
     }
@@ -68,12 +70,18 @@ public sealed class InstallerViewModel : ObservableObject
                 StatusText = "Skin destination applied. Review the final paths and conflicts, then install again.";
                 return;
             }
-            var reporter = new Progress<InstallProgress>(value => { Stage = value.Stage; Progress = value.Percentage; StatusText = value.CurrentFile is null ? value.Message : $"{value.Message} · {value.CurrentFile}"; });
+            var reporter = new Progress<InstallProgress>(value =>
+            {
+                Stage = value.Stage;
+                Progress = value.Percentage;
+                var count = value.Total > 0 ? $" ({value.Current:N0}/{value.Total:N0})" : string.Empty;
+                StatusText = value.CurrentFile is null ? value.Message + count : $"{value.Message}{count} · {value.CurrentFile}";
+            });
             var result = await _installer.InstallAsync(Analysis, new InstallOptions { AllowOverwriteConflicts = AllowConflicts, CreateBackup = true, VerifyAfterInstall = true }, reporter, cancellationToken);
             if (!result.Success) { Error = result.Error; Stage = InstallStage.Failed; return; }
             if (result.ModId.HasValue) InstallationCompleted?.Invoke(result.ModId.Value);
         }
         finally { IsBusy = false; }
     }
-    private void SetError(Exception exception) { Error = exception.Message; Stage = InstallStage.Failed; IsBusy = false; }
+    private void SetError(Exception exception) { Error = _errors.Handle(exception, "Installation"); Stage = InstallStage.Failed; IsBusy = false; }
 }

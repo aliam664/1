@@ -48,4 +48,6 @@
   <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ExistingInstallation">نصب فعلی بازی</sys:String>
   <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ProviderArchitecture">معماری مستقل از ارائه‌دهنده برای به‌روزرسانی</sys:String>
   <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SkinCarTarget">پوشهٔ ماشین مقصد (مثال: ks_ferrari_458)</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="PreserveUninstallAction">حفظ فایل‌های تغییریافته و حذف مود</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RestoreUninstallAction">حذف تغییرات، بازیابی و حذف مود</sys:String>
 </ResourceDictionary>

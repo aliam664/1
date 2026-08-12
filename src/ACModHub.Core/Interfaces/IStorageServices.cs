@@ -5,6 +5,7 @@ namespace ACModHub.Core.Interfaces;
 public interface IArchiveService
 {
     Task<ArchiveInspection> InspectAsync(string archivePath, CancellationToken cancellationToken = default);
+    Task<string?> ReadTextEntryAsync(string archivePath, string entryPath, int maximumBytes = 1_048_576, CancellationToken cancellationToken = default);
     Task ExtractAsync(string archivePath, string destinationDirectory, CancellationToken cancellationToken = default);
 }
 
@@ -43,6 +44,7 @@ public interface IAppPaths
     string CacheDirectory { get; }
     string DownloadsDirectory { get; }
     string LogsDirectory { get; }
+    string LocksDirectory { get; }
     string JournalsDirectory { get; }
     string DisabledModsDirectory { get; }
 }

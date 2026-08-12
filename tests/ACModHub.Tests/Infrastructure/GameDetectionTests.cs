@@ -15,6 +15,8 @@ public sealed class GameDetectionTests
         Directory.CreateDirectory(Path.Combine(steam, "steamapps"));
         var game = Path.Combine(library, "steamapps", "common", "assettocorsa");
         Directory.CreateDirectory(Path.Combine(game, "content"));
+        Directory.CreateDirectory(Path.Combine(game, "apps"));
+        Directory.CreateDirectory(Path.Combine(game, "system"));
         await File.WriteAllTextAsync(Path.Combine(game, "acs.exe"), "test");
         await File.WriteAllTextAsync(Path.Combine(library, "steamapps", "appmanifest_244210.acf"), "manifest");
         var escaped = library.Replace("\\", "\\\\", StringComparison.Ordinal);
@@ -22,6 +24,24 @@ public sealed class GameDetectionTests
         var detector = new SteamGameDetector(new FakeSteamLocation(steam));
         var result = await detector.DetectAsync();
         Assert.Contains(result, x => x.IsValid && x.RootPath == game);
+    }
+
+    [Fact]
+    public async Task Detect_ReturnsEveryValidSteamInstallation()
+    {
+        using var environment = new TestEnvironment();
+        var roots = new[] { Path.Combine(environment.Root, "steam-a"), Path.Combine(environment.Root, "steam-b") };
+        foreach (var root in roots)
+        {
+            var game = Path.Combine(root, "steamapps", "common", "assettocorsa");
+            Directory.CreateDirectory(Path.Combine(game, "content"));
+            Directory.CreateDirectory(Path.Combine(game, "apps"));
+            Directory.CreateDirectory(Path.Combine(game, "system"));
+            await File.WriteAllTextAsync(Path.Combine(game, "acs.exe"), "test");
+            await File.WriteAllTextAsync(Path.Combine(root, "steamapps", "appmanifest_244210.acf"), "manifest");
+        }
+        var result = await new SteamGameDetector(new FakeSteamLocation(roots)).DetectAsync();
+        Assert.Equal(2, result.Count(x => x.IsValid));
     }
 
     [Fact]

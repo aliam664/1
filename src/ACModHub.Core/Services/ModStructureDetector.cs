@@ -15,7 +15,7 @@ public sealed class ModStructureDetector : IModStructureDetector
         ArgumentException.ThrowIfNullOrWhiteSpace(archiveName);
         ArgumentNullException.ThrowIfNull(entries);
 
-        var files = entries.Where(x => !x.IsDirectory).ToArray();
+        var files = entries.Where(x => !x.IsDirectory && !IsPackageManifest(x.ArchivePath)).ToArray();
         if (files.Length == 0)
             throw new ModHubException("The archive does not contain any files.");
 
@@ -101,7 +101,7 @@ public sealed class ModStructureDetector : IModStructureDetector
         var mappings = BuildMappings(files, paths, prefixLength, string.Empty);
         var destinations = mappings.Select(x => x.DestinationPath.Replace('\\', '/')).ToArray();
         var categories = destinations.Select(CategoryFromDestination).Distinct().ToArray();
-        var category = categories.Length == 1 ? categories[0] : ModCategory.Miscellaneous;
+        var category = categories.Length == 1 ? categories[0] : ModCategory.Mixed;
         var identity = GetIdentity(destinations, category);
         if (prefixLength > 0)
             warnings.Add($"Removed {prefixLength} extra wrapper folder(s) from the archive.");
@@ -262,6 +262,12 @@ public sealed class ModStructureDetector : IModStructureDetector
 
     private static bool StartsWithSegments(string[] value, string[] prefix) =>
         value.Length >= prefix.Length && value.Take(prefix.Length).SequenceEqual(prefix, StringComparer.OrdinalIgnoreCase);
+
+    private static bool IsPackageManifest(string path)
+    {
+        var normalized = path.Replace('\\', '/').Trim('/');
+        return !normalized.Contains('/') && (normalized.Equals("manifest.json", StringComparison.OrdinalIgnoreCase) || normalized.Equals("acmodhub.manifest.json", StringComparison.OrdinalIgnoreCase));
+    }
 
     private static string NormalizeArchivePath(string path) => SafePath.NormalizeRelative(path).Replace('\\', '/');
     private static string[] Split(string path) => path.Replace('\\', '/').Split('/', StringSplitOptions.RemoveEmptyEntries);

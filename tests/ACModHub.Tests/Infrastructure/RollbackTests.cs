@@ -32,6 +32,7 @@ public sealed class RollbackTests
         public string ArchivePath { get; set; } = string.Empty;
         private static readonly ArchiveEntryDescriptor[] Entries = [new("content/cars/rollback/one.txt", 3, 3, false), new("content/cars/rollback/two.txt", 3, 3, false)];
         public Task<ArchiveInspection> InspectAsync(string archivePath, CancellationToken cancellationToken = default) => Task.FromResult(new ArchiveInspection { ArchivePath = archivePath, Entries = Entries });
+        public Task<string?> ReadTextEntryAsync(string archivePath, string entryPath, int maximumBytes = 1_048_576, CancellationToken cancellationToken = default) => Task.FromResult<string?>(null);
         public async Task ExtractAsync(string archivePath, string destinationDirectory, CancellationToken cancellationToken = default)
         {
             var file = Path.Combine(destinationDirectory, "content", "cars", "rollback", "one.txt");

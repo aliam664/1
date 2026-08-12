@@ -26,3 +26,13 @@ public interface IFileLockService
 {
     bool IsLocked(string path);
 }
+
+public interface IInstallationLockService
+{
+    ValueTask<IAsyncDisposable> AcquireAsync(string gameRoot, CancellationToken cancellationToken = default);
+}
+
+public interface IUserErrorMessageService
+{
+    string ToUserMessage(Exception exception, string operation);
+}

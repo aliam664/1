@@ -12,14 +12,16 @@ public sealed class MainViewModel : ObservableObject
     private readonly IFilePickerService _picker;
     private readonly ILocalizationService _localization;
     private readonly ISettingsService _settings;
+    private readonly IUiErrorHandler _errors;
     private object? _currentPage;
     private string _selectedPage = "Dashboard";
     private string? _notification;
     private FlowDirection _flowDirection;
+    private bool _downloadsHooked;
 
-    public MainViewModel(IServiceProvider services, IFilePickerService picker, ILocalizationService localization, ISettingsService settings)
+    public MainViewModel(IServiceProvider services, IFilePickerService picker, ILocalizationService localization, ISettingsService settings, IUiErrorHandler errors)
     {
-        _services = services; _picker = picker; _localization = localization; _settings = settings; _flowDirection = localization.FlowDirection;
+        _services = services; _picker = picker; _localization = localization; _settings = settings; _errors = errors; _flowDirection = localization.FlowDirection;
         NavigateCommand = new AsyncRelayCommand(NavigateAsync, onError: SetError);
         ImportCommand = new AsyncRelayCommand(ImportAsync, onError: SetError);
         ToggleLanguageCommand = new AsyncRelayCommand(ToggleLanguageAsync, onError: SetError);
@@ -48,7 +50,11 @@ public sealed class MainViewModel : ObservableObject
             case "Tracks": await ShowLibraryAsync(ModCategory.Track, token); break;
             case "Skins": await ShowLibraryAsync(ModCategory.Skin, token); break;
             case "Apps": await ShowLibraryAsync(ModCategory.App, token); break;
-            case "Downloads": CurrentPage = _services.GetRequiredService<DownloadsViewModel>(); break;
+            case "Downloads":
+                var downloads = _services.GetRequiredService<DownloadsViewModel>();
+                if (!_downloadsHooked) { downloads.PackageInstallRequested += path => ImportCommand.Execute(path); _downloadsHooked = true; }
+                CurrentPage = downloads;
+                break;
             case "Updates": CurrentPage = _services.GetRequiredService<UpdatesViewModel>(); break;
             case "Backups": var backups = _services.GetRequiredService<BackupsViewModel>(); CurrentPage = backups; await backups.LoadAsync(token); break;
             case "Settings": var settings = _services.GetRequiredService<SettingsViewModel>(); CurrentPage = settings; await settings.LoadAsync(token); break;
@@ -75,7 +81,12 @@ public sealed class MainViewModel : ObservableObject
 
     private async Task ImportAsync(object? parameter, CancellationToken token)
     {
-        var archive = parameter is string[] files && files.Length > 0 ? files[0] : _picker.PickArchive();
+        var archive = parameter switch
+        {
+            string path => path,
+            string[] files when files.Length > 0 => files[0],
+            _ => _picker.PickArchive()
+        };
         if (archive is null) return;
         var installer = _services.GetRequiredService<InstallerViewModel>();
         installer.CancelRequested += () => NavigateCommand.Execute("Mods");
@@ -83,5 +94,5 @@ public sealed class MainViewModel : ObservableObject
         CurrentPage = installer; SelectedPage = "Installer";
         await installer.InitializeAsync(archive, token);
     }
-    private void SetError(Exception exception) => Notification = exception.Message;
+    private void SetError(Exception exception) => Notification = _errors.Handle(exception, "Navigation");
 }

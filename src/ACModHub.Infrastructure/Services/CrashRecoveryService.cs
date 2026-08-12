@@ -9,12 +9,14 @@ public sealed class CrashRecoveryService : ICrashRecoveryService
 {
     private readonly IJournalStore _journals;
     private readonly IModRepository _repository;
+    private readonly IInstallationLockService _installationLocks;
     private readonly ILogger<CrashRecoveryService> _logger;
 
-    public CrashRecoveryService(IJournalStore journals, IModRepository repository, ILogger<CrashRecoveryService> logger)
+    public CrashRecoveryService(IJournalStore journals, IModRepository repository, IInstallationLockService installationLocks, ILogger<CrashRecoveryService> logger)
     {
         _journals = journals;
         _repository = repository;
+        _installationLocks = installationLocks;
         _logger = logger;
     }
 
@@ -25,6 +27,7 @@ public sealed class CrashRecoveryService : ICrashRecoveryService
         {
             try
             {
+                await using var installationLock = await _installationLocks.AcquireAsync(journal.GamePath, cancellationToken).ConfigureAwait(false);
                 foreach (var operation in journal.Operations.AsEnumerable().Reverse())
                 {
                     cancellationToken.ThrowIfCancellationRequested();
@@ -64,16 +67,30 @@ public sealed class CrashRecoveryService : ICrashRecoveryService
         foreach (var owner in ownership.Values.ToArray())
         {
             if (!owner.ModIds.Remove(journal.ModId)) continue;
+            owner.OwnerStack.RemoveAll(x => x == journal.ModId);
             if (owner.ModIds.Count == 0) { ownership.Remove(Normalize(owner.RelativePath)); deletions.Add(owner.RelativePath); }
         }
         if (journal.PreviousManifest is not null)
         {
-            foreach (var file in journal.PreviousManifest.Files)
+            if (journal.PreviousOwnership.Count > 0)
             {
-                var key = Normalize(file.RelativePath);
-                if (!ownership.TryGetValue(key, out var owner)) { owner = new FileOwnershipRecord { RelativePath = file.RelativePath }; ownership.Add(key, owner); }
-                owner.ModIds.Add(journal.ModId);
-                deletions.Remove(file.RelativePath);
+                foreach (var previous in journal.PreviousOwnership)
+                {
+                    ownership[Normalize(previous.RelativePath)] = previous;
+                    deletions.Remove(previous.RelativePath);
+                }
+            }
+            else
+            {
+                foreach (var file in journal.PreviousManifest.Files)
+                {
+                    var key = Normalize(file.RelativePath);
+                    if (!ownership.TryGetValue(key, out var owner)) { owner = new FileOwnershipRecord { RelativePath = file.RelativePath }; ownership.Add(key, owner); }
+                    owner.ModIds.Add(journal.ModId);
+                    owner.OwnerStack.RemoveAll(x => x == journal.ModId);
+                    owner.OwnerStack.Add(journal.ModId);
+                    deletions.Remove(file.RelativePath);
+                }
             }
             await _repository.SaveAsync(journal.PreviousManifest, cancellationToken).ConfigureAwait(false);
         }

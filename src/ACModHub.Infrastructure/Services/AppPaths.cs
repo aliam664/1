@@ -17,6 +17,7 @@ public sealed class AppPaths : IAppPaths
     public string CacheDirectory => Path.Combine(DataRoot, "cache");
     public string DownloadsDirectory => Path.Combine(DataRoot, "downloads");
     public string LogsDirectory => Path.Combine(DataRoot, "logs");
+    public string LocksDirectory => Path.Combine(DataRoot, "locks");
     public string JournalsDirectory => Path.Combine(DataRoot, "journals");
     public string DisabledModsDirectory => Path.Combine(DataRoot, "disabled");
 
@@ -27,6 +28,7 @@ public sealed class AppPaths : IAppPaths
         yield return CacheDirectory;
         yield return DownloadsDirectory;
         yield return LogsDirectory;
+        yield return LocksDirectory;
         yield return JournalsDirectory;
         yield return DisabledModsDirectory;
     }

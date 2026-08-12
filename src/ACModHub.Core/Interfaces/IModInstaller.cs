@@ -2,6 +2,12 @@ using ACModHub.Core.Models;
 
 namespace ACModHub.Core.Interfaces;
 
+public interface IModUninstaller
+{
+    Task<UninstallAnalysis> AnalyzeAsync(Guid modId, CancellationToken cancellationToken = default);
+    Task UninstallAsync(Guid modId, UninstallOptions options, CancellationToken cancellationToken = default);
+}
+
 public interface IModInstaller
 {
     Task<ModAnalysis> AnalyzeAsync(string archivePath, string gamePath, CancellationToken cancellationToken = default);
@@ -12,5 +18,7 @@ public interface IModInstaller
     Task<VerificationResult> RepairAsync(Guid modId, IProgress<InstallProgress>? progress = null, CancellationToken cancellationToken = default);
     Task EnableAsync(Guid modId, CancellationToken cancellationToken = default);
     Task DisableAsync(Guid modId, CancellationToken cancellationToken = default);
+    Task<UninstallAnalysis> AnalyzeUninstallAsync(Guid modId, CancellationToken cancellationToken = default);
     Task UninstallAsync(Guid modId, CancellationToken cancellationToken = default);
+    Task UninstallAsync(Guid modId, UninstallOptions options, CancellationToken cancellationToken = default);
 }

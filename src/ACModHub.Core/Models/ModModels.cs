@@ -5,6 +5,8 @@ public sealed class ModFileRecord
     public required string RelativePath { get; init; }
     public required long Size { get; init; }
     public required string Sha256 { get; init; }
+    public bool WasExisting { get; set; }
+    public string? BackupPath { get; set; }
     public string? DisabledStorePath { get; set; }
 }
 
@@ -29,6 +31,7 @@ public sealed class FileOwnershipRecord
 {
     public required string RelativePath { get; init; }
     public HashSet<Guid> ModIds { get; init; } = [];
+    public List<Guid> OwnerStack { get; init; } = [];
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 }
 

@@ -26,7 +26,7 @@ public sealed class InstallOptions
     public string? VersionOverride { get; init; }
 }
 
-public sealed record InstallProgress(InstallStage Stage, double Percentage, string Message, string? CurrentFile = null);
+public sealed record InstallProgress(InstallStage Stage, double Percentage, string Message, string? CurrentFile = null, int Current = 0, int Total = 0);
 
 public sealed class InstallResult
 {
@@ -51,11 +51,28 @@ public sealed class InstallationJournal
     public required string ArchivePath { get; init; }
     public TransactionKind Kind { get; init; } = TransactionKind.Install;
     public ModManifest? PreviousManifest { get; init; }
+    public List<FileOwnershipRecord> PreviousOwnership { get; init; } = [];
     public JournalState State { get; set; } = JournalState.InProgress;
     public InstallStage Stage { get; set; } = InstallStage.Analyze;
     public DateTimeOffset StartedAt { get; init; } = DateTimeOffset.UtcNow;
     public List<JournalOperation> Operations { get; init; } = [];
     public string? Error { get; set; }
+}
+
+public sealed record ModifiedInstalledFile(string RelativePath, string InstalledSha256, string CurrentSha256);
+
+public sealed class UninstallAnalysis
+{
+    public required Guid ModId { get; init; }
+    public required IReadOnlyList<ModifiedInstalledFile> ModifiedFiles { get; init; }
+    public IReadOnlyCollection<Guid> BlockingNewerModIds { get; init; } = [];
+    public bool RequiresUserDecision => ModifiedFiles.Count > 0;
+    public bool CanUninstall => BlockingNewerModIds.Count == 0;
+}
+
+public sealed class UninstallOptions
+{
+    public ModifiedFileAction ModifiedFileAction { get; init; } = ModifiedFileAction.Abort;
 }
 
 public sealed class BackupDescriptor

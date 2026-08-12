@@ -11,6 +11,7 @@ public sealed class DashboardViewModel : ObservableObject
     private readonly IModRepository _repository;
     private readonly ILaunchService _launcher;
     private readonly IFilePickerService _picker;
+    private readonly IUiErrorHandler _errors;
     private AppSettings _currentSettings = new();
     private GameInstallation? _installation;
     private string _gamePath = "—";
@@ -22,9 +23,9 @@ public sealed class DashboardViewModel : ObservableObject
     private bool _isBusy;
     private string? _error;
 
-    public DashboardViewModel(ISettingsService settings, IGameDetector detector, IModRepository repository, ILaunchService launcher, IFilePickerService picker)
+    public DashboardViewModel(ISettingsService settings, IGameDetector detector, IModRepository repository, ILaunchService launcher, IFilePickerService picker, IUiErrorHandler errors)
     {
-        _settings = settings; _detector = detector; _repository = repository; _launcher = launcher; _picker = picker;
+        _settings = settings; _detector = detector; _repository = repository; _launcher = launcher; _picker = picker; _errors = errors;
         RefreshCommand = new AsyncRelayCommand((_, token) => LoadAsync(token), onError: SetError);
         LaunchCommand = new AsyncRelayCommand(LaunchAsync, _ => _installation?.IsValid == true, SetError);
         BrowseCommand = new AsyncRelayCommand(BrowseAsync, onError: SetError);
@@ -84,5 +85,5 @@ public sealed class DashboardViewModel : ObservableObject
     }
 
     private Task LaunchAsync(object? _, CancellationToken cancellationToken) => _launcher.LaunchAsync(_installation!, _currentSettings.LaunchThroughSteam, cancellationToken);
-    private void SetError(Exception exception) => Error = exception.Message;
+    private void SetError(Exception exception) => Error = _errors.Handle(exception, "Dashboard operation");
 }

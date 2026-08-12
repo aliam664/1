@@ -10,7 +10,7 @@ public static partial class SafePath
         if (path.IndexOf('\0') >= 0)
             throw new UnsafeArchiveException("A path contains a null character.");
 
-        var normalized = path.Replace('\\', '/').Trim();
+        var normalized = path.Replace('\\', '/');
         if (normalized.StartsWith('/') || normalized.StartsWith("//", StringComparison.Ordinal) || DrivePathRegex().IsMatch(normalized) || Path.IsPathRooted(normalized))
             throw new UnsafeArchiveException($"Absolute path is not allowed: {path}");
 
@@ -35,7 +35,21 @@ public static partial class SafePath
         var fullPath = Path.GetFullPath(Path.Combine(fullRoot, normalized));
         if (!fullPath.StartsWith(fullRoot, StringComparison.OrdinalIgnoreCase))
             throw new UnsafeArchiveException($"Path escapes the allowed root: {relativePath}");
+        EnsureNoReparsePoints(fullRoot, fullPath, relativePath);
         return fullPath;
+    }
+
+    private static void EnsureNoReparsePoints(string fullRoot, string fullPath, string originalRelativePath)
+    {
+        var relative = Path.GetRelativePath(fullRoot, fullPath);
+        var current = fullRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        foreach (var segment in relative.Split([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar], StringSplitOptions.RemoveEmptyEntries))
+        {
+            current = Path.Combine(current, segment);
+            if (!Directory.Exists(current) && !File.Exists(current)) continue;
+            if ((File.GetAttributes(current) & FileAttributes.ReparsePoint) != 0)
+                throw new UnsafeArchiveException($"A symbolic link or reparse point was found in the destination path: {originalRelativePath}");
+        }
     }
 
     private static bool IsReservedWindowsName(string segment)

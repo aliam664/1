@@ -10,9 +10,14 @@ public sealed class BytesConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        var bytes = value is long number ? number : 0;
+        var size = value switch
+        {
+            long number => (double)number,
+            int number => number,
+            double number => number,
+            _ => 0d
+        };
         string[] units = ["B", "KB", "MB", "GB", "TB"];
-        var size = (double)bytes;
         var unit = 0;
         while (size >= 1024 && unit < units.Length - 1) { size /= 1024; unit++; }
         return $"{size:0.#} {units[unit]}";

@@ -21,10 +21,39 @@ public sealed class SecureArchiveService : IArchiveService
         ".exe", ".com", ".scr", ".msi", ".msp", ".bat", ".cmd", ".ps1", ".psm1", ".vbs", ".vbe", ".js", ".jse", ".wsf", ".wsh", ".hta", ".lnk", ".url"
     };
 
-    public Task<ArchiveInspection> InspectAsync(string archivePath, CancellationToken cancellationToken = default)
+    public async Task<ArchiveInspection> InspectAsync(string archivePath, CancellationToken cancellationToken = default)
     {
         ValidateArchiveFile(archivePath);
-        return Task.Run(() => InspectCore(archivePath, cancellationToken), cancellationToken);
+        try { return await Task.Run(() => InspectCore(archivePath, cancellationToken), cancellationToken).ConfigureAwait(false); }
+        catch (UnsafeArchiveException) { throw; }
+        catch (OperationCanceledException) { throw; }
+        catch (Exception ex) when (ex is not OutOfMemoryException and not StackOverflowException)
+        {
+            throw new UnsafeArchiveException("The archive is corrupt, incomplete, or uses an unsupported archive variant.", ex);
+        }
+    }
+
+    public async Task<string?> ReadTextEntryAsync(string archivePath, string entryPath, int maximumBytes = 1_048_576, CancellationToken cancellationToken = default)
+    {
+        if (maximumBytes is <= 0 or > 4_194_304) throw new ArgumentOutOfRangeException(nameof(maximumBytes));
+        var wanted = SafePath.NormalizeRelative(entryPath).Replace('\\', '/');
+        var inspection = await InspectAsync(archivePath, cancellationToken).ConfigureAwait(false);
+        var descriptor = inspection.Entries.FirstOrDefault(x => !x.IsDirectory && x.ArchivePath.Equals(wanted, StringComparison.OrdinalIgnoreCase));
+        if (descriptor is null) return null;
+        if (descriptor.UncompressedSize > maximumBytes) throw new UnsafeArchiveException($"Metadata entry is larger than {maximumBytes:N0} bytes: {entryPath}");
+        using var archive = ArchiveFactory.OpenArchive(archivePath, new ReaderOptions { LeaveStreamOpen = false });
+        var entry = archive.Entries.First(x => !x.IsDirectory && SafePath.NormalizeRelative(x.Key!).Replace('\\', '/').Equals(wanted, StringComparison.OrdinalIgnoreCase));
+        await using var source = await entry.OpenEntryStreamAsync(cancellationToken).ConfigureAwait(false);
+        using var memory = new MemoryStream((int)Math.Min(descriptor.UncompressedSize, maximumBytes));
+        var buffer = new byte[16 * 1024];
+        while (true)
+        {
+            var read = await source.ReadAsync(buffer, cancellationToken).ConfigureAwait(false);
+            if (read == 0) break;
+            if (memory.Length + read > maximumBytes) throw new UnsafeArchiveException($"Metadata entry exceeded its read limit: {entryPath}");
+            await memory.WriteAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
+        }
+        return System.Text.Encoding.UTF8.GetString(memory.ToArray());
     }
 
     public async Task ExtractAsync(string archivePath, string destinationDirectory, CancellationToken cancellationToken = default)

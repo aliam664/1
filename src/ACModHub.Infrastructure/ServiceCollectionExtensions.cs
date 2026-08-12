@@ -18,12 +18,15 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IFileHashService, FileHashService>();
         services.AddSingleton<IDiskSpaceService, DiskSpaceService>();
         services.AddSingleton<IFileLockService, FileLockService>();
+        services.AddSingleton<IInstallationLockService, InstallationLockService>();
+        services.AddSingleton<IUserErrorMessageService, UserErrorMessageService>();
         services.AddSingleton<ISteamLocationProvider, RegistrySteamLocationProvider>();
         services.AddSingleton<IGameDetector, SteamGameDetector>();
         services.AddSingleton<IModStructureDetector, ModStructureDetector>();
         services.AddSingleton<IConflictDetector, ConflictDetector>();
         services.AddSingleton<IManifestService, ManifestService>();
         services.AddSingleton<IModScanner, ModScanner>();
+        services.AddSingleton<IModUninstaller, TransactionalModUninstaller>();
         services.AddSingleton<IModInstaller, TransactionalModInstaller>();
         services.AddSingleton<ICrashRecoveryService, CrashRecoveryService>();
         services.AddSingleton<ILaunchService, LaunchService>();

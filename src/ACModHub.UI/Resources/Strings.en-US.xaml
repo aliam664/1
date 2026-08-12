@@ -48,4 +48,6 @@
   <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ExistingInstallation">Existing installation</sys:String>
   <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ProviderArchitecture">Provider-independent update architecture</sys:String>
   <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SkinCarTarget">Destination car folder (example: ks_ferrari_458)</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="PreserveUninstallAction">Keep modified &amp; uninstall</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RestoreUninstallAction">Discard changes &amp; uninstall</sys:String>
 </ResourceDictionary>

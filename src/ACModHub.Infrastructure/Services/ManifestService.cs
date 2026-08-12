@@ -18,11 +18,17 @@ public sealed class ManifestService : IManifestService
         {
             cancellationToken.ThrowIfCancellationRequested();
             var path = manifest.Status == ModStatus.Disabled && !string.IsNullOrWhiteSpace(file.DisabledStorePath)
-                ? file.DisabledStorePath
+                ? file.DisabledStorePath!
                 : SafePath.CombineUnderRoot(gamePath, file.RelativePath);
             if (!File.Exists(path))
             {
                 issues.Add(new(file.RelativePath, "Missing file", file.Sha256, null));
+                continue;
+            }
+            var actualSize = new FileInfo(path).Length;
+            if (actualSize != file.Size)
+            {
+                issues.Add(new(file.RelativePath, $"Size mismatch (expected {file.Size:N0}, actual {actualSize:N0})", file.Sha256, null));
                 continue;
             }
             if (string.IsNullOrWhiteSpace(file.Sha256)) continue;

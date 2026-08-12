@@ -95,9 +95,12 @@ public sealed partial class SteamGameDetector : IGameDetector
     {
         var executable = Path.Combine(root, "acs.exe");
         var content = Path.Combine(root, "content");
+        var apps = Path.Combine(root, "apps");
+        var system = Path.Combine(root, "system");
         if (!Directory.Exists(root)) return new(root, executable, source, false, "Game directory does not exist.");
         if (!File.Exists(executable)) return new(root, executable, source, false, "acs.exe was not found.");
         if (!Directory.Exists(content)) return new(root, executable, source, false, "The content directory was not found.");
+        if (!Directory.Exists(apps) || !Directory.Exists(system)) return new(root, executable, source, false, "The selected folder does not contain the expected apps and system directories.");
         return new(root, executable, source, true);
     }
 

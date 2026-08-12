@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using ACModHub.Core.Interfaces;
 using ACModHub.Core.Models;
+using ACModHub.UI.Services;
 
 namespace ACModHub.UI.ViewModels;
 
@@ -8,11 +9,12 @@ public sealed class UpdatesViewModel : ObservableObject
 {
     private readonly IEnumerable<IContentProvider> _providers;
     private readonly IModRepository _repository;
+    private readonly IUiErrorHandler _errors;
     private string? _message;
-    public UpdatesViewModel(IEnumerable<IContentProvider> providers, IModRepository repository)
+    public UpdatesViewModel(IEnumerable<IContentProvider> providers, IModRepository repository, IUiErrorHandler errors)
     {
-        _providers = providers; _repository = repository;
-        CheckCommand = new AsyncRelayCommand(CheckAsync, onError: ex => Message = ex.Message);
+        _providers = providers; _repository = repository; _errors = errors;
+        CheckCommand = new AsyncRelayCommand(CheckAsync, onError: ex => Message = _errors.Handle(ex, "Update check"));
     }
     public ObservableCollection<ContentRelease> Releases { get; } = [];
     public string? Message { get => _message; private set => SetProperty(ref _message, value); }

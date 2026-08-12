@@ -98,6 +98,7 @@ public sealed class JsonJournalStore : IJournalStore
         ArchivePath = source.ArchivePath,
         Kind = source.Kind,
         PreviousManifest = source.PreviousManifest,
+        PreviousOwnership = source.PreviousOwnership,
         State = source.State,
         Stage = source.Stage,
         StartedAt = source.StartedAt,

@@ -9,6 +9,7 @@ public class ModHubException : Exception
 public sealed class UnsafeArchiveException : ModHubException
 {
     public UnsafeArchiveException(string message) : base(message) { }
+    public UnsafeArchiveException(string message, Exception innerException) : base(message, innerException) { }
 }
 
 public sealed class InstallationException : ModHubException

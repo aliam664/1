@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddACModHubUi(this IServiceCollection services)
     {
         services.AddSingleton<IFilePickerService, FilePickerService>();
+        services.AddSingleton<IUiErrorHandler, UiErrorHandler>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddSingleton<MainViewModel>();
         services.AddTransient<DashboardViewModel>();

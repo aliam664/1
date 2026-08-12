@@ -4,18 +4,21 @@ A Windows launcher, mod manager, secure mod installer, backup manager and downlo
 
 > AC Mod Hub is an independent community project. Assetto Corsa and Steam are trademarks of their respective owners.
 
+**راهنمای کامل فارسی نصب و راه‌اندازی:** [INSTALL-FA.md](INSTALL-FA.md)
+
 ## Highlights
 
-- Steam discovery through registry locations, `libraryfolders.vdf` and App ID `244210`
-- Manual game-path selection and diagnostics for executable, `content`, write access and disk space
+- Steam discovery through registry locations, `libraryfolders.vdf` and App ID `244210`, including multiple selectable installations
+- Manual game-path selection and diagnostics for executable, `content`, `apps`, `system`, write access and disk space
 - ZIP, 7Z and RAR inspection/extraction through SharpCompress
-- Automatic car, track, skin, app, weather, CSP and miscellaneous structure detection
-- Wrapper-folder correction, preview, conflict detection and locked-file checks
-- Transactional install journal, pre-overwrite backups, atomic copies, SHA-256 verification and rollback
-- Persistent per-mod manifests and shared file ownership
-- Enable, disable, reinstall, update, repair, verify and ownership-aware uninstall
+- Automatic car, track, skin, app, weather, CSP, mixed and unknown structure detection
+- Wrapper-folder correction, optional package `manifest.json`, preview, conflict detection and locked-file checks
+- Transactional install journal, pre-overwrite backups, atomic copies, size/SHA-256 verification and rollback
+- Persistent per-mod manifests, ordered shared-file ownership and baseline backup references
+- Enable, disable, reinstall, update, repair, verify and modified-file-aware uninstall with restore/preserve choices
+- Per-game-root in-process and cross-process installation locks
 - Existing installation scanning/import, including separate car skin manifests
-- Resumable HTTP download queue with Range support, progress, pause, resume, cancellation, retry, concurrency and optional SHA-256
+- Resumable HTTP download queue with Range support, real speed/ETA/progress, expected-size/SHA-256 validation, pause, resume, cancellation, retry and concurrency
 - Provider-independent `IContentProvider` update architecture (no third-party catalog dependency in v1)
 - Persian/English UI (Persian/RTL by default), dark gaming-oriented shell and drag-and-drop import
 - Per-user Inno Setup installer and portable self-contained `win-x64` package
@@ -103,7 +106,7 @@ The GitHub Actions workflow performs the same build on `windows-latest` and uplo
 1. Start AC Mod Hub normally, without administrator privileges.
 2. The dashboard searches known Steam libraries for Assetto Corsa.
 3. If detection fails, open **Settings**, select the folder containing `acs.exe`, and run Diagnostics.
-4. Drag a `.zip`, `.7z` or `.rar` archive onto the window, or select **Import mod**.
+4. Drag a `.zip`, `.7z` or `.rar` archive onto the window, select **Import mod**, or download a URL in **Downloads** and choose **Install** on the completed row.
 5. Review detected category, destination files, warnings and conflicts.
 6. Explicitly allow resolvable conflicts if appropriate, then select **Install & verify**.
 
@@ -116,6 +119,7 @@ Application state is stored below:
 ├── disabled\
 ├── downloads\
 ├── journals\
+├── locks\
 ├── logs\
 ├── manifests\
 ├── library.json
@@ -135,7 +139,7 @@ Analyze → Preview → Conflict Check → Backup → Install → Verify → Don
 
 For each target, it durably appends a recovery operation to a write-through JSONL journal **before** changing the file; transaction metadata and the previous manifest are stored atomically in JSON. Existing files are copied to a backup tree. New content is copied to a temporary sibling and atomically moved into place. Any extraction, I/O, cancellation or hash-verification failure reverses the journal. Incomplete journals are recovered at the next startup.
 
-Ownership is keyed by normalized game-relative path. Uninstall removes a physical file only after the selected mod is removed from its owner set and no owners remain. Shared files are retained. Disabling a solely owned file moves it into `%AppData%\ACModHub\disabled`; a shared file is not removed from the game.
+Ownership is keyed by normalized game-relative path and includes an ordered owner stack. Every installed file records whether it existed and the exact baseline backup path. Uninstall first compares the current SHA-256 with the installed hash: modified files require an explicit preserve or discard/restore choice. The newest owner restores its predecessor's backup; an older owner cannot be removed until newer overriding mods are removed, preventing a broken backup chain. Files that existed before the mod are restored, while files created by the mod are deleted. Disable/enable uses the same baseline backups and rolls back partial in-process failures.
 
 ## Archive security model
 
@@ -149,13 +153,13 @@ Before extraction, every archive entry is validated. AC Mod Hub rejects:
 - suspicious compression ratios, oversized entries and excessive aggregate/entry counts;
 - executable/command payloads such as EXE, MSI, COM, SCR, BAT, CMD, PowerShell, script-host and shortcut files.
 
-Extraction first targets a private staging directory. Every final destination is independently resolved with `SafePath.CombineUnderRoot`. The app never runs EXE content from a mod, never starts PowerShell or a hidden command, and never silently elevates itself.
+Extraction first targets a private staging directory. Every final destination is independently resolved with `SafePath.CombineUnderRoot`; existing descendant symlinks, junctions and reparse points are rejected so a lexically safe path cannot redirect outside its validated root. The app never runs EXE content from a mod, never starts PowerShell or a hidden command, and never silently elevates itself.
 
 Some legitimate packages include a separate executable installer. Under the strict v1 policy these archives are intentionally rejected; install their non-executable content from a trusted repack instead.
 
 ## Downloads and updates
 
-Version 1 deliberately has no dependency on a mod catalog. The real HTTP queue accepts a URL, filename, optional SHA-256 and metadata. Partial downloads use `.part` files and resume when the server supports HTTP Range.
+Version 1 deliberately has no dependency on a mod catalog. The real HTTP queue accepts a URL, filename, optional expected size, SHA-256 and metadata. It reports downloaded bytes, total bytes when known, real percentage, transfer speed and ETA; percentage remains indeterminate when the server omits a length. Partial downloads use `.part` files and resume when the server supports HTTP Range. A completed row can be sent directly to the secure Analyze/Preview installer from the Downloads page.
 
 Future sources implement:
 
@@ -175,16 +179,16 @@ A GitHub Releases or dedicated catalog provider can therefore be added without c
 
 The test project covers:
 
-- Steam/game detection and manual validation
-- mod structure/category detection and wrapper repair
-- archive traversal and executable-policy validation
-- conflict classification
-- backup/restore
-- transactional installation and SHA-256 manifests
-- forced-failure rollback
-- ownership-aware uninstall
-- enable/disable
-- JSON manifest and ownership persistence
+- multiple Steam installations, library VDF parsing and manual validation
+- car, track, CSP, mixed, unknown, skin and wrapper-folder analysis
+- optional package metadata and corrupt/traversal/executable archive rejection
+- conflict classification, permission-message translation and per-root installation locking
+- backup/restore and original-baseline persistence through updates
+- transactional installation, size/SHA-256 verification and forced-failure rollback
+- shared owner ordering, pre-existing-file restoration and modified-file uninstall choices
+- enable/disable with baseline restoration
+- incomplete download detection
+- JSON manifest, ownership and crash-recovery persistence
 
 Run with coverage collection if desired:
 

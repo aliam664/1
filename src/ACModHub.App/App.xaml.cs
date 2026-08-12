@@ -27,6 +27,7 @@ public partial class App : Application
             var dataRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ACModHub");
             var builder = Host.CreateApplicationBuilder(e.Args);
             builder.Logging.ClearProviders();
+            builder.Logging.SetMinimumLevel(LogLevel.Debug);
             builder.Logging.AddDebug();
             builder.Logging.AddProvider(new RollingFileLoggerProvider(Path.Combine(dataRoot, "logs")));
             builder.Services.AddACModHubInfrastructure(dataRoot).AddACModHubUi();

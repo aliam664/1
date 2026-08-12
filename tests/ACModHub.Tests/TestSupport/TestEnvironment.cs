@@ -12,6 +12,8 @@ public sealed class TestEnvironment : IDisposable
         Root = Path.Combine(Path.GetTempPath(), "acmodhub-tests", Guid.NewGuid().ToString("N"));
         GamePath = Path.Combine(Root, "game");
         Directory.CreateDirectory(Path.Combine(GamePath, "content"));
+        Directory.CreateDirectory(Path.Combine(GamePath, "apps"));
+        Directory.CreateDirectory(Path.Combine(GamePath, "system"));
         File.WriteAllText(Path.Combine(GamePath, "acs.exe"), "test executable marker");
         var services = new ServiceCollection();
         services.AddLogging();

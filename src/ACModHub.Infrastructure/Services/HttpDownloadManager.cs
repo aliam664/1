@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
 using ACModHub.Core.Interfaces;
@@ -17,15 +18,17 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
     private readonly ConcurrentDictionary<Guid, DownloadJob> _jobs = new();
     private readonly ConcurrentDictionary<Guid, CancellationTokenSource> _tokens = new();
     private readonly SemaphoreSlim _concurrency;
+    private readonly TimeSpan _retryBaseDelay;
     private bool _disposed;
 
-    public HttpDownloadManager(HttpClient httpClient, IFileHashService hashes, IAppPaths paths, ILogger<HttpDownloadManager> logger, int maxConcurrency = 3)
+    public HttpDownloadManager(HttpClient httpClient, IFileHashService hashes, IAppPaths paths, ILogger<HttpDownloadManager> logger, int maxConcurrency = 3, TimeSpan? retryBaseDelay = null)
     {
         _httpClient = httpClient;
         _hashes = hashes;
         _paths = paths;
         _logger = logger;
         _concurrency = new SemaphoreSlim(Math.Clamp(maxConcurrency, 1, 8));
+        _retryBaseDelay = retryBaseDelay ?? TimeSpan.FromSeconds(1);
     }
 
     public event EventHandler<DownloadProgress>? ProgressChanged;
@@ -37,6 +40,9 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
         if (request.Source.Scheme is not ("http" or "https")) throw new ArgumentException("Only HTTP and HTTPS URLs are accepted.", nameof(request));
+        if (request.ExpectedSize is <= 0) throw new ArgumentException("Expected download size must be positive when provided.", nameof(request));
+        if (!string.IsNullOrWhiteSpace(request.ExpectedSha256) && (request.ExpectedSha256.Length != 64 || request.ExpectedSha256.Any(x => !Uri.IsHexDigit(x))))
+            throw new ArgumentException("Expected SHA-256 must contain exactly 64 hexadecimal characters.", nameof(request));
         var safeName = Path.GetFileName(request.FileName);
         if (string.IsNullOrWhiteSpace(safeName) || safeName != request.FileName) throw new ArgumentException("The download file name is invalid.", nameof(request));
         var destination = Path.Combine(_paths.DownloadsDirectory, $"{request.Id:N}-{safeName}");
@@ -119,6 +125,14 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
                         return;
                     }
                     catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { return; }
+                    catch (DownloadValidationException ex)
+                    {
+                        job.Error = ex.Message;
+                        job.State = DownloadState.Failed;
+                        Raise(job);
+                        _logger.LogError(ex, "Download {DownloadId} failed validation", job.Request.Id);
+                        return;
+                    }
                     catch (Exception ex) when (ex is HttpRequestException or IOException)
                     {
                         job.RetryCount++;
@@ -130,7 +144,8 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
                             _logger.LogError(ex, "Download {DownloadId} failed", job.Request.Id);
                             return;
                         }
-                        await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, job.RetryCount)), cancellationToken).ConfigureAwait(false);
+                        var retryDelay = TimeSpan.FromMilliseconds(_retryBaseDelay.TotalMilliseconds * Math.Pow(2, job.RetryCount - 1));
+                        await Task.Delay(retryDelay, cancellationToken).ConfigureAwait(false);
                     }
                 }
             }
@@ -160,6 +175,10 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
         if (!append) existing = 0;
         job.TotalBytes = response.Content.Headers.ContentRange?.Length ?? (response.Content.Headers.ContentLength.HasValue ? existing + response.Content.Headers.ContentLength.Value : null);
         job.BytesReceived = existing;
+        job.SpeedBytesPerSecond = null;
+        job.EstimatedTimeRemaining = null;
+        var sessionStartBytes = existing;
+        var stopwatch = Stopwatch.StartNew();
 
         await using var source = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
         await using var target = new FileStream(partial, append ? FileMode.Append : FileMode.Create, FileAccess.Write, FileShare.Read, 128 * 1024, FileOptions.Asynchronous | FileOptions.SequentialScan);
@@ -170,9 +189,21 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
             if (read == 0) break;
             await target.WriteAsync(buffer.AsMemory(0, read), cancellationToken).ConfigureAwait(false);
             job.BytesReceived += read;
+            if (stopwatch.Elapsed.TotalSeconds >= 0.2)
+            {
+                var transferred = job.BytesReceived - sessionStartBytes;
+                job.SpeedBytesPerSecond = transferred / stopwatch.Elapsed.TotalSeconds;
+                job.EstimatedTimeRemaining = job.TotalBytes.HasValue && job.SpeedBytesPerSecond > 0
+                    ? TimeSpan.FromSeconds(Math.Max(0, job.TotalBytes.Value - job.BytesReceived) / job.SpeedBytesPerSecond.Value)
+                    : null;
+            }
             Raise(job);
         }
         await target.FlushAsync(cancellationToken).ConfigureAwait(false);
+        if (job.TotalBytes.HasValue && job.BytesReceived != job.TotalBytes.Value)
+            throw new IOException($"The download ended at {job.BytesReceived:N0} of {job.TotalBytes.Value:N0} expected bytes.");
+        if (job.Request.ExpectedSize.HasValue && job.BytesReceived != job.Request.ExpectedSize.Value)
+            throw new DownloadValidationException($"The downloaded file size ({job.BytesReceived:N0}) does not match the package metadata ({job.Request.ExpectedSize.Value:N0}).");
 
         job.State = DownloadState.Verifying;
         Raise(job);
@@ -180,20 +211,23 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
         {
             var actual = await _hashes.ComputeSha256Async(partial, cancellationToken).ConfigureAwait(false);
             if (!actual.Equals(job.Request.ExpectedSha256, StringComparison.OrdinalIgnoreCase))
-                throw new IOException("The downloaded file failed SHA-256 verification.");
+                throw new DownloadValidationException("The downloaded file failed SHA-256 verification.");
         }
         File.Move(partial, destination, true);
         job.State = DownloadState.Completed;
+        job.EstimatedTimeRemaining = TimeSpan.Zero;
         job.Error = null;
         Raise(job);
     }
+
+    private sealed class DownloadValidationException(string message) : Exception(message);
 
     private DownloadJob RequiredJob(Guid id) => _jobs.TryGetValue(id, out var value) ? value : throw new KeyNotFoundException("The download job does not exist.");
 
     private void Raise(DownloadJob job)
     {
         var percentage = job.TotalBytes is > 0 ? job.BytesReceived * 100d / job.TotalBytes.Value : null;
-        ProgressChanged?.Invoke(this, new DownloadProgress(job.Request.Id, job.State, job.BytesReceived, job.TotalBytes, percentage));
+        ProgressChanged?.Invoke(this, new DownloadProgress(job.Request.Id, job.State, job.BytesReceived, job.TotalBytes, percentage, job.SpeedBytesPerSecond, job.EstimatedTimeRemaining));
     }
 
     public void Dispose()

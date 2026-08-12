@@ -73,6 +73,8 @@ public sealed class ModScanner : IModScanner
                     ownership.Add(key, owner);
                 }
                 owner.ModIds.Add(manifest.Id);
+                owner.OwnerStack.RemoveAll(x => x == manifest.Id);
+                owner.OwnerStack.Add(manifest.Id);
                 owner.UpdatedAt = DateTimeOffset.UtcNow;
             }
         }
