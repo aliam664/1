@@ -45,7 +45,8 @@ const api = {
     getStatus: () => invoke(INVOKE_CHANNELS.GAME_GET_STATUS),
     detect: () => invoke(INVOKE_CHANNELS.GAME_DETECT),
     setPath: (gamePath) => invoke(INVOKE_CHANNELS.GAME_SET_PATH, gamePath),
-    browse: () => invoke(INVOKE_CHANNELS.GAME_BROWSE)
+    browse: () => invoke(INVOKE_CHANNELS.GAME_BROWSE),
+    launch: () => invoke(INVOKE_CHANNELS.GAME_LAUNCH)
   },
   downloads: {
     list: () => invoke(INVOKE_CHANNELS.DOWNLOADS_LIST),

@@ -146,6 +146,9 @@ function createBrowserBridge() {
       },
       async browse() {
         return { ok: true, data: null };
+      },
+      async launch() {
+        return { ok: false, error: { code: 'GAME_PATH_INVALID', message: 'Preview cannot launch Assetto Corsa' } };
       }
     },
     downloads: {

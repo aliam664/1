@@ -19,8 +19,18 @@ export function renderHome() {
   const installed = items.filter((item) => item.installed);
 
   const root = document.createElement('div');
+  const gameOk = Boolean(getState().gameStatus?.valid);
   root.className = 'page-home';
   root.innerHTML = `
+    ${
+      gameOk
+        ? ''
+        : `<section class="banner card">
+            <strong data-i18n="banner.game.title">${t('banner.game.title')}</strong>
+            <p data-i18n="banner.game.body">${t('banner.game.body')}</p>
+            <button class="btn btn-primary" type="button" data-nav="settings" data-i18n="home.cta.settings">${t('home.cta.settings')}</button>
+          </section>`
+    }
     <section class="hero">
       <div>
         <p class="badge badge-accent" data-i18n="home.greeting">${t('home.greeting')}</p>

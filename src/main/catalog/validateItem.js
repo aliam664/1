@@ -79,6 +79,7 @@ export function validateCatalogItem(item, fileName = 'item') {
       tags: rec.tags || [],
       cover: rec.cover || '',
       featured: Boolean(rec.featured),
+      packaged: rec.packaged !== false && !String(rec.downloadUrl).includes('/releases/download/demo/'),
       publishedAt: rec.publishedAt || null,
       updatedAt: rec.updatedAt || rec.publishedAt || null,
       revocationReason: rec.revocationReason || null

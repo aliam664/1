@@ -27,4 +27,13 @@ describe('catalog validation', () => {
     const doc = validateCatalogDocument({ items: [valid, valid] });
     assert.equal(doc.ok, false);
   });
+
+  it('marks unpublished /demo/ packages as not packaged', () => {
+    const result = validateCatalogItem({
+      ...valid,
+      downloadUrl: 'https://github.com/aliam664/1/releases/download/demo/a.rar'
+    });
+    assert.equal(result.ok, true);
+    assert.equal(result.value.packaged, false);
+  });
 });

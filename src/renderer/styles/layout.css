@@ -198,8 +198,17 @@ html[data-theme="light"] .topbar {
   letter-spacing: -0.02em;
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex: 1;
+}
+
 .topbar-search {
   max-inline-size: 320px;
+  flex: 1;
 }
 
 .content {

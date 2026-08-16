@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync, statfsSync } from 'node:fs';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { AppError, ErrorCodes } from '../app/errors.js';
@@ -57,6 +57,7 @@ export function createInstaller(options) {
     const id = randomUUID();
     const extractRoot = path.join(tempDir, id);
     mkdirSync(extractRoot, { recursive: true });
+    assertFreeSpace(extractRoot, archivePath);
     onProgress?.({ phase: 'extract', sessionId: id });
     try {
       await archive.extract(archivePath, extractRoot, { declaredType, password });
@@ -227,6 +228,26 @@ export function createInstaller(options) {
   }
 
   return { analyze, commit, uninstall, cleanup, purgeOrphans, listInstalled: () => repos.installed.list() };
+}
+
+function assertFreeSpace(targetDir, archivePath) {
+  let needed = 0;
+  try {
+    needed = statSync(archivePath).size * 3;
+  } catch {
+    needed = 64 * 1024 * 1024;
+  }
+  try {
+    const stats = statfsSync(targetDir);
+    const free = Number(stats.bavail) * Number(stats.bsize);
+    if (Number.isFinite(free) && free < needed) {
+      throw new AppError(ErrorCodes.DISK_SPACE, 'Not enough free disk space for this install');
+    }
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw error;
+    }
+  }
 }
 
 function dirSize(dir) {

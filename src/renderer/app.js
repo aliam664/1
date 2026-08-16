@@ -1,5 +1,6 @@
 import { applyTranslations, directionFor, loadLanguage, t } from './i18n/i18n.js';
 import { ALL_ROUTES, renderSidebar } from './components/sidebar.js';
+import { escapeHtml } from './components/cards.js';
 import { renderHome } from './pages/home.js';
 import { renderCatalogPage } from './pages/catalog.js';
 import { renderFavorites } from './pages/favorites.js';
@@ -7,6 +8,7 @@ import { renderDownloads } from './pages/downloads.js';
 import { renderUpdates } from './pages/updates.js';
 import { renderSettings } from './pages/settings.js';
 import { getBridge } from './services/bridge.js';
+import { formatBytes, isPackaged, localizedDescription, localizedName } from './services/format.js';
 import { getState, setState, subscribe } from './state/store.js';
 
 const PAGE_TITLES = {
@@ -24,8 +26,11 @@ const sidebarEl = document.getElementById('sidebar');
 const contentEl = document.getElementById('content');
 const titleEl = document.getElementById('page-title');
 const toastEl = document.getElementById('toast');
+const modalEl = document.getElementById('modal');
+const modalCard = document.getElementById('modal-card');
 const bridge = getBridge();
 let toastTimer = 0;
+let pendingInstall = null;
 
 function applyChrome(state) {
   const root = document.documentElement;
@@ -96,6 +101,68 @@ function restoreFocus(snapshot) {
       node.setSelectionRange(snapshot.start, snapshot.start);
     }
   }
+}
+
+function closeModal() {
+  pendingInstall = null;
+  if (modalEl) {
+    modalEl.hidden = true;
+  }
+  if (modalCard) {
+    modalCard.replaceChildren();
+  }
+}
+
+function showModal(html) {
+  if (!modalEl || !modalCard) {
+    return;
+  }
+  modalCard.innerHTML = html;
+  modalEl.hidden = false;
+  applyTranslations(modalCard);
+}
+
+function openItemDetail(id) {
+  const item = (getState().catalog?.items || []).find((entry) => entry.id === id);
+  if (!item) {
+    return;
+  }
+  const packaged = isPackaged(item);
+  showModal(`
+    <h2 class="ltr-isolate">${escapeHtml(localizedName(item))}</h2>
+    <p class="muted ltr-isolate">${escapeHtml(item.author || '')} · ${escapeHtml(item.version || '')} · ${escapeHtml(String(item.archiveType || '').toUpperCase())} · ${formatBytes(item.size)}</p>
+    <p>${escapeHtml(localizedDescription(item))}</p>
+    ${packaged ? '' : `<p class="badge badge-warn">${t('item.sample.help')}</p>`}
+    <div class="modal-actions">
+      ${
+        item.installed
+          ? `<button class="btn" type="button" data-uninstall="${item.id}">${t('item.uninstall')}</button>`
+          : `<button class="btn btn-primary" type="button" data-install="${item.id}" ${packaged ? '' : 'disabled'}>${t('item.install')}</button>`
+      }
+      <button class="btn" type="button" data-action="close-modal">${t('common.close')}</button>
+    </div>
+  `);
+}
+
+function showInstallPreview(preview) {
+  pendingInstall = preview;
+  const rows = (preview.items || [])
+    .map(
+      (item) =>
+        `<li><bdi>${escapeHtml(item.folderName)}</bdi> → <bdi>${escapeHtml(item.suggestedDest)}</bdi>${
+          item.exists ? ` — ${t('install.conflict')}` : ''
+        }</li>`
+    )
+    .join('');
+  showModal(`
+    <h2>${t('install.preview')}</h2>
+    <p>${t('install.ready')}</p>
+    <ul class="coming-list">${rows}</ul>
+    <div class="modal-actions">
+      <button class="btn btn-primary" type="button" data-action="confirm-install">${t('install.confirm')}</button>
+      <button class="btn" type="button" data-action="close-modal">${t('common.cancel')}</button>
+    </div>
+  `);
 }
 
 function showToast(message) {
@@ -183,19 +250,29 @@ async function tryInstallDownload(payload) {
     showToast(t('install.unrecognized'));
     return;
   }
+  showInstallPreview({ ...analysis, contentId: payload.contentId });
+}
+
+async function confirmPendingInstall() {
+  if (!pendingInstall) {
+    return;
+  }
+  const preview = pendingInstall;
   const result = await unwrap(
     await bridge.install.commit({
-      sessionId: analysis.sessionId,
-      selections: analysis.items.map((item) => ({
+      sessionId: preview.sessionId,
+      selections: (preview.items || []).map((item) => ({
         folderName: item.folderName,
         overwrite: false,
         backup: Boolean(item.exists)
       })),
-      contentId: payload.contentId
+      contentId: preview.contentId
     }),
     t('error.generic')
   );
+  closeModal();
   if (result) {
+    showToast(t('install.done'));
     await refreshCatalog(false);
   }
 }
@@ -248,11 +325,35 @@ async function bindEvents() {
       await changeReducedMotion(motionBtn.getAttribute('aria-pressed') !== 'true');
       return;
     }
+    const openItem = target.closest('[data-open-item]');
+    if (openItem && !target.closest('button')) {
+      openItemDetail(openItem.getAttribute('data-open-item'));
+      return;
+    }
     const installBtn = target.closest('[data-install]');
     if (installBtn) {
-      await unwrap(await bridge.downloads.enqueue(installBtn.getAttribute('data-install')), t('error.generic'));
+      if (!getState().gameStatus?.valid && bridge.isElectron) {
+        showToast(t('install.needGame'));
+        navigate('settings');
+        return;
+      }
+      const id = installBtn.getAttribute('data-install');
+      const item = (getState().catalog?.items || []).find((entry) => entry.id === id);
+      if (item && !isPackaged(item)) {
+        showToast(t('item.sample.help'));
+        return;
+      }
+      await unwrap(await bridge.downloads.enqueue(id), t('error.generic'));
       await refreshDownloads();
+      closeModal();
       navigate('downloads');
+      return;
+    }
+    const uninstallBtn = target.closest('[data-uninstall]');
+    if (uninstallBtn) {
+      await unwrap(await bridge.install.uninstall(uninstallBtn.getAttribute('data-uninstall')), t('error.generic'));
+      closeModal();
+      await refreshCatalog(false);
       return;
     }
     const favBtn = target.closest('[data-fav]');
@@ -292,7 +393,13 @@ async function bindEvents() {
       return;
     }
     const action = target.closest('[data-action]')?.getAttribute('data-action');
-    if (action === 'refresh-catalog') {
+    if (action === 'close-modal') {
+      closeModal();
+    } else if (action === 'confirm-install') {
+      await confirmPendingInstall();
+    } else if (action === 'launch-game') {
+      await unwrap(await bridge.game.launch(), t('install.needGame'));
+    } else if (action === 'refresh-catalog') {
       await refreshCatalog(true);
     } else if (action === 'check-updates') {
       const info = await unwrap(await bridge.updates.check(), t('error.generic'));

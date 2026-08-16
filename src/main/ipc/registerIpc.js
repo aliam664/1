@@ -1,6 +1,7 @@
 import { APP_CONFIG } from '../config/appConfig.js';
 import { AppError } from '../app/errors.js';
 import { inspectGamePath } from '../assetto-corsa/validatePath.js';
+import { resolveGameExecutable } from '../assetto-corsa/launch.js';
 import { INVOKE_CHANNELS, EVENT_CHANNELS } from './channels.js';
 import {
   assertBoolean,
@@ -154,6 +155,15 @@ export function registerIpcHandlers(deps) {
     return inspectGamePath(result.filePaths[0]);
   });
 
+  handle(INVOKE_CHANNELS.GAME_LAUNCH, async () => {
+    const exe = resolveGameExecutable(settingsStore.get().gamePath);
+    const error = await shell.openPath(exe);
+    if (error) {
+      throw new AppError('GAME_PATH_INVALID', error);
+    }
+    return { exe };
+  });
+
   handle(INVOKE_CHANNELS.DOWNLOADS_LIST, () => downloads.list());
 
   handle(INVOKE_CHANNELS.DOWNLOADS_ENQUEUE, async (_event, contentId) => {
@@ -165,6 +175,12 @@ export function registerIpcHandlers(deps) {
       throw new IpcValidationError(item.revocationReason || 'This item was revoked', {
         field: 'contentId',
         code: 'REVOKED'
+      });
+    }
+    if (item.packaged === false) {
+      throw new IpcValidationError('This catalog sample has no published package', {
+        field: 'contentId',
+        code: 'NOT_FOUND'
       });
     }
     const id = await downloads.enqueue({
@@ -275,11 +291,4 @@ export function registerIpcHandlers(deps) {
 
 function ALLOWED_COUNT() {
   return Object.keys(INVOKE_CHANNELS).length;
-}
-
-function assertBoundedLocalPath(value) {
-  if (typeof value !== 'string' || value.length < 2 || value.length > 1024 || value.includes('\0')) {
-    throw new IpcValidationError('Invalid archive path', { field: 'archivePath', code: 'PATH' });
-  }
-  return value;
 }

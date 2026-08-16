@@ -1,6 +1,6 @@
 {
   "catalogVersion": "2026.08.16",
-  "generatedAt": "2026-08-16T03:28:50.118Z",
+  "generatedAt": "2026-08-16T06:19:10.644Z",
   "categories": [
     "car",
     "track",
@@ -36,6 +36,7 @@
       ],
       "cover": "images/cars/bmw-m3-e46.svg",
       "featured": true,
+      "packaged": false,
       "publishedAt": "2026-05-02T00:00:00Z",
       "updatedAt": "2026-07-18T00:00:00Z",
       "revocationReason": null
@@ -64,6 +65,7 @@
       ],
       "cover": "images/cars/mazda-miata-na.svg",
       "featured": false,
+      "packaged": false,
       "publishedAt": "2026-06-11T00:00:00Z",
       "updatedAt": "2026-06-11T00:00:00Z",
       "revocationReason": null
@@ -92,6 +94,7 @@
       ],
       "cover": "images/cars/porsche-911-gt3.svg",
       "featured": false,
+      "packaged": false,
       "publishedAt": "2026-04-20T00:00:00Z",
       "updatedAt": "2026-08-01T00:00:00Z",
       "revocationReason": null
@@ -120,6 +123,7 @@
       ],
       "cover": "images/tracks/monza-2024.svg",
       "featured": true,
+      "packaged": false,
       "publishedAt": "2026-03-08T00:00:00Z",
       "updatedAt": "2026-07-02T00:00:00Z",
       "revocationReason": null
@@ -148,6 +152,7 @@
       ],
       "cover": "images/tracks/nurburgring-nordschleife.svg",
       "featured": false,
+      "packaged": false,
       "publishedAt": "2026-01-14T00:00:00Z",
       "updatedAt": "2026-08-10T00:00:00Z",
       "revocationReason": null
@@ -176,6 +181,7 @@
       ],
       "cover": "images/tracks/shiraz-circuit.svg",
       "featured": false,
+      "packaged": false,
       "publishedAt": "2026-08-12T00:00:00Z",
       "updatedAt": "2026-08-12T00:00:00Z",
       "revocationReason": null
@@ -203,6 +209,7 @@
       ],
       "cover": "images/mods/pit-crew-app.svg",
       "featured": false,
+      "packaged": false,
       "publishedAt": "2025-11-03T00:00:00Z",
       "updatedAt": "2025-11-03T00:00:00Z",
       "revocationReason": null
@@ -231,6 +238,7 @@
       ],
       "cover": "images/mods/sol-weather.svg",
       "featured": false,
+      "packaged": false,
       "publishedAt": "2026-02-01T00:00:00Z",
       "updatedAt": "2026-06-22T00:00:00Z",
       "revocationReason": null

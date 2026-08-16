@@ -1,20 +1,28 @@
 import { t } from '../i18n/i18n.js';
-import { coverHue, formatBytes, localizedName } from '../services/format.js';
+import { coverHue, formatBytes, isPackaged, localizedName } from '../services/format.js';
 
 export function renderCard(item, options = {}) {
   const hue = Math.floor(coverHue(item.id) / 30);
   const name = localizedName(item);
   const typeKey = `item.type.${item.type}`;
+  const packaged = isPackaged(item);
   const badges = [];
   if (item.installed) {
     badges.push(`<span class="badge badge-ok">${t('item.installed')}</span>`);
   }
-  if (!item.sha256) {
+  if (!packaged) {
+    badges.push(`<span class="badge badge-warn">${t('item.sample')}</span>`);
+  } else if (!item.sha256) {
     badges.push(`<span class="badge">${t('item.unverified')}</span>`);
   }
   if (item.status === 'deprecated') {
     badges.push(`<span class="badge badge-warn">${t('item.deprecated')}</span>`);
   }
+  const primary = item.installed
+    ? `<button class="btn" type="button" data-uninstall="${item.id}">${t('item.uninstall')}</button>`
+    : `<button class="btn btn-primary" type="button" data-install="${item.id}" ${!packaged || item.status === 'revoked' ? 'disabled' : ''}>
+        ${t('item.install')}
+      </button>`;
   return `
     <article class="content-card${options.featured ? ' is-featured' : ''}" data-open-item="${item.id}">
       <div class="content-cover hue-${hue}">
@@ -29,9 +37,7 @@ export function renderCard(item, options = {}) {
         </div>
         <div class="card-badges">${badges.join('')}</div>
         <div class="card-actions">
-          <button class="btn btn-primary" type="button" data-install="${item.id}" ${item.installed || item.status === 'revoked' ? 'disabled' : ''}>
-            ${item.installed ? t('item.installed') : t('item.install')}
-          </button>
+          ${primary}
           <button class="btn btn-quiet" type="button" data-fav="${item.id}" data-fav-type="${item.type}">
             ${item.favorite ? t('item.unfavorite') : t('item.favorite')}
           </button>

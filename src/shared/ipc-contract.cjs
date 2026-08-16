@@ -19,6 +19,7 @@ const INVOKE_CHANNELS = Object.freeze({
   GAME_DETECT: 'game:detect',
   GAME_SET_PATH: 'game:setPath',
   GAME_BROWSE: 'game:browse',
+  GAME_LAUNCH: 'game:launch',
 
   DOWNLOADS_LIST: 'downloads:list',
   DOWNLOADS_ENQUEUE: 'downloads:enqueue',

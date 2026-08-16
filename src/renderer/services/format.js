@@ -54,3 +54,17 @@ export function coverHue(id) {
   }
   return hash;
 }
+
+/**
+ * Sample catalog rows that point at unpublished /demo/ assets must not
+ * pretend they can be installed.
+ */
+export function isPackaged(item) {
+  if (!item) {
+    return false;
+  }
+  if (item.packaged === false) {
+    return false;
+  }
+  return !String(item.downloadUrl || '').includes('/releases/download/demo/');
+}
