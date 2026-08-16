@@ -1,0 +1,25 @@
+appId: com.stockcorsa.launcher
+productName: StockCorsa Launcher
+copyright: Copyright © 2026 StockCorsa
+asar: true
+directories:
+  output: dist-electron
+  buildResources: build
+files:
+  - src/**/*
+  - launcher/**/*
+  - package.json
+  - "!**/*.map"
+extraMetadata:
+  main: src/main/app/index.js
+win:
+  target:
+    - nsis
+    - portable
+  artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+# 7zip-bin asarUnpack is added in Stage 5 when archive extraction lands.
+# nativeModule rebuild (better-sqlite3) is added in Stage 2.
