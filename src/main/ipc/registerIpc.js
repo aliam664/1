@@ -4,6 +4,7 @@ import { inspectGamePath } from '../assetto-corsa/validatePath.js';
 import { INVOKE_CHANNELS, EVENT_CHANNELS } from './channels.js';
 import {
   assertBoolean,
+  assertBoundedString,
   assertHttpsUrl,
   assertId,
   assertLanguage,
@@ -194,15 +195,45 @@ export function registerIpcHandlers(deps) {
   });
 
   handle(INVOKE_CHANNELS.INSTALL_ANALYZE, async (_event, payload) => {
-    const archivePath = assertBoundedLocalPath(payload?.archivePath);
-    return installer.analyze(archivePath, payload?.declaredType, payload?.password);
+    const downloadId = assertId(payload?.downloadId, 'downloadId');
+    const row = downloads.list().find((item) => item.id === downloadId);
+    if (!row || row.state !== 'completed' || !row.filePath) {
+      throw new IpcValidationError('Download is not ready to install', {
+        field: 'downloadId',
+        code: 'NOT_FOUND'
+      });
+    }
+    const item = row.contentId ? catalog.getItem(row.contentId) : null;
+    return installer.analyze(row.filePath, item?.archiveType, payload?.password);
   });
 
   handle(INVOKE_CHANNELS.INSTALL_COMMIT, async (_event, plan) => {
-    if (!plan || typeof plan !== 'object' || !Array.isArray(plan.selections)) {
+    if (!plan || typeof plan !== 'object' || typeof plan.sessionId !== 'string') {
       throw new IpcValidationError('Invalid install plan', { field: 'plan', code: 'TYPE' });
     }
-    return installer.commit(plan);
+    if (!Array.isArray(plan.selections)) {
+      throw new IpcValidationError('Invalid install selections', { field: 'selections', code: 'TYPE' });
+    }
+    const sessionId = assertId(plan.sessionId, 'sessionId');
+    const selections = plan.selections.map((choice) => ({
+      folderName: assertBoundedString(choice?.folderName, 'folderName', {
+        min: 1,
+        max: 80,
+        pattern: /^[^\\/:*?"<>|\0]+$/
+      }),
+      overwrite: Boolean(choice?.overwrite),
+      backup: Boolean(choice?.backup)
+    }));
+    return installer.commit({
+      sessionId,
+      selections,
+      contentId: plan.contentId ? assertId(plan.contentId, 'contentId') : undefined,
+      name: typeof plan.name === 'string' ? plan.name.slice(0, 200) : undefined,
+      version: typeof plan.version === 'string' ? plan.version.slice(0, 40) : undefined,
+      sourceUrl: typeof plan.sourceUrl === 'string' ? plan.sourceUrl.slice(0, 2000) : undefined,
+      archiveType: typeof plan.archiveType === 'string' ? plan.archiveType.slice(0, 8) : undefined,
+      checksum: typeof plan.checksum === 'string' ? plan.checksum.slice(0, 64) : undefined
+    });
   });
 
   handle(INVOKE_CHANNELS.INSTALL_UNINSTALL, (_event, id) => installer.uninstall(assertId(id)));

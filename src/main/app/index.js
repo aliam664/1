@@ -139,6 +139,7 @@ async function start() {
     logger
   });
 
+  installer.purgeOrphans();
   downloads.restore();
   cleanupTemp(userPaths.tempDir, logger);
 

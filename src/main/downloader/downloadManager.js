@@ -51,8 +51,15 @@ export function createDownloadManager(options) {
       const response = await fetchImpl(url, {
         method: 'GET',
         headers: { Range: 'bytes=0-0', 'User-Agent': APP_CONFIG.userAgent },
-        redirect: 'follow'
+        redirect: 'manual'
       });
+      if (response.body) {
+        try {
+          await response.arrayBuffer();
+        } catch {
+          // ignore unread-body errors; we only needed headers
+        }
+      }
       const accept = response.headers.get('Accept-Ranges') || '';
       const contentRange = response.headers.get('Content-Range') || '';
       return response.status === 206 || accept.includes('bytes') || contentRange.startsWith('bytes');
@@ -183,7 +190,7 @@ export function createDownloadManager(options) {
       headers.Range = `bytes=${offset}-`;
     }
     try {
-      const response = await fetchImpl(row.url, { headers, signal: controller.signal, redirect: 'follow' });
+      const response = await fetchHttps(row.url, { headers, signal: controller.signal, fetchImpl });
       if (!response.ok && response.status !== 206) {
         throw new AppError(ErrorCodes.NETWORK, `Download failed (${response.status})`);
       }
@@ -319,4 +326,33 @@ export function createDownloadManager(options) {
   }
 
   return { enqueue, pause, resume, cancel, retry, list, restore, probeResume };
+}
+
+/**
+ * Follow redirects only while the hop stays on HTTPS.
+ * @param {string} url
+ * @param {{ headers: Record<string, string>, signal: AbortSignal, fetchImpl: typeof fetch }} options
+ */
+async function fetchHttps(url, options) {
+  let current = url;
+  for (let hop = 0; hop < APP_CONFIG.catalog.maximumRedirects; hop += 1) {
+    if (!current.startsWith('https://')) {
+      throw new AppError(ErrorCodes.HOST_UNTRUSTED, 'Redirect left HTTPS');
+    }
+    const response = await options.fetchImpl(current, {
+      headers: options.headers,
+      signal: options.signal,
+      redirect: 'manual'
+    });
+    if ([301, 302, 303, 307, 308].includes(response.status)) {
+      const location = response.headers.get('location');
+      if (!location) {
+        throw new AppError(ErrorCodes.NETWORK, 'Redirect without Location');
+      }
+      current = new URL(location, current).toString();
+      continue;
+    }
+    return response;
+  }
+  throw new AppError(ErrorCodes.NETWORK, 'Too many redirects');
 }

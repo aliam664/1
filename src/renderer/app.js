@@ -23,7 +23,9 @@ const PAGE_TITLES = {
 const sidebarEl = document.getElementById('sidebar');
 const contentEl = document.getElementById('content');
 const titleEl = document.getElementById('page-title');
+const toastEl = document.getElementById('toast');
 const bridge = getBridge();
+let toastTimer = 0;
 
 function applyChrome(state) {
   const root = document.documentElement;
@@ -61,7 +63,55 @@ function renderPage(state) {
   applyTranslations(document);
 }
 
+function rememberFocus() {
+  const active = document.activeElement;
+  if (!(active instanceof HTMLElement) || !active.closest('.app-shell')) {
+    return null;
+  }
+  const key =
+    active.getAttribute('data-search') !== null
+      ? 'search'
+      : active.getAttribute('data-game-path') !== null
+        ? 'game-path'
+        : active.getAttribute('data-nav') || active.getAttribute('data-install') || active.id;
+  const start = active instanceof HTMLInputElement ? active.selectionStart : null;
+  return { key, start, tag: active.tagName, name: active.getAttribute('data-search') !== null };
+}
+
+function restoreFocus(snapshot) {
+  if (!snapshot) {
+    return;
+  }
+  let node = null;
+  if (snapshot.key === 'search') {
+    node = document.querySelector('[data-search]');
+  } else if (snapshot.key === 'game-path') {
+    node = document.querySelector('[data-game-path]');
+  } else if (snapshot.key) {
+    node = document.querySelector(`[data-nav="${snapshot.key}"], [data-install="${snapshot.key}"]`);
+  }
+  if (node instanceof HTMLElement) {
+    node.focus();
+    if (node instanceof HTMLInputElement && snapshot.start != null) {
+      node.setSelectionRange(snapshot.start, snapshot.start);
+    }
+  }
+}
+
+function showToast(message) {
+  if (!toastEl || !message) {
+    return;
+  }
+  toastEl.hidden = false;
+  toastEl.textContent = message;
+  window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => {
+    toastEl.hidden = true;
+  }, 4200);
+}
+
 function renderShell(state) {
+  const focus = rememberFocus();
   const active = (state.downloads || []).filter((row) => row.state === 'running' || row.state === 'queued').length;
   sidebarEl.innerHTML = renderSidebar({
     route: state.route,
@@ -72,6 +122,7 @@ function renderShell(state) {
   });
   applyChrome(state);
   renderPage(state);
+  restoreFocus(focus);
 }
 
 function navigate(route) {
@@ -86,7 +137,7 @@ async function unwrap(result, fallbackMessage) {
   if (result && result.ok) {
     return result.data;
   }
-  setState({ error: result?.error?.message || fallbackMessage });
+  showToast(result?.error?.message || fallbackMessage);
   return null;
 }
 
@@ -118,6 +169,35 @@ function mergeDownload(payload) {
     ? current.map((row) => (row.id === payload.id ? { ...row, ...payload } : row))
     : [...current, payload];
   setState({ downloads: next.filter((row) => row.state !== 'canceled') });
+  if (payload.state === 'completed' && bridge.isElectron) {
+    tryInstallDownload(payload);
+  }
+}
+
+async function tryInstallDownload(payload) {
+  const analysis = await unwrap(await bridge.install.analyze({ downloadId: payload.id }), t('error.generic'));
+  if (!analysis) {
+    return;
+  }
+  if (!analysis.recognized || !analysis.items?.length) {
+    showToast(t('install.unrecognized'));
+    return;
+  }
+  const result = await unwrap(
+    await bridge.install.commit({
+      sessionId: analysis.sessionId,
+      selections: analysis.items.map((item) => ({
+        folderName: item.folderName,
+        overwrite: false,
+        backup: Boolean(item.exists)
+      })),
+      contentId: payload.contentId
+    }),
+    t('error.generic')
+  );
+  if (result) {
+    await refreshCatalog(false);
+  }
 }
 
 async function changeLanguage(language) {
