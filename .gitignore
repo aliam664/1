@@ -10,3 +10,4 @@ installer/Output/
 *.suo
 *.tmp
 *.log
+installer/version.iss

@@ -15,7 +15,7 @@ public sealed class DownloadManagerTests
         {
             var handler = new IncompleteResponseHandler();
             using var http = new HttpClient(handler);
-            using var manager = new HttpDownloadManager(http, new FileHashService(), new AppPaths(root), NullLogger<HttpDownloadManager>.Instance, 1, TimeSpan.FromMilliseconds(5));
+            using var manager = new HttpDownloadManager(http, new FileHashService(), new AppPaths(root), NullLogger<HttpDownloadManager>.Instance, () => 1, TimeSpan.FromMilliseconds(5));
             var failed = new TaskCompletionSource<DownloadJob>(TaskCreationOptions.RunContinuationsAsynchronously);
             manager.ProgressChanged += (_, progress) =>
             {

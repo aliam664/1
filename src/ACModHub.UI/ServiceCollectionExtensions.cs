@@ -11,8 +11,9 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<IFilePickerService, FilePickerService>();
         services.AddSingleton<IUiErrorHandler, UiErrorHandler>();
-        services.AddSingleton<IHtmlCatalogPageBuilder, HtmlCatalogPageBuilder>();
+        services.AddSingleton<IStorePageBuilder, StorePageBuilder>();
         services.AddSingleton<ILocalizationService, LocalizationService>();
+        services.AddSingleton<WebView2RuntimeDetector>();
         services.AddSingleton<MainViewModel>();
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<CatalogViewModel>();
