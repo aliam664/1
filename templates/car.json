@@ -1,0 +1,17 @@
+{
+  "id": "author-car-name",
+  "type": "car",
+  "name": { "fa": "نام فارسی", "en": "English name" },
+  "author": "Author",
+  "description": { "fa": "توضیحات فارسی", "en": "English description" },
+  "version": "1.0.0",
+  "archiveType": "rar",
+  "downloadUrl": "https://github.com/owner/repo/releases/download/tag/file.rar",
+  "sha256": "",
+  "size": 1,
+  "status": "published",
+  "tags": [],
+  "cover": "images/cars/author-car-name.svg",
+  "publishedAt": "2026-08-16T00:00:00Z",
+  "updatedAt": "2026-08-16T00:00:00Z"
+}

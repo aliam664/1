@@ -1,0 +1,239 @@
+{
+  "catalogVersion": "2026.08.16",
+  "generatedAt": "2026-08-16T03:28:50.118Z",
+  "categories": [
+    "car",
+    "track",
+    "mod"
+  ],
+  "featured": [
+    "bmw-m3-e46",
+    "monza-2024"
+  ],
+  "items": [
+    {
+      "id": "bmw-m3-e46",
+      "type": "car",
+      "name": {
+        "fa": "بی‌ام‌و M3 E46",
+        "en": "BMW M3 E46"
+      },
+      "author": "Community",
+      "description": {
+        "fa": "نسخهٔ تورینگ کلاسیک E46 با صدای ۶ سیلندر خطی و تعادل آشنای عقب‌محور.",
+        "en": "Classic E46 touring car with an inline-six soundtrack and familiar rear-drive balance."
+      },
+      "version": "1.2.0",
+      "archiveType": "rar",
+      "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/bmw-m3-e46.rar",
+      "sha256": "",
+      "size": 185000000,
+      "status": "published",
+      "tags": [
+        "bmw",
+        "touring",
+        "rwd"
+      ],
+      "cover": "images/cars/bmw-m3-e46.svg",
+      "featured": true,
+      "publishedAt": "2026-05-02T00:00:00Z",
+      "updatedAt": "2026-07-18T00:00:00Z",
+      "revocationReason": null
+    },
+    {
+      "id": "mazda-miata-na",
+      "type": "car",
+      "name": {
+        "fa": "مزدا میاتا NA",
+        "en": "Mazda MX-5 NA"
+      },
+      "author": "Community",
+      "description": {
+        "fa": "رودستر سبک ژاپنی برای رانندگی در پیست‌های فنی.",
+        "en": "Lightweight Japanese roadster built for technical circuits."
+      },
+      "version": "1.0.3",
+      "archiveType": "zip",
+      "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/mazda-miata-na.zip",
+      "sha256": "",
+      "size": 92000000,
+      "status": "published",
+      "tags": [
+        "mazda",
+        "roadster"
+      ],
+      "cover": "images/cars/mazda-miata-na.svg",
+      "featured": false,
+      "publishedAt": "2026-06-11T00:00:00Z",
+      "updatedAt": "2026-06-11T00:00:00Z",
+      "revocationReason": null
+    },
+    {
+      "id": "porsche-911-gt3",
+      "type": "car",
+      "name": {
+        "fa": "پورشه ۹۱۱ GT3",
+        "en": "Porsche 911 GT3"
+      },
+      "author": "Community",
+      "description": {
+        "fa": "کوپهٔ موتور عقب با آیرودینامیک پیست.",
+        "en": "Rear-engined coupe with circuit-focused aero."
+      },
+      "version": "2.0.1",
+      "archiveType": "rar",
+      "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/porsche-911-gt3.rar",
+      "sha256": "",
+      "size": 240000000,
+      "status": "published",
+      "tags": [
+        "porsche",
+        "gt"
+      ],
+      "cover": "images/cars/porsche-911-gt3.svg",
+      "featured": false,
+      "publishedAt": "2026-04-20T00:00:00Z",
+      "updatedAt": "2026-08-01T00:00:00Z",
+      "revocationReason": null
+    },
+    {
+      "id": "monza-2024",
+      "type": "track",
+      "name": {
+        "fa": "مونزا ۲۰۲۴",
+        "en": "Monza 2024"
+      },
+      "author": "Community",
+      "description": {
+        "fa": "معبد سرعت با سه شیکین و خط راست طولانی.",
+        "en": "The temple of speed: three chicanes and a long main straight."
+      },
+      "version": "1.1.0",
+      "archiveType": "rar",
+      "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/monza-2024.rar",
+      "sha256": "",
+      "size": 410000000,
+      "status": "published",
+      "tags": [
+        "italy",
+        "historic"
+      ],
+      "cover": "images/tracks/monza-2024.svg",
+      "featured": true,
+      "publishedAt": "2026-03-08T00:00:00Z",
+      "updatedAt": "2026-07-02T00:00:00Z",
+      "revocationReason": null
+    },
+    {
+      "id": "nurburgring-nordschleife",
+      "type": "track",
+      "name": {
+        "fa": "نوربرگرینگ نوردشلایفه",
+        "en": "Nürburgring Nordschleife"
+      },
+      "author": "Community",
+      "description": {
+        "fa": "سبز جهنمی؛ بیش از بیست کیلومتر و ده‌ها پیچ کور.",
+        "en": "The Green Hell: twenty-plus kilometres of blind crests."
+      },
+      "version": "1.4.2",
+      "archiveType": "7z",
+      "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/nurburgring-nordschleife.7z",
+      "sha256": "",
+      "size": 890000000,
+      "status": "published",
+      "tags": [
+        "germany",
+        "endurance"
+      ],
+      "cover": "images/tracks/nurburgring-nordschleife.svg",
+      "featured": false,
+      "publishedAt": "2026-01-14T00:00:00Z",
+      "updatedAt": "2026-08-10T00:00:00Z",
+      "revocationReason": null
+    },
+    {
+      "id": "shiraz-circuit",
+      "type": "track",
+      "name": {
+        "fa": "پیست شیراز",
+        "en": "Shiraz Circuit"
+      },
+      "author": "Community",
+      "description": {
+        "fa": "پیست خیالی الهام‌گرفته از پیچ‌های کوهستانی فارس.",
+        "en": "A fictional circuit inspired by the mountain roads of Fars."
+      },
+      "version": "0.9.0",
+      "archiveType": "zip",
+      "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/shiraz-circuit.zip",
+      "sha256": "",
+      "size": 155000000,
+      "status": "published",
+      "tags": [
+        "iran",
+        "fictional"
+      ],
+      "cover": "images/tracks/shiraz-circuit.svg",
+      "featured": false,
+      "publishedAt": "2026-08-12T00:00:00Z",
+      "updatedAt": "2026-08-12T00:00:00Z",
+      "revocationReason": null
+    },
+    {
+      "id": "pit-crew-app",
+      "type": "mod",
+      "name": {
+        "fa": "اپ خدمه پیت",
+        "en": "Pit Crew App"
+      },
+      "author": "Community",
+      "description": {
+        "fa": "اپلیکیشن داخل بازی برای استراتژی تایر و سوخت.",
+        "en": "In-game app for tyre and fuel strategy."
+      },
+      "version": "1.0.0",
+      "archiveType": "zip",
+      "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/pit-crew-app.zip",
+      "sha256": "",
+      "size": 4200000,
+      "status": "deprecated",
+      "tags": [
+        "app"
+      ],
+      "cover": "images/mods/pit-crew-app.svg",
+      "featured": false,
+      "publishedAt": "2025-11-03T00:00:00Z",
+      "updatedAt": "2025-11-03T00:00:00Z",
+      "revocationReason": null
+    },
+    {
+      "id": "sol-weather",
+      "type": "mod",
+      "name": {
+        "fa": "بسته آب‌وهوا Sol",
+        "en": "Sol Weather Pack"
+      },
+      "author": "Community",
+      "description": {
+        "fa": "چرخهٔ روز و شب و آب‌وهوای پویا برای Assetto Corsa.",
+        "en": "Day/night cycle and dynamic weather for Assetto Corsa."
+      },
+      "version": "2.2.8",
+      "archiveType": "zip",
+      "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/sol-weather.zip",
+      "sha256": "",
+      "size": 64000000,
+      "status": "published",
+      "tags": [
+        "weather",
+        "visual"
+      ],
+      "cover": "images/mods/sol-weather.svg",
+      "featured": false,
+      "publishedAt": "2026-02-01T00:00:00Z",
+      "updatedAt": "2026-06-22T00:00:00Z",
+      "revocationReason": null
+    }
+  ]
+}

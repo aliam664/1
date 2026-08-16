@@ -1,0 +1,29 @@
+# Copy to .github/workflows/build-catalog.yml when the GitHub App has
+# the `workflows` permission. The Action only runs the local script.
+name: build-catalog
+on:
+  push:
+    paths:
+      - 'database/**'
+      - 'schemas/**'
+      - 'scripts/build-catalog.mjs'
+      - 'src/main/catalog/**'
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node scripts/build-catalog.mjs
+      - name: Publish catalog branch
+        run: |
+          git config user.name "stockcorsa-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add dist/catalog.json dist/manifest.json
+          git diff --cached --quiet && echo "no catalog change" && exit 0
+          git checkout -B catalog
+          git commit -m "chore: refresh aggregated catalog"
+          git push origin catalog --force

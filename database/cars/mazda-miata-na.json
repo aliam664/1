@@ -1,0 +1,20 @@
+{
+  "id": "mazda-miata-na",
+  "type": "car",
+  "name": { "fa": "مزدا میاتا NA", "en": "Mazda MX-5 NA" },
+  "author": "Community",
+  "description": {
+    "fa": "رودستر سبک ژاپنی برای رانندگی در پیست‌های فنی.",
+    "en": "Lightweight Japanese roadster built for technical circuits."
+  },
+  "version": "1.0.3",
+  "archiveType": "zip",
+  "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/mazda-miata-na.zip",
+  "sha256": "",
+  "size": 92000000,
+  "status": "published",
+  "tags": ["mazda", "roadster"],
+  "cover": "images/cars/mazda-miata-na.svg",
+  "publishedAt": "2026-06-11T00:00:00Z",
+  "updatedAt": "2026-06-11T00:00:00Z"
+}

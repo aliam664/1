@@ -1,0 +1,20 @@
+{
+  "id": "shiraz-circuit",
+  "type": "track",
+  "name": { "fa": "پیست شیراز", "en": "Shiraz Circuit" },
+  "author": "Community",
+  "description": {
+    "fa": "پیست خیالی الهام‌گرفته از پیچ‌های کوهستانی فارس.",
+    "en": "A fictional circuit inspired by the mountain roads of Fars."
+  },
+  "version": "0.9.0",
+  "archiveType": "zip",
+  "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/shiraz-circuit.zip",
+  "sha256": "",
+  "size": 155000000,
+  "status": "published",
+  "tags": ["iran", "fictional"],
+  "cover": "images/tracks/shiraz-circuit.svg",
+  "publishedAt": "2026-08-12T00:00:00Z",
+  "updatedAt": "2026-08-12T00:00:00Z"
+}

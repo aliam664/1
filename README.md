@@ -1,58 +1,64 @@
 # StockCorsa Launcher
 
 Independent Windows desktop launcher for **Assetto Corsa** cars, tracks and mods.
-Built with Electron, vanilla ESM, and a locked-down renderer. Persian (RTL) is
-the default language; English is included.
+Electron main process, sandboxed vanilla ESM renderer, Persian RTL by default.
 
 Assetto Corsa and Steam are trademarks of their respective owners. This project
 does not bundle or redistribute game files or third-party mods.
 
-**فارسی:** این برنامه از صفر با Electron بازنویسی شده است. مرحلهٔ ۱ — پوسته،
-امنیت، i18n و تنظیمات زبان/تم — آماده است. قابلیت‌های کاتالوگ، دانلود و نصب در
-مراحل بعد اضافه می‌شوند. معماری: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ·
+**فارسی:** لانچر دسکتاپ برای مرور، دانلود و نصب محتوای Assetto Corsa.
+معماری: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ·
 فازبندی: [docs/PHASES.md](docs/PHASES.md)
 
-## Current status
+## What it does
 
-| Stage | Scope | State |
-| --- | --- | --- |
-| 1 | Electron shell, CSP/sandbox, i18n, Home, Settings | **done** |
-| 2 | SQLite + migrations | next |
-| 3 | Aggregated catalog + GitHub Action | planned |
-| 4 | Assetto Corsa detection | planned |
-| 5 | ZIP / 7z / RAR extract | planned |
-| 6 | Download manager + SHA-256 | planned |
-| 7 | Installer pipeline | planned |
-| 8 | electron-builder + auto-update | planned |
-
-## Requirements
-
-- Node.js 20.11+ (22 recommended)
-- Windows 10/11 to run the packaged desktop app
-- Linux/macOS can run unit tests and the web preview of the renderer
+- Aggregated HTTPS catalog (jsDelivr → raw GitHub → last-known-good cache)
+- Local SQLite state: settings, favorites, install manifests, download queue
+- Streamed downloads with pause/resume when the host supports HTTP Range
+- SHA-256 verification, RAR/ZIP/7z extract, zip-slip / zip-bomb rejection
+- Assetto Corsa path detection (Steam registry + `libraryfolders.vdf`)
+- Safe install into `content/cars` / `content/tracks` with uninstall from manifest
+- Optional WinRAR / 7-Zip helper for multi-volume RAR
+- Launcher update check against GitHub Releases (consent-first; no silent apply)
 
 ## Commands
 
 ```bash
 npm install
 npm test
-npm start          # Electron window (Windows / local desktop)
-npm run preview    # Renderer only, http://0.0.0.0:4173
+npm run catalog:build
+npm run preview          # renderer demo at http://0.0.0.0:4173
+npm start                # Electron (needs a desktop session)
+npm run dist             # Windows NSIS + portable via electron-builder
 ```
 
-`npm start` needs a desktop session. In this repository the renderer is also
-servable through `npm run preview` so the UI can be reviewed without Electron.
+The web preview uses a bundled demo catalog and simulated downloads. It never
+receives Node privileges. Real extract/install/Steam detection run only in Electron.
 
-Native module rebuild (`electron-builder install-app-deps`) is **not** used yet.
-It will be added in Stage 2 together with `better-sqlite3`.
+## Database
 
-## Security (Stage 1)
+The adapter prefers **better-sqlite3** when the native module is present and
+falls back to **sql.js**. Both read and write a real SQLite file at
+`app.getPath('userData')/stockcorsa.db`, so swapping engines later does not
+change callers or on-disk data.
+
+`postinstall` runs `electron-builder install-app-deps` only if both Electron
+and better-sqlite3 are installed.
+
+## Adding catalog items
+
+Copy `templates/car.json` (or track/mod), fill the fields, drop it in
+`database/cars/` and run `npm run catalog:build`. Invalid IDs, empty links or
+unknown `archiveType` fail the build. The launcher does not fetch one JSON
+file per car.
+
+## Security
 
 - `contextIsolation`, `sandbox`, `webSecurity` on; `nodeIntegration` off
-- Renderer CSP forbids `unsafe-inline`, `unsafe-eval` and all network (`connect-src 'none'`)
-- Preload exposes only `window.stockcorsa` — never raw `ipcRenderer`
-- Every IPC payload is validated (type / enum / length)
-- No tokens, API keys or credentials exist in the source tree
+- Renderer CSP: no `unsafe-inline`, no `unsafe-eval`, `connect-src 'none'`
+- Preload exposes only `window.stockcorsa`
+- Every IPC payload is validated
+- No tokens or credentials in the tree
 
 ## License
 

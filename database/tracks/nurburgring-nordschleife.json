@@ -1,0 +1,20 @@
+{
+  "id": "nurburgring-nordschleife",
+  "type": "track",
+  "name": { "fa": "نوربرگرینگ نوردشلایفه", "en": "Nürburgring Nordschleife" },
+  "author": "Community",
+  "description": {
+    "fa": "سبز جهنمی؛ بیش از بیست کیلومتر و ده‌ها پیچ کور.",
+    "en": "The Green Hell: twenty-plus kilometres of blind crests."
+  },
+  "version": "1.4.2",
+  "archiveType": "7z",
+  "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/nurburgring-nordschleife.7z",
+  "sha256": "",
+  "size": 890000000,
+  "status": "published",
+  "tags": ["germany", "endurance"],
+  "cover": "images/tracks/nurburgring-nordschleife.svg",
+  "publishedAt": "2026-01-14T00:00:00Z",
+  "updatedAt": "2026-08-10T00:00:00Z"
+}

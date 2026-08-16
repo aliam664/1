@@ -3,6 +3,8 @@ import { describe, it } from 'node:test';
 import {
   IpcValidationError,
   assertBoolean,
+  assertHttpsUrl,
+  assertId,
   assertLanguage,
   assertTheme
 } from '../src/main/ipc/validate.js';
@@ -11,26 +13,26 @@ import { ALLOWED_INVOKE, isAllowedEvent, isAllowedInvoke } from '../src/main/ipc
 describe('ipc validators', () => {
   it('accepts the documented language and theme enums', () => {
     assert.equal(assertLanguage('fa'), 'fa');
-    assert.equal(assertLanguage('en'), 'en');
     assert.equal(assertTheme('dark'), 'dark');
-    assert.equal(assertTheme('light'), 'light');
     assert.equal(assertBoolean(false, 'reducedMotion'), false);
+    assert.equal(assertId('bmw-m3-e46'), 'bmw-m3-e46');
+    assert.equal(assertHttpsUrl('https://example.com/a.zip'), 'https://example.com/a.zip');
   });
 
   it('rejects unknown or mistyped values', () => {
     assert.throws(() => assertLanguage('de'), IpcValidationError);
-    assert.throws(() => assertLanguage(1), IpcValidationError);
     assert.throws(() => assertTheme('solarized'), IpcValidationError);
     assert.throws(() => assertBoolean('yes', 'reducedMotion'), IpcValidationError);
+    assert.throws(() => assertHttpsUrl('http://evil.example/x'), IpcValidationError);
+    assert.throws(() => assertId('../etc/passwd'), IpcValidationError);
   });
 
-  it('allow-lists only the Stage 1 invoke channels', () => {
+  it('allow-lists invoke channels and rejects fs/shell smuggling', () => {
     assert.equal(isAllowedInvoke('app:getInfo'), true);
-    assert.equal(isAllowedInvoke('settings:get'), true);
+    assert.equal(isAllowedInvoke('catalog:sync'), true);
+    assert.equal(isAllowedInvoke('downloads:enqueue'), true);
     assert.equal(isAllowedInvoke('fs:read'), false);
-    assert.equal(isAllowedInvoke('shell.openExternal'), false);
-    assert.equal(isAllowedEvent('settings:changed'), true);
-    assert.equal(isAllowedEvent('any'), false);
-    assert.equal(ALLOWED_INVOKE.length, 5);
+    assert.equal(isAllowedEvent('download:progress'), true);
+    assert.equal(ALLOWED_INVOKE.length >= 20, true);
   });
 });

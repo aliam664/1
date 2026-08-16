@@ -1,7 +1,3 @@
-/**
- * Tiny observable store. No framework.
- */
-
 const state = {
   route: 'home',
   language: 'fa',
@@ -10,6 +6,12 @@ const state = {
   online: typeof navigator === 'undefined' ? true : navigator.onLine,
   isElectron: false,
   appInfo: null,
+  settings: null,
+  catalog: { items: [], featured: [], itemCount: 0 },
+  downloads: [],
+  gameStatus: null,
+  updateInfo: null,
+  search: '',
   error: null
 };
 
@@ -19,18 +21,11 @@ export function getState() {
   return state;
 }
 
-/**
- * @param {Partial<typeof state>} patch
- */
 export function setState(patch) {
   Object.assign(state, patch);
   listeners.forEach((listener) => listener(state));
 }
 
-/**
- * @param {(snapshot: typeof state) => void} listener
- * @returns {() => void}
- */
 export function subscribe(listener) {
   listeners.add(listener);
   return () => listeners.delete(listener);

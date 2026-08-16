@@ -1,0 +1,7 @@
+{
+  "categories": [
+    { "id": "car", "name": { "fa": "ماشین", "en": "Car" } },
+    { "id": "track", "name": { "fa": "پیست", "en": "Track" } },
+    { "id": "mod", "name": { "fa": "مود", "en": "Mod" } }
+  ]
+}

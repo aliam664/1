@@ -104,3 +104,31 @@ export function assertTheme(value) {
 
 export const LANGUAGE_VALUES_LIST = LANGUAGE_VALUES;
 export const THEME_VALUES_LIST = THEME_VALUES;
+
+const ID_PATTERN = /^[a-zA-Z0-9._:-]{1,80}$/;
+
+/**
+ * @param {unknown} value
+ * @param {string} [field]
+ */
+export function assertId(value, field = 'id') {
+  return assertBoundedString(value, field, { min: 1, max: 80, pattern: ID_PATTERN });
+}
+
+/**
+ * @param {unknown} value
+ * @param {string} [field]
+ */
+export function assertHttpsUrl(value, field = 'url') {
+  const url = assertBoundedString(value, field, { min: 12, max: 2000 });
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch {
+    throw new IpcValidationError(`${field} is not a valid URL`, { field, code: 'URL' });
+  }
+  if (parsed.protocol !== 'https:') {
+    throw new IpcValidationError(`${field} must be https`, { field, code: 'URL' });
+  }
+  return url;
+}
