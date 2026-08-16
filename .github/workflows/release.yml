@@ -1,0 +1,167 @@
+name: Release
+
+# AC Mod Hub 2.0 - REAL Windows release pipeline (windows-latest).
+# Build (0 error) -> tests -> publish win-x64 self-contained -> Inno Setup
+# -> real smoke test of the installed app -> SHA256SUMS -> GitHub Prerelease.
+# Release guard: refuses to release unless the source is the real 2.0 tree.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Windows build, smoke test and GitHub Prerelease
+    runs-on: windows-latest
+    steps:
+      - name: "1. Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "2. Setup .NET 8"
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: "Release guard: source must be the real 2.0 tree"
+        shell: bash
+        run: |
+          set -e
+          VERSION=$(python -c "import re;print(re.search(r'<Version>([^<]+)</Version>', open('Directory.Build.props').read()).group(1))")
+          echo "Single-source version: $VERSION"
+          if [ "$VERSION" != "2.0.0-preview.1" ]; then
+            echo "REFUSING TO RELEASE: this is not the 2.0 source (version=$VERSION)"
+            exit 1
+          fi
+          grep -q 'x:Key="BackgroundColor">#080B11' src/ACModHub.UI/Resources/Theme.xaml \
+            || { echo "REFUSING TO RELEASE: 2.0 design tokens missing"; exit 1; }
+          grep -q 'aliam664.github.io/Data/catalog.v1.json' src/ACModHub.Core/AppConfig.cs \
+            || { echo "REFUSING TO RELEASE: aliam664/Data catalog connection missing"; exit 1; }
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "$GITHUB_REF_NAME" != "v$VERSION" ]; then
+            echo "REFUSING TO RELEASE: tag $GITHUB_REF_NAME != v$VERSION"
+            exit 1
+          fi
+          echo "Release guard passed: 2.0 source, new design, Data connection verified."
+
+      - name: "3. dotnet restore"
+        run: dotnet restore ACModHub.sln
+
+      - name: "4. dotnet build -c Release"
+        run: dotnet build ACModHub.sln -c Release --no-restore
+
+      - name: "5. dotnet test -c Release"
+        run: dotnet test ACModHub.sln -c Release --no-build --logger "trx;LogFileName=test-results.trx"
+
+      - name: "Upload test results on failure"
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: "**/TestResults/*.trx"
+
+      - name: "6. dotnet publish win-x64 self-contained"
+        run: dotnet publish src/ACModHub.App/ACModHub.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=false --no-restore -o artifacts/publish/win-x64
+
+      - name: "Verify real EXE + self-contained runtime layout"
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $dir = 'artifacts/publish/win-x64'
+          $exe = Join-Path $dir 'ACModHub.exe'
+          if (-not (Test-Path $exe)) { throw "ACModHub.exe was NOT produced" }
+          $size = (Get-Item $exe).Length
+          if ($size -lt 100KB) { throw "ACModHub.exe is suspiciously small ($size bytes) - not a real build" }
+          $required = @('hostfxr.dll','coreclr.dll','System.Private.CoreLib.dll',
+                        'PresentationFramework.dll','ACModHub.dll','ACModHub.UI.dll',
+                        'ACModHub.Core.dll','ACModHub.Infrastructure.dll',
+                        'SharpCompress.dll','Microsoft.Web.WebView2.Core.dll')
+          $missing = $required | Where-Object { -not (Test-Path (Join-Path $dir $_)) }
+          if ($missing) { throw "Missing runtime files next to the EXE: $($missing -join ', ')" }
+          Write-Host "ACModHub.exe is real ($size bytes); runtime layout complete."
+
+      - name: "7. Install Inno Setup 6"
+        shell: powershell
+        run: choco install innosetup --version=6.3.3 -y --no-progress
+
+      - name: "8. Build AC-Mod-Hub-Setup.exe"
+        shell: powershell
+        run: ./build.ps1 -SkipBuild -SkipTests
+
+      - name: "Verify the installer exists"
+        shell: pwsh
+        run: |
+          $setup = 'artifacts/installer/AC-Mod-Hub-Setup.exe'
+          if (-not (Test-Path $setup)) { throw "Installer was NOT produced" }
+          Write-Host "Installer ready: $((Get-Item $setup).Length) bytes"
+
+      - name: "9. Smoke test: silent install + real startup of the installed app"
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $setup = (Resolve-Path 'artifacts/installer/AC-Mod-Hub-Setup.exe').Path
+          $installDir = Join-Path $env:LOCALAPPDATA 'ACModHubSmoke'
+          if (Test-Path $installDir) { Remove-Item $installDir -Recurse -Force }
+          $setupProc = Start-Process -FilePath $setup -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART',"/DIR=$installDir" -PassThru -Wait
+          if ($setupProc.ExitCode -ne 0) { throw "Silent setup failed with exit code $($setupProc.ExitCode)" }
+          $appExe = Join-Path $installDir 'ACModHub.exe'
+          if (-not (Test-Path $appExe)) { throw "Installed ACModHub.exe is missing" }
+          $app = Start-Process -FilePath $appExe -PassThru
+          Start-Sleep -Seconds 8
+          if ($app.HasExited) { throw "Installed app exited during startup with code $($app.ExitCode)" }
+          $logs = Join-Path $env:APPDATA 'ACModHub\logs'
+          if (-not (Test-Path $logs)) { throw "App is alive but did not create %AppData%\ACModHub\logs" }
+          Start-Sleep -Seconds 2
+          $latest = Get-ChildItem $logs -Filter *.log | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if ($latest) {
+            $content = Get-Content $latest.FullName -Raw -ErrorAction SilentlyContinue
+            if ($content -match 'startup failed|Startup Error|Unhandled UI exception') {
+              throw "App started but logged a startup failure: $($latest.FullName)"
+            }
+          }
+          Stop-Process -Id $app.Id -Force -ErrorAction SilentlyContinue
+          $unins = Join-Path $installDir 'unins000.exe'
+          if (Test-Path $unins) { Start-Process -FilePath $unins -ArgumentList '/VERYSILENT' -Wait }
+          Write-Host "Smoke test passed: setup installed, app started and initialized clean logs."
+
+      - name: "10. SHA256SUMS.txt + BUILD-INFO.txt"
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $setup = 'artifacts/installer/AC-Mod-Hub-Setup.exe'
+          $hash = (Get-FileHash -Algorithm SHA256 $setup).Hash.ToLowerInvariant()
+          "$hash *AC-Mod-Hub-Setup.exe" | Set-Content 'artifacts/installer/SHA256SUMS.txt' -Encoding ascii
+          @(
+            'Build info',
+            '==========',
+            'Version : 2.0.0-preview.1',
+            "Date    : $(Get-Date -Format u)",
+            "Sha256  : $hash"
+          ) | Set-Content 'artifacts/installer/BUILD-INFO.txt' -Encoding utf8
+          Write-Host "SHA-256: $hash"
+
+      - name: "11. Upload build artifacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: AC-Mod-Hub-2.0.0-preview.1-win-x64
+          path: |
+            artifacts/installer/AC-Mod-Hub-Setup.exe
+            artifacts/installer/SHA256SUMS.txt
+            artifacts/installer/BUILD-INFO.txt
+            artifacts/AC-Mod-Hub-Portable-win-x64.zip
+
+      - name: "12+13. Publish GitHub Prerelease and upload Setup + SHA"
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v2.0.0-preview.1
+          name: AC Mod Hub 2.0.0-preview.1
+          prerelease: true
+          generate_release_notes: true
+          files: |
+            artifacts/installer/AC-Mod-Hub-Setup.exe
+            artifacts/installer/SHA256SUMS.txt
+            artifacts/installer/BUILD-INFO.txt
+            artifacts/AC-Mod-Hub-Portable-win-x64.zip
