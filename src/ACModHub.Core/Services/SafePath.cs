@@ -64,4 +64,21 @@ public static partial class SafePath
 
     [GeneratedRegex("^[a-zA-Z]:($|[/\\\\])", RegexOptions.CultureInvariant)]
     private static partial Regex DrivePathRegex();
+
+    /// <summary>
+    /// Validates a single file name (no directory part) for use as a download destination:
+    /// rejects separators, Windows reserved device names, trailing dots/spaces, ADS (":"),
+    /// and characters that are invalid on Windows file systems.
+    /// </summary>
+    public static bool IsSafeFileName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return false;
+        if (name.Length > 240) return false;
+        if (name.Contains('/') || name.Contains('\\') || name.Contains('\0')) return false;
+        if (name.EndsWith(' ') || name.EndsWith('.')) return false;
+        if (name.IndexOf(':') >= 0) return false; // drive qualifier or ADS stream
+        if (name.IndexOfAny(['<', '>', '"', '|', '?', '*']) >= 0) return false;
+        if (IsReservedWindowsName(name)) return false;
+        return true;
+    }
 }

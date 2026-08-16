@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using ACModHub.Core.Interfaces;
 using ACModHub.Core.Models;
+using ACModHub.Core.Services;
 using Microsoft.Extensions.Logging;
 
 namespace ACModHub.Infrastructure.Services;
@@ -17,19 +18,24 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
     private readonly ILogger<HttpDownloadManager> _logger;
     private readonly ConcurrentDictionary<Guid, DownloadJob> _jobs = new();
     private readonly ConcurrentDictionary<Guid, CancellationTokenSource> _tokens = new();
-    private readonly SemaphoreSlim _concurrency;
+    private readonly Func<int> _maxConcurrencyProvider;
     private readonly TimeSpan _retryBaseDelay;
+    private SemaphoreSlim? _concurrency;
     private bool _disposed;
 
-    public HttpDownloadManager(HttpClient httpClient, IFileHashService hashes, IAppPaths paths, ILogger<HttpDownloadManager> logger, int maxConcurrency = 3, TimeSpan? retryBaseDelay = null)
+    public HttpDownloadManager(HttpClient httpClient, IFileHashService hashes, IAppPaths paths, ILogger<HttpDownloadManager> logger, Func<int>? maxConcurrencyProvider = null, TimeSpan? retryBaseDelay = null)
     {
         _httpClient = httpClient;
         _hashes = hashes;
         _paths = paths;
         _logger = logger;
-        _concurrency = new SemaphoreSlim(Math.Clamp(maxConcurrency, 1, 8));
+        // Lazy provider: the semaphore is created on first use so constructing the manager
+        // never blocks on settings I/O.
+        _maxConcurrencyProvider = maxConcurrencyProvider ?? (() => 3);
         _retryBaseDelay = retryBaseDelay ?? TimeSpan.FromSeconds(1);
     }
+
+    private SemaphoreSlim Concurrency => _concurrency ??= new SemaphoreSlim(Math.Clamp(_maxConcurrencyProvider(), 1, 8));
 
     public event EventHandler<DownloadProgress>? ProgressChanged;
     public IReadOnlyCollection<DownloadJob> Jobs => _jobs.Values.OrderByDescending(x => x.CreatedAt).ToArray();
@@ -43,8 +49,8 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
         if (request.ExpectedSize is <= 0) throw new ArgumentException("Expected download size must be positive when provided.", nameof(request));
         if (!string.IsNullOrWhiteSpace(request.ExpectedSha256) && (request.ExpectedSha256.Length != 64 || request.ExpectedSha256.Any(x => !Uri.IsHexDigit(x))))
             throw new ArgumentException("Expected SHA-256 must contain exactly 64 hexadecimal characters.", nameof(request));
-        var safeName = Path.GetFileName(request.FileName);
-        if (string.IsNullOrWhiteSpace(safeName) || safeName != request.FileName) throw new ArgumentException("The download file name is invalid.", nameof(request));
+        if (!SafePath.IsSafeFileName(request.FileName))
+            throw new ArgumentException("The download file name is invalid.", nameof(request));
         var destination = Path.Combine(_paths.DownloadsDirectory, $"{request.Id:N}-{safeName}");
         var job = new DownloadJob { Request = request, DestinationPath = destination };
         if (!_jobs.TryAdd(request.Id, job)) throw new InvalidOperationException("A download with this ID already exists.");
@@ -82,6 +88,9 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
     {
         cancellationToken.ThrowIfCancellationRequested();
         var job = RequiredJob(jobId);
+        // Terminal-state protection: cancelling a finished download must never touch
+        // the verified file or corrupt the state.
+        if (job.State is DownloadState.Completed or DownloadState.Cancelled or DownloadState.Verifying) return Task.CompletedTask;
         job.State = DownloadState.Cancelled;
         if (_tokens.TryGetValue(jobId, out var token)) token.Cancel();
         var part = job.DestinationPath + ".part";
@@ -114,7 +123,7 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
     {
         try
         {
-            await _concurrency.WaitAsync(cancellationToken).ConfigureAwait(false);
+            await Concurrency.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
                 for (;;)
@@ -127,6 +136,9 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
                     catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { return; }
                     catch (DownloadValidationException ex)
                     {
+                        // The bytes on disk failed validation: discard the partial so a
+                        // later retry starts clean instead of reusing corrupt data.
+                        try { if (File.Exists(job.DestinationPath + ".part")) File.Delete(job.DestinationPath + ".part"); } catch (IOException) { }
                         job.Error = ex.Message;
                         job.State = DownloadState.Failed;
                         Raise(job);
@@ -149,7 +161,7 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
                     }
                 }
             }
-            finally { _concurrency.Release(); }
+            finally { Concurrency.Release(); }
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
     }
@@ -226,8 +238,21 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
 
     private void Raise(DownloadJob job)
     {
-        double? percentage = job.TotalBytes is > 0 ? job.BytesReceived * 100d / job.TotalBytes.Value : null;
-        ProgressChanged?.Invoke(this, new DownloadProgress(job.Request.Id, job.State, job.BytesReceived, job.TotalBytes, percentage, job.SpeedBytesPerSecond, job.EstimatedTimeRemaining));
+        // Subscriber isolation: one failing subscriber must never break the download loop
+        // or prevent other subscribers from receiving progress.
+        var handlers = ProgressChanged?.GetInvocationList() ?? [];
+        foreach (var handler in handlers)
+        {
+            try
+            {
+                ((EventHandler<DownloadProgress>)handler)(this, new DownloadProgress(job.Request.Id, job.State, job.BytesReceived, job.TotalBytes,
+                    job.TotalBytes is > 0 ? job.BytesReceived * 100d / job.TotalBytes.Value : null, job.SpeedBytesPerSecond, job.EstimatedTimeRemaining));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "A download progress subscriber threw an exception");
+            }
+        }
     }
 
     public void Dispose()
@@ -235,7 +260,7 @@ public sealed class HttpDownloadManager : IDownloadManager, IDisposable
         if (_disposed) return;
         _disposed = true;
         foreach (var token in _tokens.Values) { token.Cancel(); token.Dispose(); }
-        _concurrency.Dispose();
+        _concurrency?.Dispose();
     }
 }
 

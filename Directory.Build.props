@@ -7,9 +7,22 @@
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+    <!--
+      Single source of truth for the product version.
+      Consumed by:
+        - Assembly informational version (UI title bar, diagnostics)
+        - AppInfo (User-Agent strings)
+        - build.ps1 / CI (generates installer/version.iss for Inno Setup)
+        - scripts/validate.py (version consistency check)
+      Do NOT hard-code a version anywhere else.
+    -->
     <Company>AC Mod Hub</Company>
     <Product>AC Mod Hub</Product>
     <Copyright>Copyright © AC Mod Hub 2026</Copyright>
-    <Version>1.0.1</Version>
+    <Version>2.0.0-preview.1</Version>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+    <InformationalVersion>2.0.0-preview.1</InformationalVersion>
   </PropertyGroup>
 </Project>

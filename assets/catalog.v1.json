@@ -1,6 +1,8 @@
 {
   "schemaVersion": 1,
-  "title": "AC Mod Hub Store",
-  "updatedAt": "2026-08-12T00:00:00Z",
+  "revision": 1,
+  "generatedAt": "2026-08-16T00:00:00Z",
+  "repository": "aliam664/Data",
+  "minimumLauncherVersion": "2.0.0",
   "mods": []
 }
