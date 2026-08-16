@@ -1,0 +1,54 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xml:lang="en-US">
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavDashboard">Dashboard</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavMods">Mods</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavCars">Cars</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavTracks">Tracks</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavSkins">Skins</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavApps">Apps</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavDownloads">Downloads</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavUpdates">Updates</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavBackups">Backups</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavSettings">Settings</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ImportMod">Import mod</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="LaunchGame">Launch game</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DashboardTitle">Command center</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="LibraryTitle">Mod library</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="GameStatus">Game status</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="GamePath">Game path</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="InstalledMods">Installed mods</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Cars">Cars</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Tracks">Tracks</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Updates">Updates</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Search">Search by name or author…</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AllCategories">All categories</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Refresh">Refresh</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Browse">Browse</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="InstallerTitle">Secure mod installer</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Install">Install &amp; verify</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Cancel">Cancel</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Conflicts">File conflicts</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Files">Files</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AllowOverwrite">Overwrite resolvable conflicts after backup</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DownloadsTitle">Download manager</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="BackupsTitle">Backup manager</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SettingsTitle">Settings &amp; diagnostics</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Save">Save</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Detect">Auto-detect</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Diagnostics">Run diagnostics</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ScanExisting">Scan &amp; import existing content</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NameLabel">Name</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AuthorLabel">Author</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="VersionLabel">Version</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="CategoryLabel">Category</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SizeLabel">Size</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="StatusLabel">Status</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="EnableAction">Enable</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DisableAction">Disable</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UpdateAction">Update</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RepairAction">Repair</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReinstallAction">Reinstall</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UninstallAction">Uninstall</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="VerifyAction">Verify</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="PauseAction">Pause</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ResumeAction">Resume</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RetryAction">Retry</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DeleteAction">Delete</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RestoreAction">Restore</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AddAction">Add</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UrlLabel">HTTP / HTTPS URL</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="FileNameLabel">File name</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ShaLabel">SHA-256 (optional)</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="StateLabel">State</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReceivedLabel">Received</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="TotalLabel">Total</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RetriesLabel">Retries</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ErrorLabel">Error</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="CheckProviders">Check providers</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ApplicationLabel">Application</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="LanguageLabel">Language / زبان</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ConcurrentDownloadsLabel">Concurrent downloads (1–8)</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ExistingInstallation">Existing installation</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ProviderArchitecture">Provider-independent update architecture</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SkinCarTarget">Destination car folder (example: ks_ferrari_458)</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="PreserveUninstallAction">Keep modified &amp; uninstall</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RestoreUninstallAction">Discard changes &amp; uninstall</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavCatalog">Mod Store</sys:String>
+</ResourceDictionary>

@@ -1,0 +1,54 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xml:lang="fa-IR">
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavDashboard">داشبورد</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavMods">مودها</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavCars">ماشین‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavTracks">پیست‌ها</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavSkins">اسکین‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavApps">اپ‌ها</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavDownloads">دانلودها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavUpdates">به‌روزرسانی‌ها</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavBackups">پشتیبان‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavSettings">تنظیمات</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ImportMod">وارد کردن مود</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="LaunchGame">اجرای بازی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DashboardTitle">مرکز کنترل</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="LibraryTitle">کتابخانه مودها</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="GameStatus">وضعیت بازی</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="GamePath">مسیر بازی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="InstalledMods">مودهای نصب‌شده</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Cars">ماشین‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Tracks">پیست‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Updates">آپدیت‌ها</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Search">جستجو بر اساس نام یا سازنده…</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AllCategories">همه دسته‌ها</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Refresh">تازه‌سازی</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Browse">انتخاب مسیر</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="InstallerTitle">نصب امن مود</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Install">نصب و بررسی</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Cancel">انصراف</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Conflicts">تداخل فایل‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Files">فایل‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AllowOverwrite">با پشتیبان‌گیری، تداخل‌های قابل‌حل بازنویسی شوند</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DownloadsTitle">مدیریت دانلود</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="BackupsTitle">مدیریت پشتیبان‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SettingsTitle">تنظیمات و عیب‌یابی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Save">ذخیره</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Detect">تشخیص خودکار</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Diagnostics">اجرای عیب‌یابی</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ScanExisting">اسکن و واردکردن محتوای فعلی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NameLabel">نام</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AuthorLabel">سازنده</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="VersionLabel">نسخه</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="CategoryLabel">دسته‌بندی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SizeLabel">حجم</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="StatusLabel">وضعیت</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="EnableAction">فعال‌سازی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DisableAction">غیرفعال‌سازی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UpdateAction">به‌روزرسانی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RepairAction">تعمیر</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReinstallAction">نصب مجدد</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UninstallAction">حذف مود</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="VerifyAction">بررسی سلامت</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="PauseAction">مکث</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ResumeAction">ادامه</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RetryAction">تلاش مجدد</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DeleteAction">حذف</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RestoreAction">بازیابی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AddAction">افزودن</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UrlLabel">نشانی HTTP / HTTPS</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="FileNameLabel">نام فایل</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ShaLabel">SHA-256 (اختیاری)</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="StateLabel">وضعیت</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReceivedLabel">دریافت‌شده</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="TotalLabel">کل</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RetriesLabel">تلاش‌ها</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ErrorLabel">خطا</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="CheckProviders">بررسی منابع</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ApplicationLabel">برنامه</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="LanguageLabel">زبان / Language</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ConcurrentDownloadsLabel">دانلودهای هم‌زمان (۱ تا ۸)</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ExistingInstallation">نصب فعلی بازی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ProviderArchitecture">معماری مستقل از ارائه‌دهنده برای به‌روزرسانی</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SkinCarTarget">پوشهٔ ماشین مقصد (مثال: ks_ferrari_458)</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="PreserveUninstallAction">حفظ فایل‌های تغییریافته و حذف مود</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RestoreUninstallAction">حذف تغییرات، بازیابی و حذف مود</sys:String>
+  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavCatalog">فروشگاه مود</sys:String>
+</ResourceDictionary>

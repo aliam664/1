@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="{{LANG}}" dir="{{DIR}}">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>{{CSS}}</style>
+</head>
+<body>
+<div class="ambient ambient-a"></div><div class="ambient ambient-b"></div><div class="noise"></div>
+<main class="page">
+  <section class="hero glass">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="pulse-dot"></span> AC MOD HUB · CURATED STORE</div>
+      <h1><span class="gradient-text">Drive beyond</span><br>the ordinary.</h1>
+      <p id="heroDescription">مودهای منتخب Assetto Corsa را امن دانلود، بررسی و نصب کنید.</p>
+      <div class="hero-actions">
+        <button class="primary" onclick="focusCatalog()"><span>Explore mods</span><b>↘</b></button>
+        <button class="ghost" onclick="refreshCatalog()">↻ &nbsp;Refresh catalog</button>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="speed-ring ring-one"></div><div class="speed-ring ring-two"></div>
+      <div class="ac-mark">AC<span>MH</span></div>
+      <div class="telemetry t1">RPM&nbsp; 8,450</div><div class="telemetry t2">BOOST&nbsp; 1.4</div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stat glass"><span>CATALOG</span><strong id="modCount">0</strong><small>available mods</small></div>
+    <div class="stat glass"><span>SECURITY</span><strong>SHA-256</strong><small>verified pipeline</small></div>
+    <div class="stat glass"><span>INSTALL</span><strong>ATOMIC</strong><small>backup + rollback</small></div>
+    <div class="stat glass"><span>SOURCE</span><strong id="catalogSource">EMBEDDED</strong><small id="catalogDate">ready</small></div>
+  </section>
+
+  <section class="catalog" id="catalog">
+    <header class="section-head">
+      <div><div class="eyebrow">MOD COLLECTION</div><h2>Choose your next experience</h2></div>
+      <div class="controls glass">
+        <span class="search-icon">⌕</span><input id="search" type="text" placeholder="Search name, author, tag..." onkeyup="applyFilters()">
+      </div>
+    </header>
+    <div class="chips" id="chips"></div>
+    <div id="warning" class="warning hidden"></div>
+    <div id="cards" class="cards"></div>
+    <div id="empty" class="empty glass hidden">
+      <div class="empty-icon"><span>＋</span></div>
+      <h3>Catalog engine is ready</h3>
+      <p>لینک مودها هنوز اضافه نشده‌اند. فایل <b>assets/catalog.v1.json</b> آماده است و پس از افزودن لینک‌ها، کارت‌ها خودکار اینجا نمایش داده می‌شوند.</p>
+      <button class="ghost" onclick="refreshCatalog()">Check remote catalog</button>
+    </div>
+  </section>
+</main>
+<div id="toast" class="toast"><span class="toast-loader"></span><div><b id="toastTitle">Preparing</b><small id="toastText">Please wait…</small></div></div>
+<script>window.__CATALOG__={{CATALOG_JSON}};window.__CATALOG_SOURCE__={{SOURCE_JSON}};window.__CATALOG_WARNING__={{WARNING_JSON}};</script>
+<script>{{JS}}</script>
+</body>
+</html>

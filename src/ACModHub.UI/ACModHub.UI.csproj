@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <IsPublishable>false</IsPublishable>
+    <RootNamespace>ACModHub.UI</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Catalog\index.html" />
+    <EmbeddedResource Include="Resources\Catalog\catalog.css" />
+    <EmbeddedResource Include="Resources\Catalog\catalog.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ACModHub.Core\ACModHub.Core.csproj" />
+    <ProjectReference Include="..\ACModHub.Infrastructure\ACModHub.Infrastructure.csproj" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+  </ItemGroup>
+</Project>
