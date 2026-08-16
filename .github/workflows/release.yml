@@ -34,6 +34,15 @@ jobs:
           pip install pyyaml
           python scripts/validate.py
 
+      - name: Verify tag matches the single version source
+        shell: bash
+        run: |
+          VERSION=$(python -c "import re;print(re.search(r'<Version>([^<]+)</Version>', open('Directory.Build.props').read()).group(1))")
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "$GITHUB_REF_NAME" != "v$VERSION" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match Directory.Build.props version v$VERSION"
+            exit 1
+          fi
+
       - name: Restore
         run: dotnet restore ACModHub.sln
 
