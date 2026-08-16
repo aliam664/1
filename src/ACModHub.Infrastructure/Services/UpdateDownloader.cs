@@ -23,16 +23,14 @@ public sealed partial class UpdateDownloader : IUpdateDownloader
     private readonly IAppPaths _paths;
     private readonly IFileHashService _hashes;
     private readonly IDiskSpaceService _diskSpace;
-    private readonly AppConfig _config;
     private readonly ILogger<UpdateDownloader> _logger;
 
-    public UpdateDownloader(IHttpClientFactory httpClientFactory, IAppPaths paths, IFileHashService hashes, IDiskSpaceService diskSpace, AppConfig config, ILogger<UpdateDownloader> logger)
+    public UpdateDownloader(IHttpClientFactory httpClientFactory, IAppPaths paths, IFileHashService hashes, IDiskSpaceService diskSpace, ILogger<UpdateDownloader> logger)
     {
         _httpClientFactory = httpClientFactory;
         _paths = paths;
         _hashes = hashes;
         _diskSpace = diskSpace;
-        _config = config;
         _logger = logger;
     }
 
@@ -108,7 +106,7 @@ public sealed partial class UpdateDownloader : IUpdateDownloader
             throw new ModHubException("The downloaded update size does not match the release metadata.");
         }
         File.Move(partial, destination, true);
-        Report(progress, UpdateDownloadState.ReadyToApply, existing: installer.Size, total: installer.Size);
+        Report(progress, UpdateDownloadState.ReadyToApply, existing: expectedSize, total: expectedSize);
         return destination;
     }
 

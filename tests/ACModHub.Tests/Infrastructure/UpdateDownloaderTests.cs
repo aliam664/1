@@ -42,7 +42,6 @@ public sealed class UpdateDownloaderTests
             paths,
             new FileHashService(),
             diskSpace ?? new DiskSpaceService(),
-            new AppConfig(),
             NullLogger<UpdateDownloader>.Instance);
     }
 

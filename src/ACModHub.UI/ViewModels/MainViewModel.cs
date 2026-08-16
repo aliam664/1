@@ -67,7 +67,9 @@ public sealed class MainViewModel : ObservableObject
         _localization.LanguageChanged += (_, _) =>
         {
             FlowDirection = _localization.FlowDirection;
-            OnPropertyChanged(nameof(NavigationGroups));
+            // Rebuild so converted labels re-resolve in the new language, keeping selection.
+            BuildNavigation();
+            SelectNavigationItem(SelectedPage);
         };
     }
 
@@ -142,9 +144,7 @@ public sealed class MainViewModel : ObservableObject
     {
         var key = parameter?.ToString() ?? "Home";
         SelectedPage = key;
-        foreach (var group in NavigationGroups)
-            foreach (var item in group.Items)
-                item.IsSelected = item.Key == key;
+        SelectNavigationItem(key);
         Notification = null;
 
         switch (key)
@@ -205,6 +205,13 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
+    private void SelectNavigationItem(string key)
+    {
+        foreach (var group in NavigationGroups)
+            foreach (var item in group.Items)
+                item.IsSelected = item.Key == key;
+    }
+
     private async Task ShowLibraryAsync(ModCategory? category, CancellationToken token)
     {
         var library = _services.GetRequiredService<LibraryViewModel>();
@@ -222,6 +229,8 @@ public sealed class MainViewModel : ObservableObject
         var settings = await _settings.LoadAsync(token);
         settings.Language = language;
         await _settings.SaveAsync(settings, token);
+        // Recreate the current page so every visible string re-resolves in the new language.
+        await NavigateAsync(SelectedPage, token);
     }
 
     private async Task ImportAsync(object? parameter, CancellationToken token)
