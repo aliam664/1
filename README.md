@@ -29,11 +29,25 @@ npm test
 npm run catalog:build
 npm run preview          # renderer demo at http://0.0.0.0:4173
 npm start                # Electron (needs a desktop session)
-npm run dist             # Windows NSIS + portable via electron-builder
+npm run dist             # Windows NSIS + portable via electron-builder (run on Windows)
 ```
 
 The web preview uses a bundled demo catalog and simulated downloads. It never
 receives Node privileges. Real extract/install/Steam detection run only in Electron.
+
+## Windows EXE
+
+On a Windows machine (this Linux sandbox cannot download the official Electron
+Windows runtime from GitHub release assets):
+
+```powershell
+./scripts/build-windows.ps1
+```
+
+Output:
+
+- `dist-electron/StockCorsa Launcher 1.0.0.exe` — portable, no install
+- `dist-electron/StockCorsa Launcher Setup 1.0.0.exe` — NSIS installer
 
 ## Database
 

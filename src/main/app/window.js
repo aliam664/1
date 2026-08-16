@@ -57,7 +57,7 @@ export function createMainWindow(options) {
     minWidth: 960,
     minHeight: 640,
     show: false,
-    backgroundColor: '#080B11',
+    backgroundColor: '#07090E',
     autoHideMenuBar: true,
     webPreferences: {
       ...WEB_PREFERENCES,

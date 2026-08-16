@@ -6,7 +6,7 @@ import { getState } from '../state/store.js';
 function pick(items, ids) {
   const set = new Set(ids || []);
   const featured = items.filter((item) => set.has(item.id) || item.featured);
-  return featured.length ? featured : items.slice(0, 3);
+  return featured.length ? featured.slice(0, 2) : items.slice(0, 2);
 }
 
 export function renderHome() {
@@ -23,7 +23,7 @@ export function renderHome() {
   root.innerHTML = `
     <section class="hero">
       <div>
-        <p class="badge" data-i18n="home.greeting">${t('home.greeting')}</p>
+        <p class="badge badge-accent" data-i18n="home.greeting">${t('home.greeting')}</p>
         <h2 data-i18n="app.tagline">${t('app.tagline')}</h2>
         <p data-i18n="home.subtitle">${t('home.subtitle')}</p>
         <button class="btn btn-primary" type="button" data-action="refresh-catalog" data-i18n="home.cta.refresh">${t('home.cta.refresh')}</button>
@@ -32,7 +32,7 @@ export function renderHome() {
     </section>
     <section class="section">
       <div class="section-head"><h2 data-i18n="home.featured">${t('home.featured')}</h2></div>
-      ${renderCardGrid(featured)}
+      ${renderCardGrid(featured, { featured: true })}
     </section>
     <section class="section">
       <div class="section-head"><h2 data-i18n="home.recentlyAdded">${t('home.recentlyAdded')}</h2></div>

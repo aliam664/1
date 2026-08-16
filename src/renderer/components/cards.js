@@ -1,12 +1,13 @@
 import { t } from '../i18n/i18n.js';
 import { coverHue, formatBytes, localizedName } from '../services/format.js';
 
-export function renderCard(item) {
-  const hue = coverHue(item.id);
+export function renderCard(item, options = {}) {
+  const hue = Math.floor(coverHue(item.id) / 30);
   const name = localizedName(item);
+  const typeKey = `item.type.${item.type}`;
   const badges = [];
   if (item.installed) {
-    badges.push(`<span class="badge">${t('item.installed')}</span>`);
+    badges.push(`<span class="badge badge-ok">${t('item.installed')}</span>`);
   }
   if (!item.sha256) {
     badges.push(`<span class="badge">${t('item.unverified')}</span>`);
@@ -15,8 +16,10 @@ export function renderCard(item) {
     badges.push(`<span class="badge badge-warn">${t('item.deprecated')}</span>`);
   }
   return `
-    <article class="content-card" data-open-item="${item.id}">
-      <div class="content-cover hue-${hue}"></div>
+    <article class="content-card${options.featured ? ' is-featured' : ''}" data-open-item="${item.id}">
+      <div class="content-cover hue-${hue}">
+        <span class="badge badge-accent cover-chip">${t(typeKey)}</span>
+      </div>
       <div class="content-body">
         <h3 class="ltr-isolate">${escapeHtml(name)}</h3>
         <p class="muted ltr-isolate">${escapeHtml(item.author || '')} · ${escapeHtml(item.version || '')}</p>
@@ -38,11 +41,12 @@ export function renderCard(item) {
   `;
 }
 
-export function renderCardGrid(items) {
+export function renderCardGrid(items, options = {}) {
   if (!items.length) {
     return `<article class="card empty-card"><strong data-i18n="home.empty.catalog.title">${t('home.empty.catalog.title')}</strong></article>`;
   }
-  return `<div class="card-grid">${items.map(renderCard).join('')}</div>`;
+  const cls = options.featured ? 'card-grid featured-grid' : 'card-grid';
+  return `<div class="${cls}">${items.map((item, index) => renderCard(item, { featured: Boolean(options.featured && index === 0) })).join('')}</div>`;
 }
 
 export function escapeHtml(value) {

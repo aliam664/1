@@ -17,7 +17,8 @@
     "catalog:build": "node scripts/build-catalog.mjs",
     "postinstall": "node scripts/postinstall.mjs",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "electron-builder --win portable nsis --x64 --publish never",
+    "dist:dir": "electron-builder --win dir --x64 --publish never"
   },
   "devDependencies": {
     "electron": "41.10.5",

@@ -19,16 +19,16 @@ export const icons = {
 };
 
 export const heroMark = `
-<svg class="hero-art" viewBox="0 0 280 160" aria-hidden="true" focusable="false">
+<svg class="hero-art" viewBox="0 0 300 168" aria-hidden="true" focusable="false">
   <defs>
     <linearGradient id="sc-line" x1="0" x2="1" y1="0" y2="1">
       <stop offset="0" stop-color="#de4058"/>
       <stop offset="1" stop-color="#63dfc7"/>
     </linearGradient>
   </defs>
-  <path d="M18 118c38-46 70-46 108 0s78 42 136-8" fill="none" stroke="url(#sc-line)" stroke-width="8" stroke-linecap="round"/>
-  <path d="M40 92c26-22 48-20 72 4" fill="none" stroke="#f2f5fa" stroke-opacity=".18" stroke-width="4" stroke-linecap="round"/>
-  <rect x="176" y="38" width="78" height="46" rx="10" fill="#161e2a" stroke="#3a485c"/>
-  <path d="M188 61h22M188 70h14" stroke="#96a2b5" stroke-width="3" stroke-linecap="round"/>
-  <circle cx="236" cy="61" r="8" fill="#de4058"/>
+  <rect x="12" y="22" width="276" height="124" rx="22" fill="#10151e" stroke="#273140"/>
+  <path d="M36 118c42-52 78-52 118 4s86 40 140-16" fill="none" stroke="url(#sc-line)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M52 94c28-24 54-22 80 6" fill="none" stroke="#f2f5fa" stroke-opacity=".16" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="236" cy="58" r="9" fill="#de4058"/>
+  <circle cx="236" cy="58" r="16" fill="none" stroke="#de4058" stroke-opacity=".28"/>
 </svg>`;

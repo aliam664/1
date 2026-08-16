@@ -5,28 +5,31 @@
   gap: var(--space-2);
   min-block-size: 40px;
   padding-inline: 16px;
-  border-radius: var(--radius-sm);
+  border-radius: 11px;
   background: var(--raised);
   border: 1px solid var(--border-strong);
   color: var(--text);
-  font-weight: 600;
-  transition: background var(--ease), border-color var(--ease);
+  font-weight: 650;
+  transition: background var(--ease), border-color var(--ease), transform var(--ease), box-shadow var(--ease);
 }
 
 .btn:hover {
   background: var(--elevated);
+  transform: translateY(-1px);
 }
 
 .btn:disabled {
   opacity: 0.42;
   cursor: not-allowed;
+  transform: none;
 }
 
 .btn-primary {
   background: var(--accent);
-  border-color: var(--accent);
+  border-color: transparent;
   color: var(--on-accent);
   min-block-size: 44px;
+  box-shadow: 0 8px 20px rgb(222 64 88 / 0.28);
 }
 
 .btn-primary:hover {
@@ -36,6 +39,7 @@
 .btn-quiet {
   background: transparent;
   border-color: transparent;
+  box-shadow: none;
 }
 
 .segmented {
@@ -52,13 +56,13 @@
   padding-inline: 14px;
   border-radius: 999px;
   color: var(--text-secondary);
-  font-weight: 600;
+  font-weight: 650;
 }
 
 .segmented button[aria-pressed="true"] {
   background: var(--elevated);
   color: var(--text);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-soft);
 }
 
 .card {
@@ -72,20 +76,41 @@
   position: relative;
   overflow: hidden;
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(180px, 0.8fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(200px, 0.85fr);
   gap: var(--space-6);
-  padding: var(--space-8);
+  padding: 36px;
   background:
-    linear-gradient(135deg, rgb(222 64 88 / 0.16), transparent 42%),
-    var(--surface);
+    radial-gradient(520px 220px at 90% 10%, rgb(222 64 88 / 0.2), transparent 55%),
+    linear-gradient(135deg, #141b26 0%, #0d121a 62%);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+html[data-theme="light"] .hero {
+  background:
+    radial-gradient(520px 220px at 90% 10%, rgb(198 45 72 / 0.12), transparent 55%),
+    linear-gradient(135deg, #fff, #eef2f7);
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -40px;
+  inset-block-end: -50px;
+  inline-size: 280px;
+  block-size: 280px;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 0.05);
+  pointer-events: none;
 }
 
 .hero h2 {
-  font-size: 26px;
-  font-weight: 700;
-  margin-block-end: var(--space-3);
+  font-size: 30px;
+  font-weight: 780;
+  letter-spacing: -0.03em;
+  margin-block: 10px 12px;
+  line-height: 1.2;
 }
 
 .hero p {
@@ -97,34 +122,40 @@
 .hero-art {
   align-self: end;
   justify-self: end;
-  inline-size: min(280px, 100%);
-  opacity: 0.92;
+  inline-size: min(300px, 100%);
+  opacity: 0.96;
 }
 
 .section {
-  margin-block-start: var(--space-8);
+  margin-block-start: 34px;
 }
 
 .section-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-block-end: var(--space-4);
+  margin-block-end: 14px;
 }
 
 .section-head h2 {
-  font-size: 17px;
-  font-weight: 650;
+  font-size: 18px;
+  font-weight: 720;
 }
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+}
+
+.featured-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 16px;
 }
 
 .empty-card {
-  min-block-size: 132px;
+  min-block-size: 140px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -135,7 +166,7 @@
 
 .empty-card strong {
   color: var(--text);
-  font-weight: 650;
+  font-weight: 700;
 }
 
 .badge {
@@ -148,7 +179,17 @@
   background: var(--raised);
   color: var(--text-secondary);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 650;
+}
+
+.badge-accent {
+  background: var(--accent-soft);
+  color: var(--accent-hover);
+}
+
+.badge-ok {
+  background: rgb(94 224 200 / 0.12);
+  color: var(--safe);
 }
 
 .badge-warn {
@@ -182,7 +223,7 @@
 
 .setting-copy h3 {
   font-size: 14px;
-  font-weight: 650;
+  font-weight: 700;
 }
 
 .setting-copy p {
@@ -238,31 +279,7 @@ html[dir="rtl"] .toggle[aria-pressed="true"] .toggle-knob {
 .meta-row bdi,
 .meta-row .value {
   color: var(--text);
-  font-weight: 600;
-}
-
-.coming-list {
-  display: grid;
-  gap: var(--space-3);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.coming-list li {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  min-block-size: 40px;
-  color: var(--text-secondary);
-}
-
-.coming-list li::before {
-  content: "";
-  inline-size: 8px;
-  block-size: 8px;
-  border-radius: 50%;
-  background: var(--border-strong);
+  font-weight: 650;
 }
 
 .toolbar {
@@ -276,11 +293,17 @@ html[dir="rtl"] .toggle[aria-pressed="true"] .toggle-knob {
 .search {
   flex: 1;
   min-inline-size: 180px;
-  min-block-size: 40px;
-  padding-inline: 14px;
-  border-radius: var(--radius-sm);
+  min-block-size: 42px;
+  padding-inline: 16px;
+  border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--raised);
+  transition: border-color var(--ease), box-shadow var(--ease);
+}
+
+.search:focus {
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 3px rgb(94 224 200 / 0.16);
 }
 
 .content-card {
@@ -288,20 +311,45 @@ html[dir="rtl"] .toggle[aria-pressed="true"] .toggle-knob {
   flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: 16px;
   overflow: hidden;
-  min-block-size: 280px;
+  min-block-size: 292px;
+  transition: transform var(--ease), border-color var(--ease), box-shadow var(--ease);
 }
 
 .content-card:hover {
   border-color: var(--border-strong);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.content-card.is-featured {
+  min-block-size: 320px;
+}
+
+.content-card.is-featured .content-cover {
+  block-size: 168px;
 }
 
 .content-cover {
-  block-size: 110px;
+  position: relative;
+  block-size: 128px;
   background:
-    radial-gradient(circle at 20% 20%, hsl(var(--hue, 350) 70% 48% / 0.85), transparent 50%),
-    linear-gradient(135deg, hsl(var(--hue, 350) 35% 16%), #101722);
+    linear-gradient(180deg, transparent 35%, rgb(7 9 14 / 0.55)),
+    radial-gradient(circle at 18% 20%, hsl(var(--hue, 350) 72% 52% / 0.9), transparent 42%),
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.03) 0 1px, transparent 1px 18px),
+    linear-gradient(135deg, hsl(var(--hue, 350) 28% 14%), #10151e);
+}
+
+.content-cover::after {
+  content: "";
+  position: absolute;
+  inset-inline: 12%;
+  inset-block-end: 22px;
+  block-size: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--safe));
+  opacity: 0.85;
 }
 
 .content-cover.hue-0 { --hue: 0; }
@@ -317,17 +365,24 @@ html[dir="rtl"] .toggle[aria-pressed="true"] .toggle-knob {
 .content-cover.hue-10 { --hue: 300; }
 .content-cover.hue-11 { --hue: 330; }
 
+.cover-chip {
+  position: absolute;
+  inset-block-start: 12px;
+  inset-inline-start: 12px;
+  z-index: 1;
+}
+
 .content-body {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: var(--space-4);
+  gap: 7px;
+  padding: 16px;
   flex: 1;
 }
 
 .content-body h3 {
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 750;
 }
 
 .muted {
@@ -352,7 +407,7 @@ html[dir="rtl"] .toggle[aria-pressed="true"] .toggle-knob {
   display: flex;
   gap: 8px;
   margin-block-start: auto;
-  padding-block-start: var(--space-3);
+  padding-block-start: 12px;
 }
 
 .card-actions .btn {
@@ -361,7 +416,7 @@ html[dir="rtl"] .toggle[aria-pressed="true"] .toggle-knob {
 
 .download-row {
   display: grid;
-  gap: var(--space-3);
+  gap: 12px;
 }
 
 .progress {
@@ -374,7 +429,7 @@ html[dir="rtl"] .toggle[aria-pressed="true"] .toggle-knob {
 .progress > span {
   display: block;
   block-size: 100%;
-  background: var(--safe);
+  background: linear-gradient(90deg, var(--safe), #8af0dd);
   inline-size: 0%;
 }
 
@@ -391,9 +446,9 @@ html[dir="rtl"] .toggle[aria-pressed="true"] .toggle-knob {
 .progress.p100 > span { inline-size: 100%; }
 
 .field {
-  min-block-size: 40px;
+  min-block-size: 42px;
   padding-inline: 12px;
-  border-radius: var(--radius-sm);
+  border-radius: 11px;
   border: 1px solid var(--border);
   background: var(--raised);
   inline-size: min(420px, 100%);
@@ -401,18 +456,20 @@ html[dir="rtl"] .toggle[aria-pressed="true"] .toggle-knob {
 
 .toast {
   position: fixed;
-  inset-block-end: 16px;
-  inset-inline-end: 16px;
+  inset-block-end: 20px;
+  inset-inline-end: 20px;
   background: var(--elevated);
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
+  border-radius: 12px;
   padding: 12px 16px;
   box-shadow: var(--shadow);
   z-index: 30;
+  max-inline-size: min(420px, calc(100vw - 32px));
 }
 
-@media (max-width: 860px) {
-  .hero {
+@media (max-width: 900px) {
+  .hero,
+  .featured-grid {
     grid-template-columns: 1fr;
   }
 

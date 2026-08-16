@@ -64,6 +64,12 @@ export function applyTranslations(root = document) {
       node.setAttribute('title', t(key));
     }
   });
+  root.querySelectorAll('[data-i18n-placeholder]').forEach((node) => {
+    const key = node.getAttribute('data-i18n-placeholder');
+    if (key) {
+      node.setAttribute('placeholder', t(key));
+    }
+  });
 }
 
 /**

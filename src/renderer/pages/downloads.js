@@ -1,5 +1,5 @@
 import { t } from '../i18n/i18n.js';
-import { formatBytes, formatEta, formatSpeed } from '../services/format.js';
+import { formatBytes, formatEta, formatSpeed, localizedName } from '../services/format.js';
 import { getState } from '../state/store.js';
 import { escapeHtml } from '../components/cards.js';
 
@@ -15,7 +15,7 @@ export function renderDownloads() {
       const pct = row.bytesTotal ? Math.round((row.bytesDone / row.bytesTotal) * 100) : 0;
       const bucket = Math.min(100, Math.round(pct / 10) * 10);
       const item = (getState().catalog?.items || []).find((entry) => entry.id === row.contentId);
-      const title = item ? item.id : row.contentId || row.id;
+      const title = item ? localizedName(item) : row.contentId || row.id;
       const canPause = row.state === 'running' && row.resumable !== false;
       return `
         <article class="card download-row">

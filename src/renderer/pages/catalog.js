@@ -1,5 +1,4 @@
-import { t } from '../i18n/i18n.js';
-import { escapeHtml, renderCardGrid } from '../components/cards.js';
+import { renderCardGrid } from '../components/cards.js';
 import { localizedName } from '../services/format.js';
 import { getState } from '../state/store.js';
 
@@ -16,11 +15,6 @@ export function renderCatalogPage(type) {
     return hay.includes(query);
   });
   const root = document.createElement('div');
-  root.innerHTML = `
-    <div class="toolbar">
-      <input class="search" type="search" data-search placeholder="${t('search.placeholder')}" value="${escapeHtml(getState().search || '')}">
-    </div>
-    ${renderCardGrid(items)}
-  `;
+  root.innerHTML = renderCardGrid(items);
   return root;
 }

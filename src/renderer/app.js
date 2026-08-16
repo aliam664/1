@@ -349,7 +349,13 @@ async function bindEvents() {
   document.addEventListener('input', (event) => {
     const target = event.target;
     if (target instanceof HTMLInputElement && target.matches('[data-search]')) {
-      setState({ search: target.value });
+      const query = target.value;
+      const route = getState().route;
+      if (query && !['cars', 'tracks', 'mods', 'favorites'].includes(route)) {
+        setState({ search: query, route: 'cars' });
+      } else {
+        setState({ search: query });
+      }
     }
   });
 
