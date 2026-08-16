@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://stockcorsa.local/schemas/track.schema.json",
+  "title": "StockCorsa track item",
+  "type": "object",
+  "required": ["id", "type", "name", "author", "description", "version", "archiveType", "downloadUrl"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)*$" },
+    "type": { "const": "track" },
+    "name": {
+      "type": "object",
+      "required": ["fa", "en"],
+      "properties": { "fa": { "type": "string", "minLength": 1 }, "en": { "type": "string", "minLength": 1 } }
+    },
+    "author": { "type": "string", "minLength": 1 },
+    "description": {
+      "type": "object",
+      "required": ["fa", "en"],
+      "properties": { "fa": { "type": "string", "minLength": 1 }, "en": { "type": "string", "minLength": 1 } }
+    },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+" },
+    "archiveType": { "enum": ["zip", "rar", "7z"] },
+    "downloadUrl": { "type": "string", "pattern": "^https://" }
+  },
+  "additionalProperties": true
+}

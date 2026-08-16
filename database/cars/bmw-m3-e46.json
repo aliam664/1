@@ -1,0 +1,21 @@
+{
+  "id": "bmw-m3-e46",
+  "type": "car",
+  "name": { "fa": "بی‌ام‌و M3 E46", "en": "BMW M3 E46" },
+  "author": "Community",
+  "description": {
+    "fa": "نسخهٔ تورینگ کلاسیک E46 با صدای ۶ سیلندر خطی و تعادل آشنای عقب‌محور.",
+    "en": "Classic E46 touring car with an inline-six soundtrack and familiar rear-drive balance."
+  },
+  "version": "1.2.0",
+  "archiveType": "rar",
+  "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/bmw-m3-e46.rar",
+  "sha256": "",
+  "size": 185000000,
+  "status": "published",
+  "tags": ["bmw", "touring", "rwd"],
+  "cover": "images/cars/bmw-m3-e46.svg",
+  "featured": true,
+  "publishedAt": "2026-05-02T00:00:00Z",
+  "updatedAt": "2026-07-18T00:00:00Z"
+}

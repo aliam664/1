@@ -1,0 +1,35 @@
+appId: com.stockcorsa.launcher
+productName: StockCorsa Launcher
+copyright: Copyright © 2026 StockCorsa
+asar: true
+npmRebuild: false
+asarUnpack:
+  - node_modules/sql.js/**/*
+  - node_modules/node-unrar-js/**/*
+  - node_modules/7zip-bin/**/*
+directories:
+  output: dist-electron
+  buildResources: build
+icon: build/icon.png
+files:
+  - src/**/*
+  - launcher/**/*
+  - dist/catalog.json
+  - dist/manifest.json
+  - package.json
+  - "!**/*.map"
+extraMetadata:
+  main: src/main/app/index.js
+win:
+  target:
+    - nsis
+    - portable
+  artifactName: "${productName}-${version}-${os}-${arch}.${ext}"
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+publish:
+  provider: github
+  owner: aliam664
+  repo: '1'

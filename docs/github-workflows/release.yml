@@ -1,0 +1,21 @@
+# Copy to .github/workflows/release.yml when workflow permission is available.
+name: release
+on:
+  push:
+    tags: ['v*']
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npm test
+      - run: npm run dist
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist-electron/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

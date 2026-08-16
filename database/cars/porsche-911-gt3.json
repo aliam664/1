@@ -1,0 +1,20 @@
+{
+  "id": "porsche-911-gt3",
+  "type": "car",
+  "name": { "fa": "پورشه ۹۱۱ GT3", "en": "Porsche 911 GT3" },
+  "author": "Community",
+  "description": {
+    "fa": "کوپهٔ موتور عقب با آیرودینامیک پیست.",
+    "en": "Rear-engined coupe with circuit-focused aero."
+  },
+  "version": "2.0.1",
+  "archiveType": "rar",
+  "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/porsche-911-gt3.rar",
+  "sha256": "",
+  "size": 240000000,
+  "status": "published",
+  "tags": ["porsche", "gt"],
+  "cover": "images/cars/porsche-911-gt3.svg",
+  "publishedAt": "2026-04-20T00:00:00Z",
+  "updatedAt": "2026-08-01T00:00:00Z"
+}

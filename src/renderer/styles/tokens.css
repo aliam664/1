@@ -1,0 +1,85 @@
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("../assets/fonts/vazirmatn-arabic-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
+}
+
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("../assets/fonts/vazirmatn-latin-ext-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("../assets/fonts/vazirmatn-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --bg: #07090e;
+  --sidebar: #0a0e15;
+  --surface: #10151e;
+  --raised: #161d28;
+  --elevated: #1c2532;
+  --border: #273140;
+  --border-strong: #3c4b60;
+  --text: #f4f7fb;
+  --text-secondary: #9aa6b8;
+  --text-subtle: #6d7a8d;
+  --accent: #de4058;
+  --accent-hover: #ee5a70;
+  --accent-soft: rgb(222 64 88 / 0.14);
+  --safe: #5ee0c8;
+  --warning: #f0b35c;
+  --error: #f06478;
+  --on-accent: #ffffff;
+  --shadow: 0 18px 48px rgb(0 0 0 / 0.34);
+  --shadow-soft: 0 8px 24px rgb(0 0 0 / 0.22);
+  --radius-sm: 9px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --sidebar-width: 260px;
+  --titlebar-height: 64px;
+  --focus: var(--safe);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --font: "Vazirmatn", "Segoe UI Variable", "Segoe UI", Tahoma, sans-serif;
+  --ease: 180ms ease;
+}
+
+html[data-theme="light"] {
+  --bg: #eef2f7;
+  --sidebar: #f8fafc;
+  --surface: #ffffff;
+  --raised: #eef2f7;
+  --elevated: #ffffff;
+  --border: #d5dde8;
+  --border-strong: #b7c3d4;
+  --text: #121822;
+  --text-secondary: #4c596b;
+  --text-subtle: #6a7688;
+  --accent: #c62d48;
+  --accent-hover: #d73c57;
+  --accent-soft: rgb(198 45 72 / 0.1);
+  --safe: #0c8f7a;
+  --warning: #9a6408;
+  --error: #c23046;
+  --on-accent: #ffffff;
+  --shadow: 0 16px 36px rgb(16 23 34 / 0.1);
+  --shadow-soft: 0 6px 16px rgb(16 23 34 / 0.06);
+}

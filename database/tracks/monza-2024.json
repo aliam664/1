@@ -1,0 +1,21 @@
+{
+  "id": "monza-2024",
+  "type": "track",
+  "name": { "fa": "مونزا ۲۰۲۴", "en": "Monza 2024" },
+  "author": "Community",
+  "description": {
+    "fa": "معبد سرعت با سه شیکین و خط راست طولانی.",
+    "en": "The temple of speed: three chicanes and a long main straight."
+  },
+  "version": "1.1.0",
+  "archiveType": "rar",
+  "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/monza-2024.rar",
+  "sha256": "",
+  "size": 410000000,
+  "status": "published",
+  "tags": ["italy", "historic"],
+  "cover": "images/tracks/monza-2024.svg",
+  "featured": true,
+  "publishedAt": "2026-03-08T00:00:00Z",
+  "updatedAt": "2026-07-02T00:00:00Z"
+}

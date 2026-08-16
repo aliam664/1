@@ -1,9 +1,0 @@
-<Project>
-  <Target Name="CopyReleaseDocumentation" AfterTargets="Publish" Condition="'$(IsPublishable)' == 'true'">
-    <ItemGroup>
-      <ReleaseDoc Include="$(MSBuildThisFileDirectory)README.md" />
-      <ReleaseDoc Include="$(MSBuildThisFileDirectory)LICENSE" Condition="Exists('$(MSBuildThisFileDirectory)LICENSE')" />
-    </ItemGroup>
-    <Copy SourceFiles="@(ReleaseDoc)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
-  </Target>
-</Project>

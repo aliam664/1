@@ -1,0 +1,20 @@
+{
+  "id": "sol-weather",
+  "type": "mod",
+  "name": { "fa": "بسته آب‌وهوا Sol", "en": "Sol Weather Pack" },
+  "author": "Community",
+  "description": {
+    "fa": "چرخهٔ روز و شب و آب‌وهوای پویا برای Assetto Corsa.",
+    "en": "Day/night cycle and dynamic weather for Assetto Corsa."
+  },
+  "version": "2.2.8",
+  "archiveType": "zip",
+  "downloadUrl": "https://github.com/aliam664/1/releases/download/demo/sol-weather.zip",
+  "sha256": "",
+  "size": 64000000,
+  "status": "published",
+  "tags": ["weather", "visual"],
+  "cover": "images/mods/sol-weather.svg",
+  "publishedAt": "2026-02-01T00:00:00Z",
+  "updatedAt": "2026-06-22T00:00:00Z"
+}

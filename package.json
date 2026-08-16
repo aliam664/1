@@ -1,0 +1,35 @@
+{
+  "name": "stockcorsa-launcher",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Independent Windows desktop launcher for Assetto Corsa cars, tracks and mods.",
+  "main": "src/main/app/index.js",
+  "author": "StockCorsa",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "preview": "node scripts/preview.mjs",
+    "test": "node --test tests/**/*.test.js",
+    "catalog:build": "node scripts/build-catalog.mjs",
+    "postinstall": "node scripts/postinstall.mjs",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win portable nsis --x64 --publish never",
+    "dist:dir": "electron-builder --win dir --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "41.10.5",
+    "electron-builder": "26.15.3"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2",
+    "node-unrar-js": "^2.0.2",
+    "sql.js": "^1.13.0"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "^11.10.0"
+  }
+}
