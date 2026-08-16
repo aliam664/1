@@ -357,6 +357,7 @@ public sealed partial class JsonModCatalogService : IModCatalogService
 
         // Status semantics.
         string? blockReason = null;
+        SemanticVersion? modMinimum = null;
         if (item.Status == CatalogWireStatus.Revoked)
         {
             if (string.IsNullOrWhiteSpace(item.RevocationReason))
@@ -365,10 +366,10 @@ public sealed partial class JsonModCatalogService : IModCatalogService
         }
         else
         {
-            var required = ParseMinimumVersion(item.MinimumLauncherVersion);
-            if (required is not null && currentLauncher is not null && currentLauncher.Value < required.Value)
+            modMinimum = ParseMinimumVersion(item.MinimumLauncherVersion);
+            if (modMinimum is not null && currentLauncher is not null && currentLauncher.Value < modMinimum.Value)
             {
-                blockReason = $"requires-launcher:{required}";
+                blockReason = $"requires-launcher:{modMinimum}";
             }
         }
 
@@ -390,7 +391,7 @@ public sealed partial class JsonModCatalogService : IModCatalogService
             FileName = fileName,
             Sha256 = string.IsNullOrWhiteSpace(item.Package?.Sha256) ? null : item.Package.Sha256,
             ExpectedSize = item.Package?.Size,
-            MinimumLauncherVersion = required?.ToString(),
+            MinimumLauncherVersion = modMinimum?.ToString(),
             PublishedAt = item.PublishedAt,
             BlockReason = blockReason,
             CoverUri = coverUrl

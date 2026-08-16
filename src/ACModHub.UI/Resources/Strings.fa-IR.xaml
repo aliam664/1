@@ -266,6 +266,7 @@
   <sys:String x:Key="AutoDetect">تشخیص خودکار</sys:String>
   <sys:String x:Key="LaunchThroughSteam">اجرا از طریق Steam (App ID 244210)</sys:String>
   <sys:String x:Key="SteamDetectedList">نصب‌های شناسایی‌شده</sys:String>
+  <sys:String x:Key="DetectedCount">{0} نصب معتبر پیدا شد.</sys:String>
   <sys:String x:Key="LanguageLabel">زبان / Language</sys:String>
   <sys:String x:Key="LanguageFa">فارسی</sys:String>
   <sys:String x:Key="LanguageEn">English</sys:String>

@@ -157,7 +157,7 @@ public sealed class SettingsViewModel : ObservableObject
             DetectedInstallations.Clear();
             foreach (var installation in found) DetectedInstallations.Add(installation);
             SelectedInstallation = found.FirstOrDefault(x => x.RootPath.Equals(GamePath, StringComparison.OrdinalIgnoreCase)) ?? found.FirstOrDefault();
-            Message = found.Length == 0 ? _localization.Get("GameNotDetected") : $"{found.Length} ✓";
+            Message = found.Length == 0 ? _localization.Get("GameNotDetected") : _localization.Format("DetectedCount", found.Length);
         }
         finally { IsBusy = false; }
     }

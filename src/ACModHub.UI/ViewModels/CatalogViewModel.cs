@@ -114,7 +114,8 @@ public sealed class CatalogViewModel : ObservableObject
     public ICoverImageService CoverService => _coverService;
 
     public ObservableCollection<CatalogModItem> Mods { get; } = [];
-    public IReadOnlyList<ModCategory> Categories { get; } = [ModCategory.Car, ModCategory.Track, ModCategory.Skin, ModCategory.App, ModCategory.Weather, ModCategory.Csp, ModCategory.Miscellaneous];
+    /// <summary>First entry is null = "All categories".</summary>
+    public IReadOnlyList<object?> CategoryOptions { get; } = [null, ModCategory.Car, ModCategory.Track, ModCategory.Skin, ModCategory.App, ModCategory.Weather, ModCategory.Csp, ModCategory.Miscellaneous];
     public IReadOnlyList<StoreSortMode> SortModes { get; } = [StoreSortMode.Default, StoreSortMode.Name, StoreSortMode.Newest, StoreSortMode.Version];
     public bool IsEmpty => !IsBusy && !HasError && Mods.Count == 0;
     public bool IsOffline => !IsBusy && !HasError && _result?.IsCached == true && _result.Warning is CatalogWarning.RemoteUnavailableUsingCache or CatalogWarning.RemoteUnavailableUsingEmbedded;

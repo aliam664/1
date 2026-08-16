@@ -77,6 +77,30 @@ public sealed class ModStatusBrushConverter : IValueConverter
     private static Brush Brush(string key) => Application.Current?.TryFindResource(key) as Brush ?? Brushes.Gray;
 }
 
+/// <summary>Localizes a nullable category option: null → StoreAllCategories, otherwise Category+enum.</summary>
+public sealed class CategoryOptionConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is null) return Application.Current?.TryFindResource("StoreAllCategories") as string ?? "All";
+        var key = "Category" + value;
+        return Application.Current?.TryFindResource(key) as string ?? value.ToString() ?? string.Empty;
+    }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => Binding.DoNothing;
+}
+
+/// <summary>Localizes a nullable mod-status option: null → AllStatuses, otherwise Status+enum.</summary>
+public sealed class StatusOptionConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is null) return Application.Current?.TryFindResource("AllStatuses") as string ?? "All";
+        var key = "Status" + value;
+        return Application.Current?.TryFindResource(key) as string ?? value.ToString() ?? string.Empty;
+    }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => Binding.DoNothing;
+}
+
 /// <summary>Converts a string resource key into its localized value.</summary>
 public sealed class LocalizedKeyConverter : IValueConverter
 {

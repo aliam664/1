@@ -43,7 +43,7 @@ public sealed class AppConfig
     /// <summary>Update packages are never installed without explicit user consent.</summary>
     public bool AutomaticUpdateInstall { get; init; } = false;
 
-    /// <summary>Hosts allowed to serve catalog covers and trusted external links.</summary>
+    /// <summary>Hosts allowed to serve catalog covers and catalog package downloads.</summary>
     public IReadOnlySet<string> TrustedHosts { get; init; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         "github.com",
@@ -51,12 +51,5 @@ public sealed class AppConfig
         "raw.githubusercontent.com",
         "objects.githubusercontent.com",
         "api.github.com"
-    };
-
-    /// <summary>Hosts allowed to be opened in the default browser from inside the store.</summary>
-    public IReadOnlySet<string> TrustedExternalLinkHosts { get; init; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-    {
-        "github.com",
-        "aliam664.github.io"
     };
 }

@@ -266,6 +266,7 @@
   <sys:String x:Key="AutoDetect">Auto-detect</sys:String>
   <sys:String x:Key="LaunchThroughSteam">Launch through Steam (App ID 244210)</sys:String>
   <sys:String x:Key="SteamDetectedList">Detected installations</sys:String>
+  <sys:String x:Key="DetectedCount">{0} valid installation(s) found.</sys:String>
   <sys:String x:Key="LanguageLabel">Language / زبان</sys:String>
   <sys:String x:Key="LanguageFa">فارسی</sys:String>
   <sys:String x:Key="LanguageEn">English</sys:String>

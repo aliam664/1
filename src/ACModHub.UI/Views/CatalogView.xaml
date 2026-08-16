@@ -7,6 +7,7 @@
     <c:BoolVisibilityConverter x:Key="BoolVisibility"/>
     <c:InverseBoolVisibilityConverter x:Key="InverseBoolVisibility"/>
     <c:LocalizedEnumConverter x:Key="LocalizedEnum"/>
+    <c:CategoryOptionConverter x:Key="CategoryOption"/>
     <c:BytesConverter x:Key="Bytes"/>
   </UserControl.Resources>
   <Grid>
@@ -74,10 +75,10 @@
         <TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="{DynamicResource StoreSearchPlaceholder}">
           <TextBox.ToolTip><TextBlock Text="{DynamicResource StoreSearchPlaceholder}"/></TextBox.ToolTip>
         </TextBox>
-        <ComboBox Grid.Column="1" Margin="10,0,0,0" ItemsSource="{Binding Categories}" SelectedItem="{Binding Category}"
+        <ComboBox Grid.Column="1" Margin="10,0,0,0" ItemsSource="{Binding CategoryOptions}" SelectedItem="{Binding Category}"
                   AutomationProperties.Name="{DynamicResource StoreAllCategories}">
           <ComboBox.ItemTemplate>
-            <DataTemplate><TextBlock Text="{Binding Converter={StaticResource LocalizedEnum}, ConverterParameter=Category}"/></DataTemplate>
+            <DataTemplate><TextBlock Text="{Binding Converter={StaticResource CategoryOption}}"/></DataTemplate>
           </ComboBox.ItemTemplate>
         </ComboBox>
         <ComboBox Grid.Column="2" Margin="10,0,0,0" ItemsSource="{Binding SortModes}" SelectedItem="{Binding Sort}"

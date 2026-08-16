@@ -28,7 +28,7 @@ public sealed class InstallerViewModel : ObservableObject
         _localization = localization;
         _errors = errors;
         InstallCommand = new AsyncRelayCommand(InstallAsync, _ => Analysis is not null && !IsBusy && !Completed, SetError);
-        CancelCommand = new RelayCommand(Cancel, _ => IsBusy || Analysis is not null);
+        CancelCommand = new RelayCommand(Cancel);
     }
 
     public event Action<Guid>? InstallationCompleted;

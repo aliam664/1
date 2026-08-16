@@ -6,6 +6,8 @@
     <c:BytesConverter x:Key="Bytes"/>
     <c:ModStatusBrushConverter x:Key="ModStatusBrush"/>
     <c:LocalizedEnumConverter x:Key="LocalizedEnum"/>
+    <c:CategoryOptionConverter x:Key="CategoryOption"/>
+    <c:StatusOptionConverter x:Key="StatusOption"/>
     <c:InverseBoolVisibilityConverter x:Key="InverseBoolVisibility"/>
     <c:InverseNullToVisibilityConverter x:Key="InverseNullVisibility"/>
     <c:BoolVisibilityConverter x:Key="BoolVisibility"/>
@@ -38,19 +40,19 @@
           <TextBlock Text="{DynamicResource LibrarySearchPlaceholder}"/>
         </TextBox.ToolTip>
       </TextBox>
-      <ComboBox Grid.Column="1" Margin="10,0,0,0" ItemsSource="{Binding Categories}" SelectedItem="{Binding Category}"
+      <ComboBox Grid.Column="1" Margin="10,0,0,0" ItemsSource="{Binding CategoryOptions}" SelectedItem="{Binding Category}"
                 AutomationProperties.Name="{DynamicResource CategoryLabel}">
         <ComboBox.ItemTemplate>
           <DataTemplate>
-            <TextBlock Text="{Binding Converter={StaticResource LocalizedEnum}, ConverterParameter=Category}"/>
+            <TextBlock Text="{Binding Converter={StaticResource CategoryOption}}"/>
           </DataTemplate>
         </ComboBox.ItemTemplate>
       </ComboBox>
-      <ComboBox Grid.Column="2" Margin="10,0,0,0" ItemsSource="{Binding Statuses}" SelectedItem="{Binding Status}"
+      <ComboBox Grid.Column="2" Margin="10,0,0,0" ItemsSource="{Binding StatusOptions}" SelectedItem="{Binding Status}"
                 AutomationProperties.Name="{DynamicResource StatusLabel}">
         <ComboBox.ItemTemplate>
           <DataTemplate>
-            <TextBlock Text="{Binding Converter={StaticResource LocalizedEnum}, ConverterParameter=Status}"/>
+            <TextBlock Text="{Binding Converter={StaticResource StatusOption}}"/>
           </DataTemplate>
         </ComboBox.ItemTemplate>
       </ComboBox>

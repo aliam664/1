@@ -59,8 +59,10 @@ public sealed class LibraryViewModel : ObservableObject
     public ObservableCollection<ModManifest> Mods { get; } = [];
     public ObservableCollection<string> SelectedModFiles { get; } = [];
     public ObservableCollection<VerificationIssue> VerificationIssues { get; } = [];
-    public IReadOnlyList<ModCategory> Categories { get; } = Enum.GetValues<ModCategory>();
-    public IReadOnlyList<ModStatus> Statuses { get; } = Enum.GetValues<ModStatus>();
+    /// <summary>First entry is null = "All".</summary>
+    public IReadOnlyList<object?> CategoryOptions { get; } = [null, .. Enum.GetValues<ModCategory>().Cast<object?>()];
+    /// <summary>First entry is null = "All statuses".</summary>
+    public IReadOnlyList<object?> StatusOptions { get; } = [null, .. Enum.GetValues<ModStatus>().Cast<object?>()];
     public IReadOnlyList<SortMode> SortModes { get; } = Enum.GetValues<SortMode>();
 
     public string Search { get => _search; set { if (SetProperty(ref _search, value)) Apply(); } }
