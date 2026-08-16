@@ -12,26 +12,38 @@ export const GITHUB_REPO = '1';
 export const CATALOG_BRANCH = 'catalog';
 export const UPDATE_REPO = `${GITHUB_OWNER}/${GITHUB_REPO}`;
 
-const JSDELIVR_BASE = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${CATALOG_BRANCH}`;
-const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${CATALOG_BRANCH}`;
+function sourcePair(id, base) {
+  return Object.freeze({
+    id,
+    manifestUrl: `${base}/dist/manifest.json`,
+    catalogUrl: `${base}/dist/catalog.json`
+  });
+}
 
 /**
  * Ordered catalog delivery chain. The client walks this list and stops
  * at the first successful, schema-valid response.
  *
- * @type {ReadonlyArray<{ id: string, manifestUrl: string, catalogUrl: string }>}
+ * `catalog` is the published aggregation branch. `main` is the fallback
+ * after the PR lands so the launcher still works before that branch exists.
  */
 export const CATALOG_SOURCES = Object.freeze([
-  Object.freeze({
-    id: 'jsdelivr',
-    manifestUrl: `${JSDELIVR_BASE}/dist/manifest.json`,
-    catalogUrl: `${JSDELIVR_BASE}/dist/catalog.json`
-  }),
-  Object.freeze({
-    id: 'raw-github',
-    manifestUrl: `${RAW_BASE}/dist/manifest.json`,
-    catalogUrl: `${RAW_BASE}/dist/catalog.json`
-  })
+  sourcePair(
+    'jsdelivr',
+    `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${CATALOG_BRANCH}`
+  ),
+  sourcePair(
+    'raw-github',
+    `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${CATALOG_BRANCH}`
+  ),
+  sourcePair(
+    'jsdelivr-main',
+    `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@main`
+  ),
+  sourcePair(
+    'raw-github-main',
+    `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main`
+  )
 ]);
 
 export const UPDATER_ENDPOINTS = Object.freeze({

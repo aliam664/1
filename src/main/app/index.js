@@ -156,6 +156,19 @@ async function start() {
   });
   createMainWindow({ logger });
 
+  detectAssettoCorsa({ savedPath: settingsStore.get().gamePath })
+    .then((result) => {
+      if (result.found && result.path !== settingsStore.get().gamePath) {
+        settingsStore.update({ gamePath: result.path });
+        logger.info('game path detected', { path: result.path, source: result.source });
+      } else if (!result.found) {
+        logger.info('game path not detected; user can browse in Settings');
+      }
+    })
+    .catch((error) => {
+      logger.warn('startup game detect failed', { message: error.message });
+    });
+
   catalog.sync(false).catch((error) => {
     logger.warn('startup catalog sync failed', { message: error.message });
   });

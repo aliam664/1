@@ -46,14 +46,13 @@ export function createHttpClient(options) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
-        const response = await fetchImpl(url, {
+        const response = await fetchFollowingHttps(fetchImpl, url, {
           method: init.method || 'GET',
           headers: {
             'User-Agent': options.userAgent || APP_CONFIG.userAgent,
             Accept: 'application/json,application/octet-stream,*/*',
             ...(init.headers || {})
           },
-          redirect: 'manual',
           signal: init.signal || controller.signal
         });
         clearTimeout(timer);
@@ -101,6 +100,26 @@ export function createHttpClient(options) {
   }
 
   return { request };
+}
+
+async function fetchFollowingHttps(fetchImpl, url, init) {
+  let current = url;
+  for (let hop = 0; hop < APP_CONFIG.catalog.maximumRedirects; hop += 1) {
+    if (!current.startsWith('https://')) {
+      throw new AppError(ErrorCodes.HOST_UNTRUSTED, 'Redirect left HTTPS');
+    }
+    const response = await fetchImpl(current, { ...init, redirect: 'manual' });
+    if ([301, 302, 303, 307, 308].includes(response.status)) {
+      const location = response.headers.get('location');
+      if (!location) {
+        throw new AppError(ErrorCodes.NETWORK, 'Redirect without Location');
+      }
+      current = new URL(location, current).toString();
+      continue;
+    }
+    return response;
+  }
+  throw new AppError(ErrorCodes.NETWORK, 'Too many redirects');
 }
 
 function sleep(ms) {

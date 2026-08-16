@@ -17,11 +17,14 @@ describe('endpoints', () => {
     }
   });
 
-  it('lists jsDelivr first and raw GitHub second', () => {
+  it('lists jsDelivr first, then raw GitHub, then main-branch fallbacks', () => {
     assert.equal(CATALOG_SOURCES[0].id, 'jsdelivr');
     assert.equal(CATALOG_SOURCES[1].id, 'raw-github');
+    assert.equal(CATALOG_SOURCES[2].id, 'jsdelivr-main');
+    assert.equal(CATALOG_SOURCES[3].id, 'raw-github-main');
     assert.match(CATALOG_SOURCES[0].manifestUrl, /jsdelivr/);
     assert.match(CATALOG_SOURCES[1].manifestUrl, /raw\.githubusercontent\.com/);
+    assert.match(CATALOG_SOURCES[3].manifestUrl, /\/main\/dist\/manifest\.json$/);
   });
 
   it('rejects http and unknown hosts', () => {
