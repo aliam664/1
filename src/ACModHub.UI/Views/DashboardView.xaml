@@ -1,14 +1,118 @@
-<UserControl x:Class="ACModHub.UI.Views.DashboardView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
- <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel>
-  <Grid Margin="0,0,0,20"><TextBlock Text="{DynamicResource DashboardTitle}" Style="{StaticResource PageTitle}"/><StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button Content="{DynamicResource Browse}" Command="{Binding BrowseCommand}" Margin="0,0,8,0"/><Button Content="{DynamicResource LaunchGame}" Command="{Binding LaunchCommand}" Style="{StaticResource PrimaryButton}"/></StackPanel></Grid>
-  <Border Style="{StaticResource Card}" Padding="24"><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel><TextBlock Text="ASSETTO CORSA" FontSize="12" Foreground="{StaticResource MutedBrush}"/><TextBlock Text="{Binding GameStatus}" FontSize="26" FontWeight="SemiBold" Margin="0,7"/><TextBlock Text="{Binding GamePath}" Foreground="{StaticResource MutedBrush}" FlowDirection="LeftToRight"/></StackPanel><Border Grid.Column="1" Width="76" Height="76" Background="#262DD4BF" CornerRadius="38"><TextBlock Text="AC" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{StaticResource AccentBrush}"/></Border></Grid></Border>
-  <UniformGrid Columns="4" Margin="0,8,0,0">
-   <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="{DynamicResource InstalledMods}" Style="{StaticResource MutedText}"/><TextBlock Text="{Binding InstalledMods}" FontSize="32" FontWeight="Bold" Margin="0,9,0,0"/></StackPanel></Border>
-   <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="{DynamicResource Cars}" Style="{StaticResource MutedText}"/><TextBlock Text="{Binding Cars}" FontSize="32" FontWeight="Bold" Margin="0,9,0,0"/></StackPanel></Border>
-   <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="{DynamicResource Tracks}" Style="{StaticResource MutedText}"/><TextBlock Text="{Binding Tracks}" FontSize="32" FontWeight="Bold" Margin="0,9,0,0"/></StackPanel></Border>
-   <Border Style="{StaticResource Card}"><StackPanel><TextBlock Text="{DynamicResource Updates}" Style="{StaticResource MutedText}"/><TextBlock Text="{Binding Updates}" FontSize="32" FontWeight="Bold" Foreground="{StaticResource AccentBrush}" Margin="0,9,0,0"/></StackPanel></Border>
-  </UniformGrid>
-  <Border Style="{StaticResource Card}" Margin="0,14,12,12"><StackPanel><TextBlock Text="Drag &amp; Drop" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="ZIP · 7Z · RAR  —  Analyze → Preview → Conflict Check → Backup → Install → Verify" Foreground="{StaticResource MutedBrush}" Margin="0,8,0,0" FlowDirection="LeftToRight"/></StackPanel></Border>
-  <TextBlock Text="{Binding Error}" Foreground="{StaticResource PrimaryBrush}" Margin="4"/>
- </StackPanel></ScrollViewer>
+<UserControl x:Class="ACModHub.UI.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Grid>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel>
+        <!-- Header -->
+        <Grid Margin="0,0,0,20">
+          <StackPanel>
+            <TextBlock Text="{DynamicResource DashboardTitle}" Style="{StaticResource PageTitle}"/>
+            <TextBlock Text="{DynamicResource DashboardSubtitle}" Style="{StaticResource MutedText}" Margin="0,6,0,0"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+            <Button Content="{DynamicResource Refresh}" Command="{Binding RefreshCommand}" Margin="0,0,8,0"/>
+            <Button Content="{DynamicResource BrowseGame}" Command="{Binding BrowseCommand}" Margin="0,0,8,0"/>
+            <Button Content="{DynamicResource LaunchGame}" Command="{Binding LaunchCommand}" Style="{StaticResource PrimaryButton}" IsEnabled="{Binding GameValid}">
+              <StackPanel Orientation="Horizontal">
+                <Path Data="{StaticResource IconPlayData}" Fill="#FFFFFF" Width="14" Height="14" Stretch="Uniform" Margin="0,0,8,0"/>
+                <TextBlock Text="{DynamicResource LaunchGame}"/>
+              </StackPanel>
+            </Button>
+          </StackPanel>
+        </Grid>
+
+        <!-- Error banner -->
+        <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource ErrorBrush}" BorderThickness="1"
+                CornerRadius="8" Padding="14,10" Margin="0,0,0,12" Visibility="{Binding HasError, Converter={StaticResource BoolVisibility}}">
+          <StackPanel Orientation="Horizontal">
+            <Path Style="{StaticResource StrokeIcon}" Data="{StaticResource IconErrorData}" Stroke="{StaticResource ErrorBrush}" VerticalAlignment="Center"/>
+            <TextBlock Text="{DynamicResource DashError}" Margin="10,0,0,0" TextWrapping="Wrap"/>
+          </StackPanel>
+        </Border>
+
+        <!-- Game status -->
+        <Border Style="{StaticResource Card}">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+              <TextBlock Text="{DynamicResource GameStatusLabel}" Style="{StaticResource MutedText}"/>
+              <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                <Path Style="{StaticResource StrokeIcon}" Data="{StaticResource IconInfoData}" Stroke="{StaticResource SafeBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBlock Text="{Binding GameStatus}" FontSize="24" FontWeight="SemiBold"/>
+              </StackPanel>
+              <TextBlock Text="{DynamicResource GamePathLabel}" Style="{StaticResource MutedText}" Margin="0,16,0,4"/>
+              <TextBlock Text="{Binding GamePath}" Foreground="{StaticResource PrimaryTextBrush}" FlowDirection="LeftToRight" TextTrimming="CharacterEllipsis" HorizontalAlignment="Left"/>
+            </StackPanel>
+            <Border Grid.Column="1" Width="84" Height="84" CornerRadius="10" Background="{StaticResource RaisedSurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+              <Path Data="{StaticResource IconCarData}" Width="44" Height="44" Stretch="Uniform" Fill="{StaticResource SecondaryTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+          </Grid>
+        </Border>
+
+        <!-- Stats -->
+        <UniformGrid Columns="4" Margin="0,12,0,0">
+          <Border Style="{StaticResource Card}" Margin="0,0,12,0">
+            <StackPanel>
+              <TextBlock Text="{DynamicResource InstalledMods}" Style="{StaticResource MutedText}"/>
+              <TextBlock Text="{Binding InstalledMods}" FontSize="32" FontWeight="Bold" Margin="0,8,0,0"/>
+            </StackPanel>
+          </Border>
+          <Border Style="{StaticResource Card}" Margin="0,0,12,0">
+            <StackPanel>
+              <TextBlock Text="{DynamicResource CarsCount}" Style="{StaticResource MutedText}"/>
+              <TextBlock Text="{Binding Cars}" FontSize="32" FontWeight="Bold" Margin="0,8,0,0"/>
+            </StackPanel>
+          </Border>
+          <Border Style="{StaticResource Card}" Margin="0,0,12,0">
+            <StackPanel>
+              <TextBlock Text="{DynamicResource TracksCount}" Style="{StaticResource MutedText}"/>
+              <TextBlock Text="{Binding Tracks}" FontSize="32" FontWeight="Bold" Margin="0,8,0,0"/>
+            </StackPanel>
+          </Border>
+          <Border Style="{StaticResource Card}">
+            <StackPanel>
+              <TextBlock Text="{DynamicResource UpdatesCount}" Style="{StaticResource MutedText}"/>
+              <TextBlock Text="{Binding Updates}" FontSize="32" FontWeight="Bold" Margin="0,8,0,0" Foreground="{StaticResource WarningBrush}"/>
+            </StackPanel>
+          </Border>
+        </UniformGrid>
+
+        <!-- Secure pipeline -->
+        <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+          <StackPanel>
+            <TextBlock Text="{DynamicResource SecurePipelineTitle}" Style="{StaticResource SectionTitle}"/>
+            <TextBlock Text="{DynamicResource SecurePipelineDesc}" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="0,8,0,16"/>
+            <WrapPanel>
+              <Border Style="{StaticResource StatusPill}" Margin="0,0,8,8"><TextBlock Text="{DynamicResource StageAnalyze}" Style="{StaticResource CaptionText}"/></Border>
+              <Border Style="{StaticResource StatusPill}" Margin="0,0,8,8"><TextBlock Text="{DynamicResource StagePreview}" Style="{StaticResource CaptionText}"/></Border>
+              <Border Style="{StaticResource StatusPill}" Margin="0,0,8,8"><TextBlock Text="{DynamicResource StageConflictCheck}" Style="{StaticResource CaptionText}"/></Border>
+              <Border Style="{StaticResource StatusPill}" Margin="0,0,8,8"><TextBlock Text="{DynamicResource StageBackup}" Style="{StaticResource CaptionText}"/></Border>
+              <Border Style="{StaticResource StatusPill}" Margin="0,0,8,8"><TextBlock Text="{DynamicResource StageInstall}" Style="{StaticResource CaptionText}"/></Border>
+              <Border Style="{StaticResource StatusPill}" Margin="0,0,8,8"><TextBlock Text="{DynamicResource StageVerify}" Style="{StaticResource CaptionText}"/></Border>
+              <Border Style="{StaticResource StatusPill}" Margin="0,0,8,8"><TextBlock Text="{DynamicResource StageDone}" Style="{StaticResource CaptionText}"/></Border>
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+
+        <!-- Drag & drop -->
+        <Border Style="{StaticResource RaisedCard}" Margin="0,12,0,0" BorderBrush="{StaticResource StrongBorderBrush}" BorderThickness="1">
+          <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Path Data="{StaticResource IconDownloadData}" Width="26" Height="26" Stretch="Uniform" Fill="{StaticResource SafeBrush}" HorizontalAlignment="Center"/>
+            <TextBlock Text="{DynamicResource DragDropHint}" Style="{StaticResource SectionTitle}" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+            <TextBlock Text="{DynamicResource DragDropHint2}" Style="{StaticResource MutedText}" HorizontalAlignment="Center" Margin="0,6,0,0" FlowDirection="LeftToRight"/>
+          </StackPanel>
+        </Border>
+
+        <!-- Busy overlay -->
+        <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="14,10" Margin="0,12,0,0"
+                Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}">
+          <TextBlock Text="{DynamicResource CommonLoading}" Style="{StaticResource MutedText}"/>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
 </UserControl>

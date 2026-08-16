@@ -22,18 +22,20 @@ public sealed class GitHubUpdateChecker : IUpdateChecker
     private readonly IAppPaths _paths;
     private readonly AppConfig _config;
     private readonly ILogger<GitHubUpdateChecker> _logger;
+    private readonly Func<SemanticVersion> _currentVersionProvider;
 
-    public GitHubUpdateChecker(IHttpClientFactory httpClientFactory, IAppPaths paths, AppConfig config, ILogger<GitHubUpdateChecker> logger)
+    public GitHubUpdateChecker(IHttpClientFactory httpClientFactory, IAppPaths paths, AppConfig config, ILogger<GitHubUpdateChecker> logger, Func<SemanticVersion>? currentVersionProvider = null)
     {
         _httpClientFactory = httpClientFactory;
         _paths = paths;
         _config = config;
         _logger = logger;
+        _currentVersionProvider = currentVersionProvider ?? (() => SemanticVersion.Parse(AppInfo.Version));
     }
 
     public async Task<UpdateCheckResult> CheckAsync(UpdateChannel channel, bool forceRefresh, CancellationToken cancellationToken = default)
     {
-        var current = SemanticVersion.Parse(AppInfo.Version);
+        var current = _currentVersionProvider();
         var feedUri = new Uri($"https://api.github.com/repos/{_config.UpdateRepository}/releases?per_page={MaximumReleases}");
 
         var cacheDirectory = Path.Combine(_paths.CacheDirectory, "updates");

@@ -1,5 +1,200 @@
-<UserControl x:Class="ACModHub.UI.Views.CatalogView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="#090D14">
+<UserControl x:Class="ACModHub.UI.Views.CatalogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:ACModHub.UI.Converters"
+             xmlns:b="clr-namespace:ACModHub.UI.Behaviors">
+  <UserControl.Resources>
+    <c:BoolVisibilityConverter x:Key="BoolVisibility"/>
+    <c:InverseBoolVisibilityConverter x:Key="InverseBoolVisibility"/>
+    <c:LocalizedEnumConverter x:Key="LocalizedEnum"/>
+    <c:BytesConverter x:Key="Bytes"/>
+  </UserControl.Resources>
   <Grid>
-    <WebBrowser x:Name="Browser" LoadCompleted="OnLoadCompleted" Navigating="OnNavigating" />
+    <!-- WebView2 store -->
+    <Border x:Name="WebViewHost" Visibility="{Binding WebViewAvailable, Converter={StaticResource BoolVisibility}}">
+      <Grid>
+        <Border x:Name="WebViewContainer"/>
+        <Border Background="{StaticResource BackgroundBrush}" Visibility="{Binding IsBusy, Converter={StaticResource BoolVisibility}}">
+          <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Text="{DynamicResource StoreLoading}" Style="{StaticResource MutedText}"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+    </Border>
+
+    <!-- Native fallback store (no WebView2 runtime, or simplified mode) -->
+    <Grid x:Name="NativeHost" Visibility="{Binding ShowNativeStore, Converter={StaticResource BoolVisibility}}">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+
+      <Grid>
+        <StackPanel>
+          <TextBlock Text="{DynamicResource StoreTitle}" Style="{StaticResource PageTitle}"/>
+          <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+            <TextBlock Text="{DynamicResource StoreSourceLabel}" Style="{StaticResource CaptionText}"/>
+            <TextBlock Text="{Binding SourceText}" Style="{StaticResource CaptionText}" Margin="6,0,0,0"/>
+          </StackPanel>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+          <Button Content="{DynamicResource StoreInstallRuntime}" Command="{Binding InstallRuntimeCommand}" Margin="0,0,8,0"/>
+          <Button Content="{DynamicResource StoreRefresh}" Command="{Binding RefreshCommand}"/>
+        </StackPanel>
+      </Grid>
+
+      <!-- WebView2 missing / offline / error banners -->
+      <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource WarningBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,12,0,0">
+        <StackPanel>
+          <StackPanel Orientation="Horizontal">
+            <Path Style="{StaticResource StrokeIcon}" Data="{StaticResource IconInfoData}" Stroke="{StaticResource WarningBrush}" VerticalAlignment="Top" Margin="0,2,0,0"/>
+            <TextBlock Text="{DynamicResource StoreWebViewMissingTitle}" Style="{StaticResource CardTitle}" Margin="10,0,0,0"/>
+          </StackPanel>
+          <TextBlock Text="{DynamicResource StoreWebViewMissingHint}" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="28,4,0,0"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource WarningBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,12,0,0"
+              Visibility="{Binding WarningText, Converter={StaticResource BoolVisibility}}">
+        <StackPanel Orientation="Horizontal">
+          <Path Style="{StaticResource StrokeIcon}" Data="{StaticResource IconWarningData}" Stroke="{StaticResource WarningBrush}" VerticalAlignment="Top" Margin="0,2,0,0"/>
+          <TextBlock Text="{Binding WarningText}" Style="{StaticResource MutedText}" TextWrapping="Wrap" Margin="10,0,0,0"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Filters -->
+      <Grid Grid.Row="2" Margin="0,14,0,14">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="2*"/>
+          <ColumnDefinition Width="200"/>
+          <ColumnDefinition Width="200"/>
+        </Grid.ColumnDefinitions>
+        <TextBox Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}" AutomationProperties.Name="{DynamicResource StoreSearchPlaceholder}">
+          <TextBox.ToolTip><TextBlock Text="{DynamicResource StoreSearchPlaceholder}"/></TextBox.ToolTip>
+        </TextBox>
+        <ComboBox Grid.Column="1" Margin="10,0,0,0" ItemsSource="{Binding Categories}" SelectedItem="{Binding Category}"
+                  AutomationProperties.Name="{DynamicResource StoreAllCategories}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate><TextBlock Text="{Binding Converter={StaticResource LocalizedEnum}, ConverterParameter=Category}"/></DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <ComboBox Grid.Column="2" Margin="10,0,0,0" ItemsSource="{Binding SortModes}" SelectedItem="{Binding Sort}"
+                  AutomationProperties.Name="{DynamicResource StoreSortDefault}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate><TextBlock Text="{Binding Converter={StaticResource LocalizedEnum}, ConverterParameter=StoreSort}"/></DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+      </Grid>
+
+      <!-- Cards -->
+      <Grid Grid.Row="3">
+        <ListBox ItemsSource="{Binding Mods}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel/>
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+          <ListBox.ItemContainerStyle>
+            <Style TargetType="ListBoxItem">
+              <Setter Property="Width" Value="300"/>
+              <Setter Property="Margin" Value="0,0,12,12"/>
+              <Setter Property="Padding" Value="0"/>
+              <Setter Property="Background" Value="Transparent"/>
+              <Setter Property="BorderThickness" Value="0"/>
+              <Setter Property="Template">
+                <Setter.Value>
+                  <ControlTemplate TargetType="ListBoxItem">
+                    <Border x:Name="Root" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="10">
+                      <ContentPresenter/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                      <Trigger Property="IsMouseOver" Value="True">
+                        <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource StrongBorderBrush}"/>
+                      </Trigger>
+                    </ControlTemplate.Triggers>
+                  </ControlTemplate>
+                </Setter.Value>
+              </Setter>
+            </Style>
+          </ListBox.ItemContainerStyle>
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <StackPanel>
+                <Grid Height="130">
+                  <Border Width="44" Height="44" CornerRadius="8" Background="{StaticResource RaisedSurfaceBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                          Visibility="{Binding CoverUri, Converter={StaticResource NullVisibility}}">
+                    <Path Data="{StaticResource IconStoreData}" Width="22" Height="22" Stretch="Uniform" Fill="{StaticResource SubtleTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  </Border>
+                  <Image Stretch="UniformToFill" b:AsyncCoverBehavior.CoverUri="{Binding CoverUri}" b:AsyncCoverBehavior.Service="{Binding DataContext.CoverService, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                  <Border Background="#66080B11"/>
+                  <Border Background="{StaticResource PrimaryBrush}" CornerRadius="10" Padding="8,3" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10"
+                          Visibility="{Binding IsDeprecated, Converter={StaticResource BoolVisibility}}">
+                    <TextBlock Text="{DynamicResource StoreDeprecatedWarning}" Style="{StaticResource CaptionText}" Foreground="#FFFFFF"/>
+                  </Border>
+                  <Border Background="{StaticResource ErrorBrush}" CornerRadius="10" Padding="8,3" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10"
+                          Visibility="{Binding IsRevoked, Converter={StaticResource BoolVisibility}}">
+                    <TextBlock Text="{DynamicResource StoreRevokedTitle}" Style="{StaticResource CaptionText}" Foreground="#FFFFFF"/>
+                  </Border>
+                </Grid>
+                <StackPanel Margin="14,12,14,14">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Name}" Style="{StaticResource CardTitle}" TextTrimming="CharacterEllipsis" MaxWidth="220"/>
+                    <Border Style="{StaticResource StatusPill}" HorizontalAlignment="Right" Margin="8,0,0,0"
+                            Visibility="{Binding IsInstallable, Converter={StaticResource InverseBoolVisibility}}">
+                      <TextBlock Text="{DynamicResource StoreInstallBlocked}" Style="{StaticResource CaptionText}" Foreground="{StaticResource ErrorBrush}"/>
+                    </Border>
+                  </StackPanel>
+                  <TextBlock Text="{Binding Author}" Style="{StaticResource CaptionText}" Margin="0,4,0,0"/>
+                  <TextBlock Text="{Binding Description}" Style="{StaticResource MutedText}" TextWrapping="Wrap" MaxHeight="40" TextTrimming="CharacterEllipsis" Margin="0,6,0,0"/>
+                  <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock Text="{Binding CategoryText}" Style="{StaticResource CaptionText}"/>
+                    <TextBlock Text=" · v" Style="{StaticResource CaptionText}" FlowDirection="LeftToRight"/>
+                    <TextBlock Text="{Binding Version}" Style="{StaticResource CaptionText}" FlowDirection="LeftToRight"/>
+                    <TextBlock Text=" · " Style="{StaticResource CaptionText}" FlowDirection="LeftToRight"/>
+                    <TextBlock Text="{Binding SizeText}" Style="{StaticResource CaptionText}" FlowDirection="LeftToRight"/>
+                  </StackPanel>
+                  <TextBlock Text="{Binding BlockReason}" Style="{StaticResource CaptionText}" Foreground="{StaticResource ErrorBrush}" TextWrapping="Wrap" Margin="0,8,0,0"
+                             Visibility="{Binding BlockReason, Converter={StaticResource NullVisibility}}"/>
+                  <Button Content="{DynamicResource StoreInstall}" Command="{Binding DataContext.InstallCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                          CommandParameter="{Binding Id}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Right" Margin="0,10,0,0"
+                          Visibility="{Binding IsInstallable, Converter={StaticResource BoolVisibility}}"/>
+                </StackPanel>
+              </StackPanel>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- States -->
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding IsEmpty, Converter={StaticResource BoolVisibility}}">
+          <Path Data="{StaticResource IconStoreData}" Width="40" Height="40" Stretch="Uniform" Fill="{StaticResource SubtleTextBrush}" HorizontalAlignment="Center"/>
+          <TextBlock Text="{DynamicResource StoreEmptyTitle}" Style="{StaticResource SectionTitle}" HorizontalAlignment="Center" Margin="0,14,0,0"/>
+          <TextBlock Text="{DynamicResource StoreEmptyHint}" Style="{StaticResource MutedText}" HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="440" TextAlignment="Center" Margin="0,8,0,0"/>
+        </StackPanel>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding HasError, Converter={StaticResource BoolVisibility}}">
+          <Path Style="{StaticResource StrokeIcon}" Data="{StaticResource IconErrorData}" Stroke="{StaticResource ErrorBrush}" Width="36" Height="36" HorizontalAlignment="Center"/>
+          <TextBlock Text="{DynamicResource StoreErrorTitle}" Style="{StaticResource SectionTitle}" HorizontalAlignment="Center" Margin="0,14,0,0"/>
+          <TextBlock Text="{Binding WarningText}" Style="{StaticResource MutedText}" HorizontalAlignment="Center" TextWrapping="Wrap" MaxWidth="440" TextAlignment="Center" Margin="0,8,0,0"/>
+          <Button Content="{DynamicResource StoreRetry}" Command="{Binding RefreshCommand}" HorizontalAlignment="Center" Margin="0,14,0,0"/>
+        </StackPanel>
+      </Grid>
+
+      <!-- Download progress (native) -->
+      <Border Grid.Row="4" Style="{StaticResource Card}" Margin="0,10,0,0" Visibility="{Binding IsDownloading, Converter={StaticResource BoolVisibility}}">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <StackPanel>
+            <TextBlock Text="{Binding DownloadStatusText}" Style="{StaticResource MutedText}"/>
+            <ProgressBar Value="{Binding DownloadProgress}" Maximum="100" Margin="0,8,0,0"/>
+          </StackPanel>
+          <Button Grid.Column="1" Content="{DynamicResource StoreCancelDownload}" Command="{Binding CancelDownloadCommand}" Margin="12,0,0,0"/>
+        </Grid>
+      </Border>
+    </Grid>
   </Grid>
 </UserControl>

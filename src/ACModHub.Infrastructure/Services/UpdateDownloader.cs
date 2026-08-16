@@ -81,14 +81,28 @@ public sealed partial class UpdateDownloader : IUpdateDownloader
         }
 
         // 4. Integrity verification. The package is never marked ready without a matching hash.
-        Report(progress, UpdateDownloadState.Verifying, existing: 0, total: installer.Size);
+        try
+        {
+            return await VerifyAndFinalizeAsync(partial, destination, expectedSha256, installer.Size, progress, cancellationToken).ConfigureAwait(false);
+        }
+        catch
+        {
+            // Cancellation or verification failure: never leave partial state behind.
+            try { if (File.Exists(partial)) File.Delete(partial); } catch (IOException) { }
+            throw;
+        }
+    }
+
+    private async Task<string> VerifyAndFinalizeAsync(string partial, string destination, string expectedSha256, long expectedSize, IProgress<UpdateDownloadProgress>? progress, CancellationToken cancellationToken)
+    {
+        Report(progress, UpdateDownloadState.Verifying, existing: 0, total: expectedSize);
         var actual = await _hashes.ComputeSha256Async(partial, cancellationToken).ConfigureAwait(false);
         if (!actual.Equals(expectedSha256, StringComparison.OrdinalIgnoreCase))
         {
             try { File.Delete(partial); } catch (IOException) { }
             throw new ModHubException("The downloaded update failed SHA-256 verification and was discarded.");
         }
-        if (new FileInfo(partial).Length != installer.Size)
+        if (new FileInfo(partial).Length != expectedSize)
         {
             try { File.Delete(partial); } catch (IOException) { }
             throw new ModHubException("The downloaded update size does not match the release metadata.");

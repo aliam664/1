@@ -36,15 +36,32 @@ public partial class App : Application
             _logger = _host.Services.GetRequiredService<ILogger<App>>();
             DispatcherUnhandledException += OnDispatcherUnhandledException;
 
-            var recovered = await _host.Services.GetRequiredService<ICrashRecoveryService>().RecoverAsync();
-            if (recovered > 0) _logger.LogWarning("Recovered {Count} interrupted installation(s)", recovered);
-            var settings = await _host.Services.GetRequiredService<ISettingsService>().LoadAsync();
-            _host.Services.GetRequiredService<ILocalizationService>().SetLanguage(settings.Language);
+            var services = _host.Services;
 
-            var window = _host.Services.GetRequiredService<MainWindow>();
+            // 1. Crash recovery of interrupted installs (before anything touches game files).
+            var recovered = await services.GetRequiredService<ICrashRecoveryService>().RecoverAsync();
+            if (recovered > 0) _logger.LogWarning("Recovered {Count} interrupted installation(s)", recovered);
+
+            // 2. Settings + localization (Persian by default).
+            var settings = await services.GetRequiredService<ISettingsService>().LoadAsync();
+            services.GetRequiredService<ILocalizationService>().SetLanguage(settings.Language);
+
+            // 3. Non-blocking snapshot of the download concurrency setting.
+            services.GetRequiredService<ConcurrencySettings>().ConcurrentDownloads = settings.ConcurrentDownloads;
+
+            // 4. Resolve a pending update restart (health marker), then show the window.
+            var updateOutcome = await services.GetRequiredService<IUpdateApplier>().ResolvePendingRestartAsync();
+            _ = services.GetRequiredService<ICoverImageService>().CleanupAsync();
+
+            var mainViewModel = services.GetRequiredService<MainViewModel>();
+            var window = services.GetRequiredService<MainWindow>();
             MainWindow = window;
             window.Show();
-            await _host.Services.GetRequiredService<MainViewModel>().InitializeAsync();
+            await mainViewModel.InitializeAsync();
+            if (updateOutcome.WasApplied) mainViewModel.NotifyUpdateApplied();
+
+            // 5. Background update check: after the window is visible, never blocking startup.
+            if (settings.CheckForUpdatesOnStartup) mainViewModel.StartBackgroundUpdateCheck();
         }
         catch (Exception ex)
         {

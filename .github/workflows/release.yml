@@ -1,0 +1,66 @@
+name: Release
+
+# Creates the Windows installer and publishes it as a GitHub Release.
+# Triggered by pushing a version tag (v*) or manually.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build installer and publish release
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Setup Python (static validation)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Static validation
+        shell: bash
+        run: |
+          pip install pyyaml
+          python scripts/validate.py
+
+      - name: Restore
+        run: dotnet restore ACModHub.sln
+
+      - name: Build (Release)
+        run: dotnet build ACModHub.sln -c Release --no-restore
+
+      - name: Test (Release)
+        run: dotnet test ACModHub.sln -c Release --no-build
+
+      - name: Publish self-contained win-x64
+        run: dotnet publish src/ACModHub.App/ACModHub.App.csproj -c Release -r win-x64 --self-contained true --no-restore -o artifacts/publish/win-x64
+
+      - name: Install Inno Setup 6
+        shell: powershell
+        run: choco install innosetup --version=6.3.3 -y --no-progress
+
+      - name: Build installer + SHA256SUMS (version from Directory.Build.props)
+        shell: powershell
+        run: ./build.ps1 -SkipBuild -SkipTests
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          prerelease: ${{ contains(github.ref, 'preview') || contains(github.ref, 'rc') || contains(github.ref, 'beta') }}
+          generate_release_notes: true
+          files: |
+            artifacts/installer/AC-Mod-Hub-Setup.exe
+            artifacts/installer/SHA256SUMS.txt
+            artifacts/installer/BUILD-INFO.txt
+            artifacts/AC-Mod-Hub-Portable-win-x64.zip

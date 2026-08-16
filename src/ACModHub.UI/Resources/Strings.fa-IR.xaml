@@ -1,54 +1,311 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xml:lang="fa-IR">
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavDashboard">داشبورد</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavMods">مودها</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavCars">ماشین‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavTracks">پیست‌ها</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavSkins">اسکین‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavApps">اپ‌ها</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavDownloads">دانلودها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavUpdates">به‌روزرسانی‌ها</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavBackups">پشتیبان‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavSettings">تنظیمات</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ImportMod">وارد کردن مود</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="LaunchGame">اجرای بازی</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DashboardTitle">مرکز کنترل</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="LibraryTitle">کتابخانه مودها</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="GameStatus">وضعیت بازی</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="GamePath">مسیر بازی</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="InstalledMods">مودهای نصب‌شده</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Cars">ماشین‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Tracks">پیست‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Updates">آپدیت‌ها</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Search">جستجو بر اساس نام یا سازنده…</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AllCategories">همه دسته‌ها</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Refresh">تازه‌سازی</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Browse">انتخاب مسیر</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="InstallerTitle">نصب امن مود</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Install">نصب و بررسی</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Cancel">انصراف</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Conflicts">تداخل فایل‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Files">فایل‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AllowOverwrite">با پشتیبان‌گیری، تداخل‌های قابل‌حل بازنویسی شوند</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DownloadsTitle">مدیریت دانلود</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="BackupsTitle">مدیریت پشتیبان‌ها</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SettingsTitle">تنظیمات و عیب‌یابی</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Save">ذخیره</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Detect">تشخیص خودکار</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="Diagnostics">اجرای عیب‌یابی</sys:String><sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ScanExisting">اسکن و واردکردن محتوای فعلی</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NameLabel">نام</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AuthorLabel">سازنده</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="VersionLabel">نسخه</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="CategoryLabel">دسته‌بندی</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SizeLabel">حجم</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="StatusLabel">وضعیت</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="EnableAction">فعال‌سازی</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DisableAction">غیرفعال‌سازی</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UpdateAction">به‌روزرسانی</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RepairAction">تعمیر</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReinstallAction">نصب مجدد</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UninstallAction">حذف مود</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="VerifyAction">بررسی سلامت</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="PauseAction">مکث</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ResumeAction">ادامه</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RetryAction">تلاش مجدد</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="DeleteAction">حذف</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RestoreAction">بازیابی</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="AddAction">افزودن</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="UrlLabel">نشانی HTTP / HTTPS</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="FileNameLabel">نام فایل</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ShaLabel">SHA-256 (اختیاری)</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="StateLabel">وضعیت</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ReceivedLabel">دریافت‌شده</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="TotalLabel">کل</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RetriesLabel">تلاش‌ها</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ErrorLabel">خطا</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="CheckProviders">بررسی منابع</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ApplicationLabel">برنامه</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="LanguageLabel">زبان / Language</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ConcurrentDownloadsLabel">دانلودهای هم‌زمان (۱ تا ۸)</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ExistingInstallation">نصب فعلی بازی</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="ProviderArchitecture">معماری مستقل از ارائه‌دهنده برای به‌روزرسانی</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="SkinCarTarget">پوشهٔ ماشین مقصد (مثال: ks_ferrari_458)</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="PreserveUninstallAction">حفظ فایل‌های تغییریافته و حذف مود</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="RestoreUninstallAction">حذف تغییرات، بازیابی و حذف مود</sys:String>
-  <sys:String xmlns:sys="clr-namespace:System;assembly=System.Runtime" x:Key="NavCatalog">فروشگاه مود</sys:String>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=System.Runtime" xml:lang="fa-IR">
+  <!-- Shell -->
+  <sys:String x:Key="AppName">AC Mod Hub</sys:String>
+  <sys:String x:Key="SecDiscover">کشف</sys:String>
+  <sys:String x:Key="SecLibrary">کتابخانه</sys:String>
+  <sys:String x:Key="SecSystem">سیستم</sys:String>
+  <sys:String x:Key="NavHome">خانه</sys:String>
+  <sys:String x:Key="NavStore">فروشگاه مود</sys:String>
+  <sys:String x:Key="NavAllMods">همهٔ مودها</sys:String>
+  <sys:String x:Key="NavCars">ماشین‌ها</sys:String>
+  <sys:String x:Key="NavTracks">پیست‌ها</sys:String>
+  <sys:String x:Key="NavSkins">اسکین‌ها</sys:String>
+  <sys:String x:Key="NavApps">اپ‌ها</sys:String>
+  <sys:String x:Key="NavDownloads">دانلودها</sys:String>
+  <sys:String x:Key="NavUpdates">به‌روزرسانی‌ها</sys:String>
+  <sys:String x:Key="NavBackups">پشتیبان‌ها</sys:String>
+  <sys:String x:Key="NavSettings">تنظیمات</sys:String>
+  <sys:String x:Key="ImportMod">واردکردن مود</sys:String>
+  <sys:String x:Key="ToggleLanguage">EN</sys:String>
+  <sys:String x:Key="WinMinimize">کوچک‌کردن</sys:String>
+  <sys:String x:Key="WinMaximize">بزرگ‌کردن</sys:String>
+  <sys:String x:Key="WinRestore">بازیابی اندازه</sys:String>
+  <sys:String x:Key="WinClose">بستن</sys:String>
+  <sys:String x:Key="UpdateBannerTitle">نسخهٔ جدیدی از AC Mod Hub در دسترس است</sys:String>
+  <sys:String x:Key="OpenUpdates">مشاهدهٔ به‌روزرسانی</sys:String>
+  <sys:String x:Key="LaterAction">بعداً</sys:String>
+  <sys:String x:Key="ViewReleaseAction">مشاهدهٔ تغییرات</sys:String>
+  <sys:String x:Key="DownloadInstallAction">دانلود و نصب</sys:String>
+  <sys:String x:Key="NotifInstalled">مود نصب و تأیید شد.</sys:String>
+  <sys:String x:Key="NotifUpdateApplied">AC Mod Hub به‌روزرسانی شد.</sys:String>
+  <!-- Common -->
+  <sys:String x:Key="Refresh">تازه‌سازی</sys:String>
+  <sys:String x:Key="Browse">انتخاب مسیر</sys:String>
+  <sys:String x:Key="Cancel">انصراف</sys:String>
+  <sys:String x:Key="Save">ذخیره</sys:String>
+  <sys:String x:Key="Close">بستن</sys:String>
+  <sys:String x:Key="Retry">تلاش مجدد</sys:String>
+  <sys:String x:Key="BackAction">بازگشت</sys:String>
+  <sys:String x:Key="CommonLoading">در حال بارگذاری…</sys:String>
+  <sys:String x:Key="CommonError">خطا</sys:String>
+  <sys:String x:Key="CommonEmpty">موردی وجود ندارد</sys:String>
+  <sys:String x:Key="OperationCancelled">عملیات لغو شد و هیچ تغییری اعمال نشد.</sys:String>
+  <sys:String x:Key="ConfirmDestructive">این عملیات برگشت‌ناپذیر است. ادامه می‌دهید؟</sys:String>
+  <!-- Dashboard -->
+  <sys:String x:Key="DashboardTitle">مرکز فرمان</sys:String>
+  <sys:String x:Key="DashboardSubtitle">وضعیت بازی، نصب امن و مدیریت مود</sys:String>
+  <sys:String x:Key="GameStatusLabel">وضعیت بازی</sys:String>
+  <sys:String x:Key="GamePathLabel">مسیر بازی</sys:String>
+  <sys:String x:Key="GameReady">آماده</sys:String>
+  <sys:String x:Key="GameNotDetected">تشخیص داده نشد</sys:String>
+  <sys:String x:Key="GameInvalid">مسیر نامعتبر</sys:String>
+  <sys:String x:Key="BrowseGame">انتخاب مسیر بازی</sys:String>
+  <sys:String x:Key="LaunchGame">اجرای بازی</sys:String>
+  <sys:String x:Key="InstalledMods">مودهای نصب‌شده</sys:String>
+  <sys:String x:Key="CarsCount">ماشین</sys:String>
+  <sys:String x:Key="TracksCount">پیست</sys:String>
+  <sys:String x:Key="UpdatesCount">آپدیت</sys:String>
+  <sys:String x:Key="SecurePipelineTitle">خط لولهٔ نصب امن</sys:String>
+  <sys:String x:Key="SecurePipelineDesc">هر بستهٔ آرشیو نامطمئن فرض می‌شود؛ پیش از هر تغییری تحلیل، پیش‌نمایش، بررسی تداخل، پشتیبان و ژورنال تراکنش ثبت می‌شود.</sys:String>
+  <sys:String x:Key="StageAnalyze">تحلیل آرشیو</sys:String>
+  <sys:String x:Key="StagePreview">پیش‌نمایش</sys:String>
+  <sys:String x:Key="StageConflictCheck">بررسی تداخل</sys:String>
+  <sys:String x:Key="StageBackup">پشتیبان‌گیری</sys:String>
+  <sys:String x:Key="StageInstall">نصب</sys:String>
+  <sys:String x:Key="StageVerify">تأیید صحت</sys:String>
+  <sys:String x:Key="StageDone">پایان</sys:String>
+  <sys:String x:Key="StageRollingBack">بازگردانی</sys:String>
+  <sys:String x:Key="StageFailed">ناموفق</sys:String>
+  <sys:String x:Key="DragDropHint">بستهٔ مود را اینجا رها کنید</sys:String>
+  <sys:String x:Key="DragDropHint2">ZIP · 7Z · RAR — بدون اجرای هیچ فایلی از داخل آرشیو</sys:String>
+  <sys:String x:Key="DashNotConfigured">ابتدا مسیر Assetto Corsa را در تنظیمات مشخص کنید.</sys:String>
+  <sys:String x:Key="DashError">خطایی رخ داد؛ برای جزئیات لاگ برنامه را ببینید.</sys:String>
+  <!-- Store -->
+  <sys:String x:Key="StoreTitle">فروشگاه مود</sys:String>
+  <sys:String x:Key="StoreSearchPlaceholder">جستجو بر اساس نام یا سازنده…</sys:String>
+  <sys:String x:Key="StoreRefresh">تازه‌سازی</sys:String>
+  <sys:String x:Key="StoreRetry">تلاش مجدد</sys:String>
+  <sys:String x:Key="StoreAllCategories">همهٔ دسته‌ها</sys:String>
+  <sys:String x:Key="StoreSortDefault">مرتب‌سازی: پیش‌فرض</sys:String>
+  <sys:String x:Key="StoreSortName">نام</sys:String>
+  <sys:String x:Key="StoreSortNewest">جدیدترین</sys:String>
+  <sys:String x:Key="StoreSortVersion">نسخه</sys:String>
+  <sys:String x:Key="StoreLoading">در حال دریافت کاتالوگ عمومی…</sys:String>
+  <sys:String x:Key="StoreEmptyTitle">کاتالوگ هنوز خالی است</sys:String>
+  <sys:String x:Key="StoreEmptyHint">به‌زودی مودها از مخزن عمومی aliam664/Data در اینجا نمایش داده می‌شوند. افزودن مود به کاتالوگ نیاز به تغییر برنامه ندارد.</sys:String>
+  <sys:String x:Key="StoreOfflineTitle">آفلاین</sys:String>
+  <sys:String x:Key="StoreOfflineHint">اتصال برقرار نیست؛ آخرین کپی معتبر کش‌شده نمایش داده می‌شود.</sys:String>
+  <sys:String x:Key="StoreErrorTitle">دریافت کاتالوگ ممکن نشد</sys:String>
+  <sys:String x:Key="StoreErrorHint">اتصال یا پاسخ سرور را بررسی کنید.</sys:String>
+  <sys:String x:Key="StoreInstall">نصب</sys:String>
+  <sys:String x:Key="StoreInstalledTag">نصب‌شده</sys:String>
+  <sys:String x:Key="StoreInstallBlocked">نصب مسدود است</sys:String>
+  <sys:String x:Key="StoreDeprecatedWarning">این مود منسوخ شده و ممکن است ناپایدار باشد.</sys:String>
+  <sys:String x:Key="StoreRevokedTitle">این مود توسط ناشر سلب اعتبار شده است</sys:String>
+  <sys:String x:Key="StoreRevokedHint">دانلود و نصب آن مسدود است. دلیل: </sys:String>
+  <sys:String x:Key="StoreNeedsLauncher">نیازمند نسخهٔ جدیدتر AC Mod Hub است.</sys:String>
+  <sys:String x:Key="StoreAuthor">سازنده</sys:String>
+  <sys:String x:Key="StoreVersion">نسخه</sys:String>
+  <sys:String x:Key="StoreSize">حجم</sys:String>
+  <sys:String x:Key="StoreCategory">دسته</sys:String>
+  <sys:String x:Key="StoreStatus">وضعیت</sys:String>
+  <sys:String x:Key="StorePublished">انتشار</sys:String>
+  <sys:String x:Key="StoreDownloading">در حال دانلود {0}…</sys:String>
+  <sys:String x:Key="StoreVerifying">در حال بررسی SHA-256…</sys:String>
+  <sys:String x:Key="StoreDownloadComplete">دانلود و تأیید صحت انجام شد.</sys:String>
+  <sys:String x:Key="StoreCancelDownload">لغو دانلود</sys:String>
+  <sys:String x:Key="StoreWebViewMissingTitle">WebView2 Runtime نصب نیست</sys:String>
+  <sys:String x:Key="StoreWebViewMissingHint">برای تجربهٔ کامل فروشگاه، Runtime رسمی Microsoft را نصب کنید. تا آن زمان نسخهٔ سادهٔ فروشگاه نمایش داده می‌شود.</sys:String>
+  <sys:String x:Key="StoreInstallRuntime">نصب WebView2 Runtime (سایت رسمی Microsoft)</sys:String>
+  <sys:String x:Key="StoreNativeNote">نسخهٔ سادهٔ فروشگاه (بدون WebView2)</sys:String>
+  <sys:String x:Key="StoreFeatured">منتخب</sys:String>
+  <sys:String x:Key="StoreSourceLabel">منبع داده</sys:String>
+  <sys:String x:Key="StoreSourceCached">کش محلی</sys:String>
+  <sys:String x:Key="StoreSourceEmbedded">داخلی (خالی)</sys:String>
+  <sys:String x:Key="StoreSourcePrimary">کاتالوگ عمومی</sys:String>
+  <sys:String x:Key="StoreSourceFallback">کاتالوگ جایگزین</sys:String>
+  <sys:String x:Key="StoreSourceOverride">منبع سفارشی</sys:String>
+  <!-- Library -->
+  <sys:String x:Key="LibraryTitle">کتابخانهٔ مود</sys:String>
+  <sys:String x:Key="LibrarySearchPlaceholder">جستجو در مودهای نصب‌شده…</sys:String>
+  <sys:String x:Key="AllStatuses">همهٔ وضعیت‌ها</sys:String>
+  <sys:String x:Key="StatusInstalled">نصب‌شده</sys:String>
+  <sys:String x:Key="StatusEnabled">فعال</sys:String>
+  <sys:String x:Key="StatusDisabled">غیرفعال</sys:String>
+  <sys:String x:Key="StatusDamaged">آسیب‌دیده</sys:String>
+  <sys:String x:Key="StatusFailed">ناموفق</sys:String>
+  <sys:String x:Key="StatusInstalling">در حال نصب</sys:String>
+  <sys:String x:Key="StatusUnmanaged">خارج از مدیریت</sys:String>
+  <sys:String x:Key="CategoryCar">ماشین</sys:String>
+  <sys:String x:Key="CategoryTrack">پیست</sys:String>
+  <sys:String x:Key="CategorySkin">اسکین</sys:String>
+  <sys:String x:Key="CategoryApp">اپ</sys:String>
+  <sys:String x:Key="CategoryWeather">آب‌وهوا</sys:String>
+  <sys:String x:Key="CategoryCsp">CSP</sys:String>
+  <sys:String x:Key="CategoryGraphics">گرافیک</sys:String>
+  <sys:String x:Key="CategorySound">صدا</sys:String>
+  <sys:String x:Key="CategoryMixed">ترکیبی</sys:String>
+  <sys:String x:Key="CategoryMiscellaneous">متفرقه</sys:String>
+  <sys:String x:Key="SortByName">نام</sys:String>
+  <sys:String x:Key="SortByAuthor">سازنده</sys:String>
+  <sys:String x:Key="SortByVersion">نسخه</sys:String>
+  <sys:String x:Key="SortBySize">حجم</sys:String>
+  <sys:String x:Key="SortByDate">تاریخ نصب</sys:String>
+  <sys:String x:Key="LibraryEmptyTitle">هنوز مودی نصب نشده است</sys:String>
+  <sys:String x:Key="LibraryEmptyHint">از فروشگاه مود نصب کنید یا بستهٔ ZIP/7Z/RAR را روی پنجره رها کنید.</sys:String>
+  <sys:String x:Key="LibraryBusy">در حال انجام عملیات…</sys:String>
+  <sys:String x:Key="LibraryDetails">جزئیات مود</sys:String>
+  <sys:String x:Key="LibraryNoSelection">یک مود را انتخاب کنید</sys:String>
+  <sys:String x:Key="AuthorLabel">سازنده</sys:String>
+  <sys:String x:Key="VersionLabel">نسخه</sys:String>
+  <sys:String x:Key="CategoryLabel">دسته‌بندی</sys:String>
+  <sys:String x:Key="SizeLabel">حجم</sys:String>
+  <sys:String x:Key="StatusLabel">وضعیت</sys:String>
+  <sys:String x:Key="InstalledDateLabel">تاریخ نصب</sys:String>
+  <sys:String x:Key="SourceLabel">منبع</sys:String>
+  <sys:String x:Key="FilesLabel">فایل‌ها</sys:String>
+  <sys:String x:Key="MetadataLabel">فراداده</sys:String>
+  <sys:String x:Key="VerifyAction">بررسی سلامت</sys:String>
+  <sys:String x:Key="EnableAction">فعال‌سازی</sys:String>
+  <sys:String x:Key="DisableAction">غیرفعال‌سازی</sys:String>
+  <sys:String x:Key="RepairAction">تعمیر</sys:String>
+  <sys:String x:Key="ReinstallAction">نصب مجدد</sys:String>
+  <sys:String x:Key="UpdateAction">به‌روزرسانی</sys:String>
+  <sys:String x:Key="UninstallAction">حذف مود</sys:String>
+  <sys:String x:Key="LibraryHealthy">سالم — همهٔ فایل‌ها با هش ثبت‌شده مطابقت دارند.</sys:String>
+  <sys:String x:Key="LibraryDamaged">مشکل پیدا شد: {0} فایل ناسازگار.</sys:String>
+  <sys:String x:Key="UninstallTitle">حذف مود</sys:String>
+  <sys:String x:Key="UninstallModifiedHint">فایل‌های زیر پس از نصب تغییر کرده‌اند:</sys:String>
+  <sys:String x:Key="UninstallBlockedTitle">حذف مسدود است</sys:String>
+  <sys:String x:Key="UninstallBlockedHint">این فایل‌ها متعلق به مود جدیدتری هستند: </sys:String>
+  <sys:String x:Key="PreserveAndUninstall">حفظ فایل‌های تغییریافته و حذف مود</sys:String>
+  <sys:String x:Key="RestoreAndUninstall">حذف تغییرات، بازگردانی و حذف مود</sys:String>
+  <sys:String x:Key="AbortUninstall">انصراف از حذف</sys:String>
+  <sys:String x:Key="UninstallDone">مود به‌صورت امن حذف شد و فایل‌های پیشین بازیابی شدند.</sys:String>
+  <sys:String x:Key="ModifiedPreservedDone">مالکیت مود حذف شد و فایل‌های تغییریافته حفظ شدند.</sys:String>
+  <sys:String x:Key="ModifiedRestoredDone">مود حذف شد؛ تغییرات کنار گذاشته و وضعیت پیش از نصب بازیابی شد.</sys:String>
+  <!-- Downloads -->
+  <sys:String x:Key="DownloadsTitle">مدیریت دانلود</sys:String>
+  <sys:String x:Key="DownloadsEmptyTitle">صف دانلود خالی است</sys:String>
+  <sys:String x:Key="DownloadsEmptyHint">یک نشانی مستقیم HTTP/HTTPS وارد کنید یا مود را از فروشگاه نصب کنید.</sys:String>
+  <sys:String x:Key="UrlLabel">نشانی HTTP / HTTPS</sys:String>
+  <sys:String x:Key="FileNameLabel">نام فایل</sys:String>
+  <sys:String x:Key="ShaLabel">SHA-256 (اختیاری)</sys:String>
+  <sys:String x:Key="AddAction">افزودن به صف</sys:String>
+  <sys:String x:Key="StateQueued">در صف</sys:String>
+  <sys:String x:Key="StateDownloading">در حال دانلود</sys:String>
+  <sys:String x:Key="StatePaused">مکث</sys:String>
+  <sys:String x:Key="StateVerifying">بررسی SHA-256</sys:String>
+  <sys:String x:Key="StateCompleted">کامل</sys:String>
+  <sys:String x:Key="StateFailed">ناموفق</sys:String>
+  <sys:String x:Key="StateCancelled">لغو شد</sys:String>
+  <sys:String x:Key="PauseAction">مکث</sys:String>
+  <sys:String x:Key="ResumeAction">ادامه</sys:String>
+  <sys:String x:Key="RetryAction">تلاش مجدد</sys:String>
+  <sys:String x:Key="InstallPackage">نصب بستهٔ کامل‌شده</sys:String>
+  <sys:String x:Key="SpeedLabel">سرعت</sys:String>
+  <sys:String x:Key="EtaLabel">زمان باقی‌مانده</sys:String>
+  <sys:String x:Key="ReceivedLabel">دریافت‌شده</sys:String>
+  <sys:String x:Key="TotalLabel">کل</sys:String>
+  <sys:String x:Key="RetriesLabel">تلاش‌ها</sys:String>
+  <sys:String x:Key="ErrorLabel">خطا</sys:String>
+  <sys:String x:Key="NameLabel">نام</sys:String>
+  <sys:String x:Key="ClearCompleted">پاک‌کردن کامل‌شده‌ها</sys:String>
+  <!-- Installer -->
+  <sys:String x:Key="InstallerTitle">نصب امن مود</sys:String>
+  <sys:String x:Key="InstallerHint">آرشیو کاملاً نامطمئن فرض می‌شود و پیش از هر تغییری بررسی می‌شود.</sys:String>
+  <sys:String x:Key="InstallerEmptyTitle">بسته‌ای برای نصب انتخاب نشده است</sys:String>
+  <sys:String x:Key="InstallerEmptyHint">فایل ZIP/7Z/RAR را انتخاب یا روی پنجره رها کنید.</sys:String>
+  <sys:String x:Key="ConflictCount">تداخل</sys:String>
+  <sys:String x:Key="WarningsLabel">هشدارها</sys:String>
+  <sys:String x:Key="AllowOverwrite">با پشتیبان‌گیری، تداخل‌های قابل‌حل بازنویسی شوند</sys:String>
+  <sys:String x:Key="SkinCarTarget">پوشهٔ ماشین مقصد (مثال: ks_ferrari_458)</sys:String>
+  <sys:String x:Key="ApplySkinTarget">اعمال ماشین مقصد</sys:String>
+  <sys:String x:Key="InstallVerify">نصب و بررسی</sys:String>
+  <sys:String x:Key="InstallerCompleted">نصب با موفقیت کامل شد و صحت فایل‌ها تأیید شد.</sys:String>
+  <sys:String x:Key="InstallerCancelled">نصب لغو شد؛ همهٔ تغییرات بازگردانی شد.</sys:String>
+  <sys:String x:Key="PreviewFiles">فایل‌ها</sys:String>
+  <sys:String x:Key="PreviewConflicts">تداخل‌ها</sys:String>
+  <!-- Backups -->
+  <sys:String x:Key="BackupsTitle">مدیریت پشتیبان‌ها</sys:String>
+  <sys:String x:Key="BackupsEmptyTitle">پشتیبانی ثبت نشده است</sys:String>
+  <sys:String x:Key="BackupsEmptyHint">هنگام نصب یا به‌روزرسانی مود، به‌صورت خودکار پشتیبان گرفته می‌شود.</sys:String>
+  <sys:String x:Key="CreatedLabel">تاریخ ایجاد</sys:String>
+  <sys:String x:Key="ModIdLabel">شناسهٔ مود</sys:String>
+  <sys:String x:Key="StorageLabel">محل نگهداری</sys:String>
+  <sys:String x:Key="RestoreAction">بازیابی</sys:String>
+  <sys:String x:Key="DeleteAction">حذف</sys:String>
+  <sys:String x:Key="BackupRestored">پشتیبان بازیابی شد.</sys:String>
+  <sys:String x:Key="BackupDeleted">پشتیبان حذف شد.</sys:String>
+  <!-- Updates -->
+  <sys:String x:Key="UpdatesTitle">به‌روزرسانی برنامه</sys:String>
+  <sys:String x:Key="CurrentVersionLabel">نسخهٔ فعلی</sys:String>
+  <sys:String x:Key="LatestVersionLabel">آخرین نسخه</sys:String>
+  <sys:String x:Key="ChannelLabel">کانال به‌روزرسانی</sys:String>
+  <sys:String x:Key="ChannelStable">پایدار (بدون پیش‌انتشار)</sys:String>
+  <sys:String x:Key="ChannelBeta">آزمایشی (شامل پیش‌انتشار)</sys:String>
+  <sys:String x:Key="CheckNow">بررسی به‌روزرسانی</sys:String>
+  <sys:String x:Key="Checking">در حال بررسی…</sys:String>
+  <sys:String x:Key="UpToDateTitle">برنامه به‌روز است</sys:String>
+  <sys:String x:Key="UpToDateHint">نسخهٔ جدیدتری در کانال انتخاب‌شده وجود ندارد.</sys:String>
+  <sys:String x:Key="UpdateAvailableTitle">نسخهٔ {0} در دسترس است</sys:String>
+  <sys:String x:Key="ReleaseNotesLabel">یادداشت‌های انتشار</sys:String>
+  <sys:String x:Key="PublishedLabel">تاریخ انتشار</sys:String>
+  <sys:String x:Key="DownloadSizeLabel">حجم دانلود</sys:String>
+  <sys:String x:Key="UpdateDownloading">در حال دانلود به‌روزرسانی…</sys:String>
+  <sys:String x:Key="UpdateVerifying">در حال بررسی صحت بسته…</sys:String>
+  <sys:String x:Key="UpdateReady">بسته دانلود و تأیید شد</sys:String>
+  <sys:String x:Key="UpdateReadyHint">با انتخاب «نصب و راه‌اندازی مجدد»، برنامه بسته می‌شود و نصب‌کنندهٔ رسمی اجرا می‌شود.</sys:String>
+  <sys:String x:Key="UpdateApplying">در حال اعمال به‌روزرسانی…</sys:String>
+  <sys:String x:Key="ApplyRestart">نصب و راه‌اندازی مجدد</sys:String>
+  <sys:String x:Key="UpdateCancelled">به‌روزرسانی لغو شد؛ فایل ناقص حذف شد.</sys:String>
+  <sys:String x:Key="UpdateFailed">به‌روزرسانی ناموفق بود.</sys:String>
+  <sys:String x:Key="UpdatePrivacyHint">هیچ به‌روزرسانی‌ای بدون تأیید شما دانلود یا نصب نمی‌شود.</sys:String>
+  <sys:String x:Key="NoReleaseNotes">یادداشت انتشار برای این نسخه منتشر نشده است.</sys:String>
+  <sys:String x:Key="UpdateCheckFailed">بررسی به‌روزرسانی ممکن نشد. اتصال را بررسی کنید.</sys:String>
+  <!-- Settings -->
+  <sys:String x:Key="SettingsTitle">تنظیمات و عیب‌یابی</sys:String>
+  <sys:String x:Key="SecGame">بازی</sys:String>
+  <sys:String x:Key="SecLanguage">زبان</sys:String>
+  <sys:String x:Key="SecDownloads">دانلودها</sys:String>
+  <sys:String x:Key="SecUpdates">به‌روزرسانی</sys:String>
+  <sys:String x:Key="SecAppearance">ظاهر</sys:String>
+  <sys:String x:Key="SecAdvanced">پیشرفته</sys:String>
+  <sys:String x:Key="SecDiagnostics">عیب‌یابی</sys:String>
+  <sys:String x:Key="SecContent">محتوای موجود</sys:String>
+  <sys:String x:Key="AutoDetect">تشخیص خودکار</sys:String>
+  <sys:String x:Key="LaunchThroughSteam">اجرا از طریق Steam (App ID 244210)</sys:String>
+  <sys:String x:Key="SteamDetectedList">نصب‌های شناسایی‌شده</sys:String>
+  <sys:String x:Key="LanguageLabel">زبان / Language</sys:String>
+  <sys:String x:Key="LanguageFa">فارسی</sys:String>
+  <sys:String x:Key="LanguageEn">English</sys:String>
+  <sys:String x:Key="ConcurrentDownloadsLabel">دانلودهای هم‌زمان (۱ تا ۸)</sys:String>
+  <sys:String x:Key="UpdateChannelLabel">کانال به‌روزرسانی</sys:String>
+  <sys:String x:Key="CheckOnStartup">بررسی به‌روزرسانی هنگام شروع</sys:String>
+  <sys:String x:Key="CheckOnStartupHint">بررسی در پس‌زمینه و پس از نمایش پنجره انجام می‌شود؛ هرگز شروع برنامه را کند نمی‌کند.</sys:String>
+  <sys:String x:Key="ReducedMotion">کاهش حرکت</sys:String>
+  <sys:String x:Key="ReducedMotionHint">حذف همهٔ جلوه‌های حرکتی برای دسترس‌پذیری</sys:String>
+  <sys:String x:Key="CatalogEndpointLabel">نشانی کاتالوگ (سفارشی، فقط HTTPS)</sys:String>
+  <sys:String x:Key="CatalogEndpointHint">خالی بگذارید تا از Endpointهای رسمی استفاده شود.</sys:String>
+  <sys:String x:Key="CatalogEndpointInvalid">نشانی کاتالوگ باید HTTPS مطلق باشد.</sys:String>
+  <sys:String x:Key="EndpointsReadOnly">Endpointهای رسمی (فقط‌خواندنی)</sys:String>
+  <sys:String x:Key="DefaultEndpoints">کاتالوگ: aliam664.github.io/Data — جایگزین: raw.githubusercontent.com/aliam664/Data/generated — به‌روزرسانی: github.com/aliam664/1</sys:String>
+  <sys:String x:Key="SettingsSaved">تنظیمات ذخیره شد.</sys:String>
+  <sys:String x:Key="SettingsBusy">در حال انجام…</sys:String>
+  <sys:String x:Key="SettingsError">ذخیره یا اعمال تنظیمات ممکن نشد.</sys:String>
+  <sys:String x:Key="RunDiagnostics">اجرای عیب‌یابی</sys:String>
+  <sys:String x:Key="ScanExisting">اسکن و واردکردن محتوای فعلی</sys:String>
+  <sys:String x:Key="ScanExistingHint">ماشین‌ها، پیست‌ها، اسکین‌ها، اپ‌ها، آب‌وهوا و CSP موجود را با محاسبهٔ SHA-256 وارد کتابخانه می‌کند.</sys:String>
+  <sys:String x:Key="ScanDone">واردکردن انجام شد.</sys:String>
+  <sys:String x:Key="ScanProgress">در حال اسکن… {0:P0}</sys:String>
+  <sys:String x:Key="DiagSteam">Steam</sys:String>
+  <sys:String x:Key="DiagGamePath">مسیر بازی</sys:String>
+  <sys:String x:Key="DiagContent">پوشهٔ content</sys:String>
+  <sys:String x:Key="DiagWrite">دسترسی نوشتن</sys:String>
+  <sys:String x:Key="DiagDisk">فضای دیسک</sys:String>
+  <sys:String x:Key="DiagStatusPassed">سالم</sys:String>
+  <sys:String x:Key="DiagStatusWarning">هشدار</sys:String>
+  <sys:String x:Key="DiagStatusFailed">خطا</sys:String>
+  <!-- Localized error mapping -->
+  <sys:String x:Key="ErrNotWritable">{0} ممکن نشد: پوشهٔ بازی قابل نوشتن نیست. مجوزها را بررسی کنید؛ برنامه هرگز بی‌صدا سطح دسترسی را بالا نمی‌برد.</sys:String>
+  <sys:String x:Key="ErrFileNotFound">{0} ممکن نشد: فایل موردنیاز پیدا نشد ({1}).</sys:String>
+  <sys:String x:Key="ErrDirectoryMissing">{0} ممکن نشد: پوشهٔ بازی یا پوشهٔ کاری دیگر وجود ندارد.</sys:String>
+  <sys:String x:Key="ErrUnsafeArchive">بستهٔ مود توسط بررسی امنیتی آرشیو مسدود شد: {1}</sys:String>
+  <sys:String x:Key="ErrCorruptPackage">بستهٔ دانلودشده ناقص، خراب یا با فرمت پشتیبانی‌نشده است.</sys:String>
+  <sys:String x:Key="ErrHttp">سرور دانلود در دسترس نیست یا پاسخ نامعتبری داده است. نشانی و اتصال را بررسی کنید.</sys:String>
+  <sys:String x:Key="ErrCancelled">{0} با خیال راحت لغو شد.</sys:String>
+  <sys:String x:Key="ErrLocked">{0} ممکن نشد: یک فایل بازی قفل است. Assetto Corsa و ابزارهای مرتبط را ببندید و دوباره تلاش کنید.</sys:String>
+  <sys:String x:Key="ErrIo">{0} هنگام عملیات فایل ممکن نشد. فضای دیسک، مسیر و مجوزها را بررسی کنید.</sys:String>
+  <sys:String x:Key="ErrUnknown">{0} به‌شکل غیرمنتظره‌ای ناموفق بود. جزئیات در لاگ برنامه ثبت شد.</sys:String>
+  <sys:String x:Key="ErrInvalidFileName">نام فایل امن نیست؛ نام‌های رزروشدهٔ ویندوز و کاراکترهای نامجاز پذیرفته نمی‌شوند.</sys:String>
 </ResourceDictionary>

@@ -15,5 +15,7 @@
     <ProjectReference Include="..\ACModHub.Infrastructure\ACModHub.Infrastructure.csproj" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+    <!-- Official WebView2 SDK; the Evergreen runtime itself is never bundled (checked at runtime). -->
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2592.51" />
   </ItemGroup>
 </Project>

@@ -16,21 +16,17 @@
 - نصب قانونی Assetto Corsa از Steam
 - حداقل ۵ گیگابایت فضای خالی برای Cache و Backupها
 - دسترسی نوشتن عادی به Steam Library بازی
+- **اختیاری:** Microsoft WebView2 Runtime برای تجربهٔ کامل فروشگاه
+  (اگر نصب نباشد، برنامه با فروشگاه سادهٔ داخلی کار می‌کند و پیوند نصب رسمی را نشان می‌دهد)
 
 برنامه نباید به‌صورت دائمی با Administrator اجرا شود و هیچ‌وقت به‌شکل مخفی دسترسی Administrator درخواست نمی‌کند.
 
 ## ۲. نصب با فایل Setup
 
-فایل Preview آماده از مسیر زیر قابل دریافت است:
+Releaseها فقط از صفحهٔ GitHub Releases پروژه منتشر می‌شوند (هیچ باینری داخل Repository نیست):
 
 ```text
-releases/v1.0.1-preview.1/AC-Mod-Hub-Setup.exe
-```
-
-یا Release صفحهٔ GitHub را باز کنید:
-
-```text
-https://github.com/aliam664/1/releases/tag/v1.0.1-preview.1
+https://github.com/aliam664/1/releases
 ```
 
 نام فایل:
@@ -38,6 +34,14 @@ https://github.com/aliam664/1/releases/tag/v1.0.1-preview.1
 ```text
 AC-Mod-Hub-Setup.exe
 ```
+
+همراه آن `SHA256SUMS.txt` منتشر می‌شود؛ قبل از اجرا:
+
+```powershell
+Get-FileHash .\AC-Mod-Hub-Setup.exe -Algorithm SHA256
+```
+
+و مقدار را با `SHA256SUMS.txt` مقایسه کنید.
 
 مراحل:
 
@@ -54,9 +58,16 @@ AC-Mod-Hub-Setup.exe
 
 Installer از نوع Per-user است و به‌طور معمول UAC یا دسترسی Administrator نیاز ندارد.
 
+### به‌روزرسانی خودکار برنامه
+
+- هنگام شروع، برنامه در پس‌زمینه (بدون کند کردن پنجره) نسخهٔ جدید را بررسی می‌کند.
+- کانال پیش‌فرض **Stable** است؛ نسخه‌های Pre-release دریافت نمی‌شوند مگر اینکه در تنظیمات کانال **Beta** را انتخاب کنید.
+- هیچ به‌روزرسانی‌ای بدون تأیید شما دانلود یا نصب نمی‌شود؛ گزینه‌های «بعداً»، «مشاهدهٔ تغییرات» و «دانلود و نصب» وجود دارد.
+- بستهٔ دانلودشده با SHA-256 منتشرشده صحت‌سنجی می‌شود و نصب توسط همان Installer رسمی (بدون Admin) انجام می‌شود. Downgrade هرگز انجام نمی‌شود.
+
 ### هشدار SmartScreen
 
-تا زمانی که فایل اجرایی با Certificate رسمی Code Signing امضا نشده باشد، Windows SmartScreen ممکن است هشدار نمایش دهد. فقط فایلی را اجرا کنید که از Repository/Release رسمی همین پروژه دریافت کرده‌اید. Hash فایل Release را نیز در صورت انتشار بررسی کنید.
+تا زمانی که فایل اجرایی با Certificate رسمی Code Signing امضا نشده باشد، Windows SmartScreen ممکن است هشدار نمایش دهد. فقط فایلی را اجرا کنید که از Release رسمی همین پروژه دریافت کرده‌اید و Hash آن را بررسی کنید.
 
 ## ۳. اجرای نسخهٔ Portable
 
@@ -290,27 +301,18 @@ artifacts\installer\AC-Mod-Hub-Setup.exe
 
 ## ۱۳. ساخت خودکار با GitHub Actions
 
-تعریف Workflow ویندوز در قالب زیر حفظ شده است:
+دو Workflow واقعی در `.github/workflows/` نگهداری می‌شوند:
 
-```text
-installer/windows-release.yml.template
-```
+- **`ci.yml`** — روی هر Pull Request و Push به `main`:
+  بازبینی استاتیک (`scripts/validate.py`) + `dotnet restore/build/test` روی Windows.
+- **`release.yml`** — با Push تگ `v*` یا به‌صورت دستی:
+  Build و تست کامل، Publish خودکفای win-x64، ساخت Installer با Inno Setup، تولید
+  `SHA256SUMS.txt` و انتشار GitHub Release با `AC-Mod-Hub-Setup.exe`، جمع‌چک،
+  BUILD-INFO و بستهٔ Portable.
 
-برای فعال‌کردن GitHub Actions، این فایل را با یک Token/اتصال دارای مجوز Workflows به مسیر `.github/workflows/windows-release.yml` کپی و commit کنید.
-
-پس از فعال‌کردن و Push کردن Workflow، در GitHub:
-
-1. وارد تب **Actions** شوید.
-2. Workflow با نام **Windows Build, Test and Installer** را انتخاب کنید.
-3. روی **Run workflow** کلیک کنید.
-4. شاخهٔ `arena/019ff412-1` را انتخاب کنید.
-5. بعد از موفقیت Job، Artifact با نام زیر را دانلود کنید:
-
-```text
-AC-Mod-Hub-1.0.1-win-x64
-```
-
-Artifact شامل Setup و Portable ZIP است.
+نسخهٔ Release از `Directory.Build.props` (تک‌منبع نسخه) به Installer تزریق می‌شود؛
+Releaseهای Pre-release فقط با تگ‌های `preview`/`rc`/`beta` ساخته می‌شوند و کانال Stable
+هرگز آن‌ها را دریافت نمی‌کند.
 
 ## ۱۴. رفع خطاهای رایج
 

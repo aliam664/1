@@ -45,6 +45,13 @@ public sealed partial class JsonModCatalogService : IModCatalogService
         _logger = logger;
     }
 
+    public async Task<CatalogLoadResult?> TryLoadCachedAsync(CancellationToken cancellationToken = default)
+    {
+        var cachePath = Path.Combine(_paths.CacheDirectory, "catalog", "catalog.v1.json");
+        var cached = await TryReadCacheAsync(cachePath, cancellationToken).ConfigureAwait(false);
+        return cached is null ? null : new CatalogLoadResult(cached.Value.Catalog, "cache", IsCached: true, Warning: cached.Value.Warning);
+    }
+
     public async Task<CatalogLoadResult> LoadAsync(bool forceRemoteRefresh = false, CancellationToken cancellationToken = default)
     {
         var cacheDirectory = Path.Combine(_paths.CacheDirectory, "catalog");
@@ -253,7 +260,7 @@ public sealed partial class JsonModCatalogService : IModCatalogService
         var catalog = new ModCatalog
         {
             SchemaVersion = 1,
-            Revision = wire.Revision is > 0 ? wire.Revision : 1,
+            Revision = wire.Revision is { } revision && revision > 0 ? revision : 1,
             GeneratedAt = wire.GeneratedAt,
             Repository = string.IsNullOrWhiteSpace(wire.Repository) ? "aliam664/Data" : wire.Repository,
             MinimumLauncherVersion = catalogMinimum?.ToString(),
